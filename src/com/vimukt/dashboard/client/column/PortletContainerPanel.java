@@ -1,30 +1,52 @@
-package com.vimukt.dashboard.client.column;
+package com.vimukti.dashboard.client.column;
 
 import java.util.List;
 
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.vimukti.dashboard.client.data.DashboardComponent;
+import com.vimukti.dashboard.client.data.DashboardComponentType;
+import com.vimukti.dashboard.client.portlet.ui.controls.Portlet;
+import com.vimukti.dashboard.client.portlet.ui.controls.PortletFactory;
+import com.vimukti.dashboard.client.ui.controls.ChartComponent;
+import com.vimukti.dashboard.client.ui.controls.dnd.IDraggable;
 import com.vimukti.dashboard.client.ui.controls.dnd.IDroppable;
-import com.vimukti.dashboard.portlet.ui.controls.Portlet;
-import com.vimukti.dashboard.portlet.ui.controls.PortletFactory;
 
 public class PortletContainerPanel extends FlowPanel implements IDroppable {
-	private List<DashboardComponent> components;
 
-	public PortletContainerPanel(List<DashboardComponent> components) {
+	private PortletFactory portletFactory = PortletFactory.getPortletFactory();
+
+	public PortletContainerPanel() {
 		this.addStyleName("portlet-container");
-		addPortlets();
 	}
 
-	private void addPortlets() {
-		if (components.isEmpty()) {
+	public void addPortlets(List<DashboardComponent> components) {
+		if (components == null || components.isEmpty()) {
 			return;
 		}
-		PortletFactory portletFactory = PortletFactory.getPortletFactory();
 		for (DashboardComponent component : components) {
-			Portlet Portlet = portletFactory.createPortlet(component);
-			this.add(Portlet);
+			Portlet portlet = portletFactory.createPortlet(component);
+			this.add(portlet);
 		}
+	}
+
+	@Override
+	public boolean canDroppable(IDraggable isDroppableWidget) {
+		Widget asWidget = isDroppableWidget.asWidget();
+		if (asWidget instanceof ChartComponent) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public void onDrop(IDraggable draggabelWidget) {
+		ChartComponent component = (ChartComponent) draggabelWidget.asWidget();
+		DashboardComponentType type = component.getType();
+		DashboardComponent emptyComponent = new DashboardComponent();
+		emptyComponent.setComponentType(type);
+		Portlet portlet = portletFactory.createPortlet(emptyComponent);
+		this.add(portlet);
 	}
 
 }
