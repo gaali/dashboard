@@ -15,7 +15,7 @@ import com.vimukti.dashboard.client.data.DashboardComponentType;
 import com.vimukti.dashboard.client.ui.controls.dnd.IDraggable;
 import com.vimukti.dashboard.client.ui.controls.dnd.IDroppable;
 
-public class Portlet extends FlowPanel implements RequiresResize {
+public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
 	private DashboardComponent component;
 	private DashboardComponentType type;
 

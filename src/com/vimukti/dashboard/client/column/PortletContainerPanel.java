@@ -9,6 +9,8 @@ import com.vimukti.dashboard.client.data.DashboardComponentType;
 import com.vimukti.dashboard.client.portlet.ui.controls.Portlet;
 import com.vimukti.dashboard.client.portlet.ui.controls.PortletFactory;
 import com.vimukti.dashboard.client.ui.controls.ChartComponent;
+import com.vimukti.dashboard.client.ui.controls.DataSourceListType;
+import com.vimukti.dashboard.client.ui.controls.DraggabelLableControl;
 import com.vimukti.dashboard.client.ui.controls.dnd.IDraggable;
 import com.vimukti.dashboard.client.ui.controls.dnd.IDroppable;
 
@@ -36,17 +38,33 @@ public class PortletContainerPanel extends FlowPanel implements IDroppable {
 		if (asWidget instanceof ChartComponent) {
 			return true;
 		}
+		if (asWidget instanceof DraggabelLableControl) {
+			return true;
+		}
 		return false;
 	}
 
 	@Override
 	public void onDrop(IDraggable draggabelWidget) {
-		ChartComponent component = (ChartComponent) draggabelWidget.asWidget();
-		DashboardComponentType type = component.getType();
-		DashboardComponent emptyComponent = new DashboardComponent();
-		emptyComponent.setComponentType(type);
-		Portlet portlet = portletFactory.createPortlet(emptyComponent);
-		this.add(portlet);
+		if (draggabelWidget instanceof ChartComponent) {
+			ChartComponent component = (ChartComponent) draggabelWidget
+					.asWidget();
+			DashboardComponentType type = component.getType();
+			DashboardComponent emptyComponent = new DashboardComponent();
+			emptyComponent.setComponentType(type);
+			Portlet portlet = portletFactory.createPortlet(emptyComponent);
+			this.add(portlet);
+		} else if (draggabelWidget instanceof DraggabelLableControl) {
+			DraggabelLableControl control = (DraggabelLableControl) draggabelWidget
+					.asWidget();
+			DataSourceListType type = control.getType();
+			if (type == DataSourceListType.REPORT) {
+
+			} else if (type == DataSourceListType.PAGE) {
+
+			}
+
+		}
 	}
 
 }

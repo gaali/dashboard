@@ -102,6 +102,7 @@ public class DataSourcePanel extends VerticalPanel {
 			List<ReportList> reports = folder.getReports();
 			for (ReportList report : reports) {
 				DraggabelLableControl item = new DraggabelLableControl(report);
+				item.setType(DataSourceListType.REPORT);
 				TreeItem reportItem = new TreeItem(item);
 				reportFolderItem.addItem(reportItem);
 			}
@@ -112,6 +113,7 @@ public class DataSourcePanel extends VerticalPanel {
 		Tree pagesTree = new Tree();
 		for (PagesList page : pages) {
 			DraggabelLableControl item = new DraggabelLableControl(page);
+			item.setType(DataSourceListType.PAGE);
 			TreeItem pageItem = new TreeItem(item);
 			pagesTree.addItem(pageItem);
 		}
