@@ -17,13 +17,15 @@ public class DashboardServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public ReportsAndPagesList getReportList() {
 		// TODO Auto-generated method stub
-		return null;
+		ReportsAndPagesList b = new ReportsAndPagesList();
+
+		return b;
 	}
 
 	@Override
 	public Dashboard getDashboard() {
-		// TODO Auto-generated method stub
-		return null;
+		Dashboard d = new Dashboard();
+		return d;
 	}
 
 	@Override

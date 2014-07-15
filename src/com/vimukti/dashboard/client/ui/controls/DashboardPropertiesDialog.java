@@ -46,8 +46,7 @@ public class DashboardPropertiesDialog extends BaseDialog {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				sPanel.add(componentSettings);
-
+				sPanel.setWidget(componentSettings);
 			}
 		});
 		this.add(tabs);

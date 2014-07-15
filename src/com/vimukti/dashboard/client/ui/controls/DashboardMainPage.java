@@ -1,8 +1,11 @@
 package com.vimukti.dashboard.client.ui.controls;
 
+import java.util.List;
+
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.vimukt.dashboard.client.column.DashboardColumnsPanel;
+import com.vimukti.dashboard.client.column.DashboardColumnsPanel;
 import com.vimukti.dashboard.client.data.Dashboard;
+import com.vimukti.dashboard.client.data.DashboardFilters;
 
 public class DashboardMainPage extends VerticalPanel {
 
@@ -23,13 +26,21 @@ public class DashboardMainPage extends VerticalPanel {
 	}
 
 	private void createFilterPanel() {
-		filtersPanel = new FiltersPanel(dashboard.getDashboardFilters());
+		List<DashboardFilters> dashboardFilters = null;
+		if (dashboard != null) {
+			dashboardFilters = dashboard.getDashboardFilters();
+		}
+		filtersPanel = new FiltersPanel(dashboardFilters);
 		filtersPanel.addStyleName("filterspanel");
 		this.add(filtersPanel);
 	}
 
 	private void createDescriptionPanel() {
-		descriptionPanel = new DescriptionPanel(dashboard.getDescription());
+		String description = "";
+		if (dashboard.getDescription() != null) {
+			description = dashboard.getDescription();
+		}
+		descriptionPanel = new DescriptionPanel(description);
 		descriptionPanel.addStyleName("descriptionPanel");
 		this.add(descriptionPanel);
 	}

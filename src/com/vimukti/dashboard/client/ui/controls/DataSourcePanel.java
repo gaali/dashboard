@@ -34,6 +34,7 @@ public class DataSourcePanel extends VerticalPanel {
 	private void createControls() {
 		createButtonsBar();
 		createSearchBox();
+
 	}
 
 	private void createButtonsBar() {
@@ -88,29 +89,36 @@ public class DataSourcePanel extends VerticalPanel {
 
 	public void showReportsPages() {
 		FlowPanel dataPanel = new FlowPanel();
-		Tree reportsTree = new Tree();
+
+		if (source == null) {
+			return;
+		}
+
 		List<Folder> folders = source.getFolders();
+		Tree reportsTree = new Tree();
 		for (Folder folder : folders) {
 			TreeItem reportFolderItem = new TreeItem(
 					new Label(folder.getName()));
 			List<ReportList> reports = folder.getReports();
 			for (ReportList report : reports) {
-				// DragAndDropControl item = new DragAndDropLabel(report);
-				// TreeItem reportItem = new TreeItem(item);
-				// reportsTree.addItem(reportItem);
+				DraggabelLableControl item = new DraggabelLableControl(report);
+				TreeItem reportItem = new TreeItem(item);
+				reportFolderItem.addItem(reportItem);
 			}
-
+			reportsTree.addItem(reportFolderItem);
 		}
+
 		List<PagesList> pages = source.getPages();
 		Tree pagesTree = new Tree();
 		for (PagesList page : pages) {
-			// DragAndDropLabel item = new DragAndDropLabel(page);
-			// TreeItem pageItem = new TreeItem(item);
-			// pagesTree.addItem(pageItem);
+			DraggabelLableControl item = new DraggabelLableControl(page);
+			TreeItem pageItem = new TreeItem(item);
+			pagesTree.addItem(pageItem);
 		}
 		dataPanel.add(reportsTree);
 		dataPanel.add(pagesTree);
 		this.add(dataPanel);
+
 	}
 
 }

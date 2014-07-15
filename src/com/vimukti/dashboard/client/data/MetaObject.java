@@ -7,6 +7,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 @SuppressWarnings("serial")
 public class MetaObject implements IsSerializable, Serializable {
 	private String id;
+	private String name;
 
 	/**
 	 * @return the id
@@ -21,6 +22,21 @@ public class MetaObject implements IsSerializable, Serializable {
 	 */
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

@@ -7,10 +7,13 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import com.ibm.icu.impl.CalendarAstronomer.Horizon;
 import com.vimukti.dashboard.client.data.IDashboardService;
 import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
+import com.vimukti.dashboard.client.ui.controls.DashboardMainPage;
 import com.vimukti.dashboard.client.ui.controls.DashboardPropertiesDialog;
-import com.vimukti.dashboard.server.DashboardServiceImpl;
+import com.vimukti.dashboard.client.ui.controls.LeftPanel;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -42,7 +45,10 @@ public class Dashboard implements EntryPoint {
 	private void createDashboardForTest() {
 		RootPanel rootPanel = RootPanel.get();
 		rootPanel.clear();
+
+		VerticalPanel vPanel = new VerticalPanel();
 		HorizontalPanel hpanel = new HorizontalPanel();
+		HorizontalPanel h2Panel = new HorizontalPanel();
 		rootPanel.add(hpanel);
 
 		Button dashboardPropertiesDialog = new Button(
@@ -58,5 +64,23 @@ public class Dashboard implements EntryPoint {
 			}
 		});
 		hpanel.add(dashboardPropertiesDialog);
+		LeftPanel addDashboardLeftPanel = addDashboardLeftPanel();
+		h2Panel.add(addDashboardLeftPanel);
+		DashboardMainPage mainPage = addDasboardMainPage();
+		h2Panel.add(mainPage);
+		vPanel.add(hpanel);
+		vPanel.add(h2Panel);
+		rootPanel.add(vPanel);
+	}
+
+	private DashboardMainPage addDasboardMainPage() {
+		DashboardMainPage mainPage = new DashboardMainPage(
+				new com.vimukti.dashboard.client.data.Dashboard());
+		return mainPage;
+	}
+
+	private LeftPanel addDashboardLeftPanel() {
+		LeftPanel leftPanel = new LeftPanel(null);
+		return leftPanel;
 	}
 }

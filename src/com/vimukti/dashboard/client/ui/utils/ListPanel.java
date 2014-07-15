@@ -1,8 +1,6 @@
 package com.vimukti.dashboard.client.ui.utils;
 
 import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.function.Consumer;
 
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -85,7 +83,5 @@ public class ListPanel extends ComplexPanel implements InsertPanel.ForIsWidget {
 	public WidgetCollection getChildNodes() {
 		return getChildren();
 	}
-
-	
 
 }

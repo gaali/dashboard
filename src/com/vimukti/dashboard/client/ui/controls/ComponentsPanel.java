@@ -6,48 +6,60 @@ import com.vimukti.dashboard.client.data.DashboardComponentType;
 public class ComponentsPanel extends FlowPanel {
 
 	public ComponentsPanel() {
+		this.getElement().setPropertyString("min-width:100px;", "25%");
 		this.addStyleName("components-panel");
 		createControls();
 	}
 
 	private void createControls() {
-		FlowPanel fPanel = new FlowPanel();
-		fPanel.setStyleName("char-componenet-grid");
 
 		ChartComponent horizontalBar = createComponent(
 				DashboardComponentType.BAR, "HorizontalBar");
-		fPanel.add(horizontalBar);
+		horizontalBar.addStyleName("horizontalbar");
+		this.add(horizontalBar);
+
 		ChartComponent verticalBar = createComponent(
 				DashboardComponentType.COLUMN, "verticalBar");
-		fPanel.add(verticalBar);
+		verticalBar.addStyleName("verticalbar");
+		this.add(verticalBar);
+
 		ChartComponent line = createComponent(DashboardComponentType.LINE,
 				"line");
-		fPanel.add(line);
+		line.addStyleName("linechart");
+		this.add(line);
+
 		ChartComponent pie = createComponent(DashboardComponentType.PIE, "pie");
-		fPanel.add(pie);
+		pie.addStyleName("piechart");
+		this.add(pie);
+
 		ChartComponent donut = createComponent(DashboardComponentType.DONUT,
 				"donut");
-		fPanel.add(donut);
+		donut.addStyleName("donutchart");
+		this.add(donut);
+
 		ChartComponent funnel = createComponent(DashboardComponentType.FUNNEL,
 				"funnel");
-		fPanel.add(funnel);
+		this.add(funnel);
 		ChartComponent scatter = createComponent(
 				DashboardComponentType.SCATTER, "scatter");
-		fPanel.add(scatter);
+		this.add(scatter);
 		ChartComponent gauge = createComponent(DashboardComponentType.GAUGE,
 				"gauge");
-		fPanel.add(gauge);
+		gauge.addStyleName("gauagechart");
+		this.add(gauge);
+
 		ChartComponent metric = createComponent(DashboardComponentType.METRIC,
 				"metric");
-		fPanel.add(metric);
+		this.add(metric);
 		ChartComponent table = createComponent(DashboardComponentType.TABLE,
 				"table");
-		fPanel.add(table);
+		table.addStyleName("table-component");
+		this.add(table);
+
 		ChartComponent page = createComponent(DashboardComponentType.PAGE,
 				"page");
-		fPanel.add(page);
-
-		this.add(fPanel);
+		page.addStyleName("page-component");
+		this.add(page);
 
 	}
 
