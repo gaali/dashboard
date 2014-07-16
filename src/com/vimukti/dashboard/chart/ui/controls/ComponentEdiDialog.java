@@ -11,15 +11,17 @@ import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.vimukti.dashboard.client.data.DashboardComponent;
 import com.vimukti.dashboard.client.data.DashboardComponentType;
 import com.vimukti.dashboard.client.ui.utils.BaseDialog;
+import com.vimukti.dashboard.client.ui.utils.TabControl;
+import com.vimukti.dashboard.client.ui.utils.TextItem;
 
-public class ChartSettingsDialog extends BaseDialog {
+public class ComponentEdiDialog extends BaseDialog {
 	private ChartComponentData data;
 	private ChartFormatting formatting;
 	private DashboardComponent chartData;
 	private TabLayoutPanel settingsPanel;
 	private SimplePanel targetPanel;
 
-	public ChartSettingsDialog(DashboardComponent chartData) {
+	public ComponentEdiDialog(DashboardComponent chartData) {
 		this.chartData = chartData;
 		this.addStyleName("chart-settings-dialog");
 	}
@@ -31,14 +33,47 @@ public class ChartSettingsDialog extends BaseDialog {
 		CreateChartDataAndChartPanel();
 	}
 
+	public void pageTypeComponentSettings() {
+		TextItem heightOfpag = new TextItem("Height (in pixels)");
+		heightOfpag.addStyleName("height-textbox");
+		TabControl tab = new TabControl();
+		tab.addTab("Formatting", new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+	}
+
 	private void CreateChartDataAndChartPanel() {
 		HorizontalPanel hPanel = new HorizontalPanel();
+
 		settingsPanel = new TabLayoutPanel(1.5, Unit.EM);
 		settingsPanel.addStyleName("settings-tabLayouts");
 		settingsPanel.add(data, "Component Data");
 		settingsPanel.add(formatting, "Formatting");
 
 		targetPanel = new SimplePanel();
+
+		TabControl tabs = new TabControl();
+		tabs.addTab("Component Data", new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				targetPanel.setWidget(data);
+
+			}
+		});
+
+		tabs.addTab("Formatting", new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				targetPanel.setWidget(formatting);
+			}
+		});
 
 		FlowPanel chartPreview = createChartPreviewPanel();
 		chartPreview.addStyleName("chartpreview");
