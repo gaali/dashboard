@@ -59,9 +59,12 @@ public class PortletContainerPanel extends FlowPanel implements IDroppable {
 					.asWidget();
 			DataSourceListType type = control.getType();
 			if (type == DataSourceListType.REPORT) {
+				Portlet portlet = portletFactory.createPortlet(emptyComponent);
 
 			} else if (type == DataSourceListType.PAGE) {
-
+				DashboardComponent pageComponent = new DashboardComponent();
+				pageComponent.setComponentType(DashboardComponentType.PAGE);
+				Portlet portlet = portletFactory.createPortlet(pageComponent);
 			}
 
 		}

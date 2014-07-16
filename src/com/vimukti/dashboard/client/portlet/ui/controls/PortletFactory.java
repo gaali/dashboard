@@ -1,6 +1,7 @@
 package com.vimukti.dashboard.client.portlet.ui.controls;
 
 import com.vimukti.dashboard.client.data.DashboardComponent;
+import com.vimukti.dashboard.client.data.DashboardComponentType;
 
 public class PortletFactory {
 
@@ -14,8 +15,24 @@ public class PortletFactory {
 	}
 
 	public Portlet createPortlet(DashboardComponent component) {
-		Portlet porlet = new Portlet(component);
-		return porlet;
+		Portlet portlet = new Portlet(component);
+		return portlet;
+	}
+
+	public Portlet createPortlerReport(String recordId) {
+		DashboardComponent component = new DashboardComponent();
+		component.setComponentType(DashboardComponentType.REPORT);
+		Portlet portlet = new Portlet(component);
+		portlet.setObjectId(recordId);
+		return portlet;
+	}
+
+	public Portlet createPortlerPage(String pageId) {
+		DashboardComponent component = new DashboardComponent();
+		component.setComponentType(DashboardComponentType.PAGE);
+		Portlet portlet = new Portlet(component);
+		portlet.setObjectId(pageId);
+		return portlet;
 	}
 
 }

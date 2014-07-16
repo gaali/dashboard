@@ -2,6 +2,7 @@ package com.vimukti.dashboard.client.data;
 
 import java.util.List;
 
+import com.gargoylesoftware.htmlunit.Page;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface IDashboardServiceAsync {
@@ -16,7 +17,7 @@ public interface IDashboardServiceAsync {
 
 	void getDashBoarFolders(AsyncCallback<List<Folder>> callback);
 
-	void getPage(String id, AsyncCallback<PagesList> callback);
+	void getPage(String id, AsyncCallback<String> callback);
 
 	void saveDashBoard(Dashboard dashboard, AsyncCallback<Void> callback);
 

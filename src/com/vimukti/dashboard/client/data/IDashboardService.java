@@ -12,7 +12,7 @@ public interface IDashboardService extends RemoteService {
 
 	List<Folder> getDashBoarFolders();
 
-	PagesList getPage(String id);
+	String getPage(String id);
 
 	Report getReport(String id);
 

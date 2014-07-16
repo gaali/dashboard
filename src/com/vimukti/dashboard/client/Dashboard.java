@@ -8,7 +8,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.ibm.icu.impl.CalendarAstronomer.Horizon;
 import com.vimukti.dashboard.client.data.IDashboardService;
 import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
 import com.vimukti.dashboard.client.ui.controls.DashboardMainPage;
@@ -38,7 +37,7 @@ public class Dashboard implements EntryPoint {
 		});
 	}
 
-	public IDashboardServiceAsync getDashboardServiceObject() {
+	public static IDashboardServiceAsync getDashboardServiceObject() {
 		return greetingService;
 	}
 

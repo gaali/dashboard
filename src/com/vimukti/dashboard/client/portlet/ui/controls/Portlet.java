@@ -2,6 +2,7 @@ package com.vimukti.dashboard.client.portlet.ui.controls;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -10,61 +11,46 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.vimukti.dashboard.client.Dashboard;
 import com.vimukti.dashboard.client.data.DashboardComponent;
 import com.vimukti.dashboard.client.data.DashboardComponentType;
+import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
+import com.vimukti.dashboard.client.data.Report;
+import com.vimukti.dashboard.client.ui.controls.ChartComponent;
+import com.vimukti.dashboard.client.ui.controls.DataSourceListType;
+import com.vimukti.dashboard.client.ui.controls.DraggabelLableControl;
 import com.vimukti.dashboard.client.ui.controls.dnd.IDraggable;
 import com.vimukti.dashboard.client.ui.controls.dnd.IDroppable;
 
 public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
 	private DashboardComponent component;
 	private DashboardComponentType type;
+	private PortletType portletTyp;
+	private String objectId;
+	IDashboardServiceAsync dashboardServiceObject = Dashboard
+			.getDashboardServiceObject();
 
 	public Portlet(DashboardComponent component) {
 		this.component = component;
 		type = component.getComponentType();
 		createControls();
+		setPortletType();
+	}
+
+	private void setPortletType() {
+
 	}
 
 	private void createControls() {
-		createHeaderBarForPortlet();
-		createTitleForPortlet();
+		createHeaderBarForPortlet(getComponentTitle(type));
+		createPortletBody();
 	}
 
-	private void createTitleForPortlet() {
-		AbsolutePanel panel = new AbsolutePanel();
-
-		// header Panel
-		FlowPanel headerPanel = new FlowPanel();
-		headerPanel.addStyleName("portler-headerPanel");
-		TextBox header = new TextBox();
-		header.addStyleName("portlet-header");
-		header.getElement().setAttribute("placeholder", "Edit Header");
-		headerPanel.add(header);
-
-		// title Panel
-		FlowPanel titlePanel = new FlowPanel();
-		titlePanel.addStyleName("portlet-titlePanel");
-		TextBox title = new TextBox();
-		title.addStyleName("portlet-title");
-		title.getElement().setAttribute("placeholder", "Edit Title");
-		titlePanel.add(title);
-
-		// title Panel
-		FlowPanel footerPanel = new FlowPanel();
-		footerPanel.addStyleName("portlet-footerPanel");
-		TextBox footer = new TextBox();
-		footer.addStyleName("portlet-title");
-		footer.getElement().setAttribute("placeholder", "Edit footer");
-		footerPanel.add(footer);
-
+	private void createPortletBody() {
 		// body panel
 		ChartContainer container = new ChartContainer();
-		container.createChartPanel();
-
-		panel.add(headerPanel);
-		panel.add(titlePanel);
-		panel.add(container);
-		panel.add(footerPanel);
+		container.createBody();
+		this.add(container);
 	}
 
 	private void prepareChart(VerticalPanel bodyPanel) {
@@ -72,21 +58,30 @@ public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
 
 	}
 
-	private void createHeaderBarForPortlet() {
+	private void createHeaderBarForPortlet(String titleString) {
 		HorizontalPanel headerBar = new HorizontalPanel();
 		headerBar.addStyleName("portlet-headerBar");
-		Label title = new Label(getComponentTitle());
-		Image settings = new Image();
-		settings.addClickHandler(new ClickHandler() {
+		Label title = new Label(titleString);
+		title.addStyleName("portler-title");
+		headerBar.add(title);
+		if (type != DashboardComponentType.REPORT) {
+			Image settings = new Image();
+			settings.addClickHandler(new ClickHandler() {
 
-			@Override
-			public void onClick(ClickEvent event) {
-				// ChartSettingsDialog componentEditor = new
-				// ChartSettingsDialog(
-				// component);
-			}
-		});
-		settings.addStyleName("portlet-settings-icon");
+				@Override
+				public void onClick(ClickEvent event) {
+					if (type == DashboardComponentType.PAGE) {
+
+					} else {
+						// ChartSettingsDialog componentEditor = new
+						// ChartSettingsDialog(
+						// component);
+					}
+				}
+			});
+			settings.addStyleName("portlet-settings-icon");
+			headerBar.add(settings);
+		}
 		Image removeIcon = new Image();
 		removeIcon.addClickHandler(new ClickHandler() {
 
@@ -96,14 +91,13 @@ public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
 
 			}
 		});
-		settings.addStyleName("portlet-remove-icon");
-		headerBar.add(title);
-		headerBar.add(settings);
+		removeIcon.addStyleName("portlet-remove-icon");
+
 		headerBar.add(removeIcon);
 		this.add(headerBar);
 	}
 
-	private String getComponentTitle() {
+	private String getComponentTitle(DashboardComponentType type) {
 		switch (type) {
 		case BAR:
 		case BAR_GROUPED:
@@ -141,10 +135,13 @@ public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
 			return "Scatter Chart";
 		case TABLE:
 			return "Tabel";
+		case REPORT:
+			return "source Report";
 		default:
 			break;
 
 		}
+
 		return null;
 	}
 
@@ -154,26 +151,80 @@ public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
 
 	}
 
+	/**
+	 * @return the objectId
+	 */
+	public String getObjectId() {
+		return objectId;
+	}
+
+	/**
+	 * @param objectId
+	 *            the objectId to set
+	 */
+	public void setObjectId(String objectId) {
+		this.objectId = objectId;
+	}
+
 	class ChartContainer extends FlowPanel implements IDroppable {
 
 		public ChartContainer() {
 			super();
 		}
 
-		public void createChartPanel() {
+		public void createBody() {
+			AbsolutePanel panel = new AbsolutePanel();
+
+			// header Panel
+			FlowPanel headerPanel = new FlowPanel();
+			headerPanel.addStyleName("portler-headerPanel");
+			TextBox header = new TextBox();
+			header.addStyleName("portlet-header");
+			header.getElement().setAttribute("placeholder", "Edit Header");
+			headerPanel.add(header);
+
+			// title Panel
+			FlowPanel titlePanel = new FlowPanel();
+			titlePanel.addStyleName("portlet-titlePanel");
+			TextBox title = new TextBox();
+			title.addStyleName("portlet-title");
+			title.getElement().setAttribute("placeholder", "Edit Title");
+			titlePanel.add(title);
+
+			// chartPanel
+			VerticalPanel chartPanel = createChartPanel();
+
+			// Footer Panel
+			FlowPanel footerPanel = new FlowPanel();
+			footerPanel.addStyleName("portlet-footerPanel");
+			TextBox footer = new TextBox();
+			footer.addStyleName("portlet-title");
+			footer.getElement().setAttribute("placeholder", "Edit footer");
+			footerPanel.add(footer);
+
+			panel.add(headerPanel);
+			panel.add(titlePanel);
+			panel.add(chartPanel);
+			panel.add(footerPanel);
+		}
+
+		public VerticalPanel createChartPanel() {
 			VerticalPanel bodyPanel = new VerticalPanel();
 			bodyPanel.addStyleName("portlet-bodyPanel");
+			final VerticalPanel chartPanel = new VerticalPanel();
+			chartPanel.addStyleName("ChartPanel");
+
 			if (component.getPage() == null && component.getReport() == null) {
 				FlowPanel icon = new FlowPanel();
 				icon.addStyleName(type.toString().toLowerCase() + "-icon");
 				Label helpText = new Label(
 						"Draga a Data source here to add data.");
 				helpText.addStyleName("portlet-helptext");
-				bodyPanel.add(icon);
-				bodyPanel.add(helpText);
+				chartPanel.add(icon);
+				chartPanel.add(helpText);
 			} else {
-				prepareChart(bodyPanel);
-				HorizontalPanel datasourceTitle = new HorizontalPanel();
+				prepareChart(chartPanel);
+				final HorizontalPanel datasourceTitle = new HorizontalPanel();
 				datasourceTitle.addStyleName("datasource title");
 				Label soureceTitle = new Label();
 				Image removeIcon = new Image();
@@ -181,27 +232,105 @@ public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
 
 					@Override
 					public void onClick(ClickEvent event) {
-						// TODO Auto-generated method stub
-
+						chartPanel.clear();
+						datasourceTitle.removeFromParent();
+						// TODO
 					}
 				});
 				datasourceTitle.add(soureceTitle);
 				datasourceTitle.add(removeIcon);
+				bodyPanel.add(datasourceTitle);
 			}
+			bodyPanel.add(chartPanel);
+			return bodyPanel;
+		}
+
+		private String getPageObject(String id) {
+			dashboardServiceObject.getPage(id, new AsyncCallback<String>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					// TODO Auto-generated method stub
+
+				}
+
+				@Override
+				public void onSuccess(String result) {
+					// TODO Auto-generated method stub
+
+				}
+			});
+			return null;
 		}
 
 		@Override
 		public void onDrop(IDraggable draggabelWidget) {
-			// TODO Auto-generated method stub
+			if (draggabelWidget instanceof ChartComponent) {
+				ChartComponent asWidget = (ChartComponent) draggabelWidget
+						.asWidget();
+				Portlet.this.clear();
+				type = asWidget.getType();
+				createControls();
+			} else if (draggabelWidget instanceof DraggabelLableControl) {
+				DraggabelLableControl widget = (DraggabelLableControl) draggabelWidget
+						.asWidget();
+				DataSourceListType type2 = widget.getType();
+				if (type2 == DataSourceListType.REPORT) {
+					dashboardServiceObject.getReport(widget.getId(),
+							new AsyncCallback<Report>() {
+
+								@Override
+								public void onSuccess(Report result) {
+									// TODO Auto-generated method stub
+
+								}
+
+								@Override
+								public void onFailure(Throwable caught) {
+									// TODO Auto-generated method stub
+
+								}
+							});
+
+				} else if (type2 == DataSourceListType.PAGE) {
+					String pageObject = getPageObject(widget.getId());
+					// TODO
+				}
+
+			}
 
 		}
 
 		@Override
 		public boolean canDroppable(IDraggable draggabelWidget) {
 			// TODO Auto-generated method stub
+			if (draggabelWidget instanceof ChartComponent) {
+				ChartComponent cpmnt = (ChartComponent) draggabelWidget
+						.asWidget();
+				DashboardComponentType componentType = cpmnt.getType();
+				if (componentType == DashboardComponentType.PAGE
+						&& type != DashboardComponentType.PAGE) {
+					return false;
+				}
+				return true;
+			} else
+
+			if (draggabelWidget instanceof DraggabelLableControl) {
+				DraggabelLableControl dlc = (DraggabelLableControl) draggabelWidget
+						.asWidget();
+				DataSourceListType sourceType = dlc.getType();
+				if (sourceType == DataSourceListType.REPORT
+						&& type != DashboardComponentType.PAGE) {
+					return true;
+				} else if (sourceType == DataSourceListType.PAGE
+						&& type == DashboardComponentType.PAGE) {
+					return true;
+				}
+
+			}
+
 			return false;
 		}
-
 	}
 
 }

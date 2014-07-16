@@ -6,7 +6,6 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.vimukti.dashboard.client.data.Dashboard;
 import com.vimukti.dashboard.client.data.Folder;
 import com.vimukti.dashboard.client.data.IDashboardService;
-import com.vimukti.dashboard.client.data.PagesList;
 import com.vimukti.dashboard.client.data.Report;
 import com.vimukti.dashboard.client.data.ReportsAndPagesList;
 
@@ -17,15 +16,13 @@ public class DashboardServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public ReportsAndPagesList getReportList() {
 		// TODO Auto-generated method stub
-		ReportsAndPagesList b = new ReportsAndPagesList();
-
-		return b;
+		return null;
 	}
 
 	@Override
 	public Dashboard getDashboard() {
-		Dashboard d = new Dashboard();
-		return d;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
@@ -35,7 +32,7 @@ public class DashboardServiceImpl extends RemoteServiceServlet implements
 	}
 
 	@Override
-	public PagesList getPage(String id) {
+	public String getPage(String id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -51,5 +48,4 @@ public class DashboardServiceImpl extends RemoteServiceServlet implements
 		// TODO Auto-generated method stub
 
 	}
-
 }

@@ -81,6 +81,6 @@ public enum DashboardComponentType {
 	@XmlEnumValue("Table")
 	TABLE,
 
-	PAGE
+	PAGE, REPORT
 
 }
