@@ -1,4 +1,4 @@
-package com.vimukti.dashboard.chart.ui.controls;
+package com.vimukti.dashboard.client.chart.ui.controls;
 
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
