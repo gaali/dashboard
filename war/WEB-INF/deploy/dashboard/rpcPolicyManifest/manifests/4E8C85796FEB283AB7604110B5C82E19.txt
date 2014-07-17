@@ -1,2 +1,0 @@
-serviceClass: com.vimukti.dashboard.client.data.IDashboardService
-path: C990C3EC7B56462AD931ACCF4A94FF59.gwt.rpc
