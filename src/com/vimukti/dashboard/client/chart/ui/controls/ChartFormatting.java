@@ -1,5 +1,14 @@
 package com.vimukti.dashboard.client.chart.ui.controls;
 
+import java.util.Arrays;
+import java.util.List;
+
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -30,45 +39,190 @@ public class ChartFormatting extends FlowPanel {
 	private ColorItem highRangeColor;
 	private TextItem maximum;
 
-	public ChartFormatting( ) {
+	private DashboardComponent component;
+
+	public ChartFormatting(DashboardComponent component) {
+		// TODO Auto-generated constructor stub
+		this.component = component;
+		type = component.getComponentType();
 		createControls();
 	}
 
-	public ChartFormatting(DashboardComponent chartData) {
-		// TODO Auto-generated constructor stub
+	public void reRender(DashboardComponent component) {
+		this.clear();
+		this.component = component;
+		type = component.getComponentType();
+		createControls();
+		if (type == DashboardComponentType.GAUGE
+				|| type == DashboardComponentType.TABLE
+				|| type == DashboardComponentType.METRIC) {
+			createTabelControls();
+		}
 	}
 
 	private void createControls() {
-		sortRowsBy = new SelectListBox();
-		maximumValueDisplayed = new TextItem("Maximum Values Displayed");
-		axisRange = new SelectListBox();
-		legendPosition = new SelectListBox();
+		sortByMaximumValue();
+		if (type == DashboardComponentType.BAR
+				|| type == DashboardComponentType.COLUMN
+				|| type == DashboardComponentType.LINE
+				|| type == DashboardComponentType.SCATTER) {
+
+			axisRange = new SelectListBox<ChartRangeType>("Axis-Range");
+			ChartRangeType[] values2 = ChartRangeType.values();
+			List<ChartRangeType> asList2 = Arrays.asList(values2);
+			axisRange.setItems(asList2);
+			if (axisRange.getSelectedValue() == ChartRangeType.MANUAL) {
+				TextItem from = new TextItem("From:");
+				from.addStyleName("axis-from-textitem");
+				from.addBlurHandler(new BlurHandler() {
+
+					@Override
+					public void onBlur(BlurEvent event) {
+						// TODO Auto-generated method stub
+
+					}
+				});
+				TextItem to = new TextItem("To:");
+				to.addStyleName("axis-to-textitem");
+				to.addBlurHandler(new BlurHandler() {
+
+					@Override
+					public void onBlur(BlurEvent event) {
+						// TODO Auto-generated method stub
+
+					}
+				});
+			}
+			this.add(axisRange);
+		}
+
+		legendPosition = new SelectListBox<ChartLegendPosition>();
+		ChartLegendPosition[] values3 = ChartLegendPosition.values();
+		List<ChartLegendPosition> asList3 = Arrays.asList(values3);
+		legendPosition.setItems(asList3);
+		legendPosition.addChangeHandler(new ChangeHandler() {
+
+			@Override
+			public void onChange(ChangeEvent event) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+		this.add(legendPosition);
+		if (type == DashboardComponentType.BAR
+				|| type == DashboardComponentType.COLUMN
+				|| type == DashboardComponentType.LINE) {
+			legendPosition.setEnabled(false);
+		}
+
 		createDataLabelFields();
 	}
 
+	public void sortByMaximumValue() {
+		sortRowsBy = new SelectListBox<DashboardComponentFilter>("Sort Rows By");
+		DashboardComponentFilter[] values = DashboardComponentFilter.values();
+		List<DashboardComponentFilter> asList = Arrays.asList(values);
+		sortRowsBy.setItems(asList);
+		sortRowsBy.addChangeHandler(new ChangeHandler() {
+
+			@Override
+			public void onChange(ChangeEvent event) {
+				// TODO Auto-generated method stub
+				// change Chart Preview and if need Call Rpc
+				// change chart with changed value
+			}
+		});
+		this.add(sortRowsBy);
+
+		maximumValueDisplayed = new TextItem("Maximum Values Displayed");
+		maximumValueDisplayed.addBlurHandler(new BlurHandler() {
+
+			@Override
+			public void onBlur(BlurEvent event) {
+				// TODO Auto-generated method stub
+				// change Chart Preview here with given value.
+				// accept only numbers and accept up to 99 only
+			}
+		});
+		this.add(maximumValueDisplayed);
+	}
+
 	private void createDataLabelFields() {
+
 		HorizontalPanel hDataLablePanel = new HorizontalPanel();
 
 		Label dataLabel = new Label("Data Label");
 		VerticalPanel vPanel = new VerticalPanel();
-		if (type == DashboardComponentType.BAR) {
-			CheckBox showChatterPhotos = new CheckBox("Show Chatter Photos");
-			vPanel.add(showChatterPhotos);
-		}
-		CheckBox showDetailsOnHover = new CheckBox("Show Details On Hover");
+
 		if (type == DashboardComponentType.PIE
 				|| type == DashboardComponentType.DONUT
 				|| type == DashboardComponentType.FUNNEL) {
 			CheckBox combineSmallGroupsIntoOthers = new CheckBox(
-					"combine Small Groups In to Others");
+					"Combine Small groups into 'Others'");
+			combineSmallGroupsIntoOthers
+					.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+						@Override
+						public void onValueChange(
+								ValueChangeEvent<Boolean> event) {
+							// TODO Auto-generated method stub
+
+						}
+					});
 			vPanel.add(combineSmallGroupsIntoOthers);
+		}
+		if (type == DashboardComponentType.BAR) {
+			CheckBox showChatterPhotos = new CheckBox("Show Chatter Photos");
+			showChatterPhotos
+					.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+						@Override
+						public void onValueChange(
+								ValueChangeEvent<Boolean> event) {
+							// TODO Auto-generated method stub
+
+						}
+					});
+			vPanel.add(showChatterPhotos);
+		}
+
+		if (type != DashboardComponentType.SCATTER) {
+			CheckBox showValues = new CheckBox("Show Value");
+			showValues.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+				@Override
+				public void onValueChange(ValueChangeEvent<Boolean> event) {
+					// TODO Auto-generated method stub
+
+				}
+			});
+			vPanel.add(showValues);
+		}
+
+		if (type == DashboardComponentType.PIE
+				|| type == DashboardComponentType.DONUT
+				|| type == DashboardComponentType.FUNNEL
+				|| type == DashboardComponentType.GAUGE) {
 			CheckBox showPercentage = new CheckBox("Show %");
 			vPanel.add(showPercentage);
 		}
-		CheckBox showValues = new CheckBox("Show Value");
-		vPanel.add(showValues);
 
+		CheckBox showDetailsOnHover = new CheckBox("Show Details On Hover");
 		vPanel.add(showDetailsOnHover);
+
+		if (type == DashboardComponentType.DONUT
+				|| type == DashboardComponentType.GAUGE) {
+			CheckBox showTotal = new CheckBox("Show Total");
+			showTotal.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+				@Override
+				public void onValueChange(ValueChangeEvent<Boolean> event) {
+					// TODO Auto-generated method stub
+
+				}
+			});
+			vPanel.add(showTotal);
+		}
 
 		hDataLablePanel.add(dataLabel);
 		hDataLablePanel.add(vPanel);
@@ -78,14 +232,96 @@ public class ChartFormatting extends FlowPanel {
 	}
 
 	private void createTabelControls() {
-		minimumValue = new TextItem("Minimum Value");
-		minimumValue.addStyleName("minimumvalue");
+		if (type == DashboardComponentType.TABLE) {
+			sortByMaximumValue();
+			CheckBox chatterPhoto = new CheckBox();
+			chatterPhoto.addStyleName("chatter-photo");
+			chatterPhoto
+					.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+						@Override
+						public void onValueChange(
+								ValueChangeEvent<Boolean> event) {
+							// TODO Auto-generated method stub
+
+						}
+					});
+			this.add(chatterPhoto);
+		}
+		if (type == DashboardComponentType.GAUGE) {
+			minimumValue = new TextItem("Minimum Value");
+			minimumValue.addStyleName("minimumvalue");
+			minimumValue.addBlurHandler(new BlurHandler() {
+
+				@Override
+				public void onBlur(BlurEvent event) {
+					// TODO Auto-generated method stub
+
+				}
+			});
+			this.add(minimumValue);
+		}
+
 		lowRangeColor = new ColorItem("Low Range Color");
-		lowRangeColor.addStyleName("LowRanangeColor");
+		lowRangeColor.addStyleName("lowranangecolor");
+		// TODO add Change Handler
+		this.add(lowRangeColor);
+
 		breakPoint1 = new TextItem("Break Point1");
+		breakPoint1.addStyleName("breakpoint1");
+		breakPoint1.addBlurHandler(new BlurHandler() {
+
+			@Override
+			public void onBlur(BlurEvent event) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+		this.add(breakPoint1);
+
 		middleRangeColor = new ColorItem("Middle Range Color");
+		middleRangeColor.addStyleName("middlerangecolor");
+		// TODO add change Handler
+		this.add(middleRangeColor);
+
 		breakPoint2 = new TextItem("Break Point2");
-		breakPoint2.addStyleName("Break Point");
+		breakPoint2.addStyleName("breakpoint2");
+		breakPoint2.addBlurHandler(new BlurHandler() {
+
+			@Override
+			public void onBlur(BlurEvent event) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+		this.add(breakPoint2);
+
+		highRangeColor = new ColorItem("Hight Range Color");
+		highRangeColor.addStyleName("highrangecolor");
+		// TODO add value change handler
+		this.add(highRangeColor);
+
+		if (type == DashboardComponentType.GAUGE) {
+			maximum = new TextItem("Maximum");
+			maximum.addStyleName("maximum");
+			maximum.addBlurHandler(new BlurHandler() {
+
+				@Override
+				public void onBlur(BlurEvent event) {
+					// TODO Auto-generated method stub
+
+				}
+			});
+			this.add(maximum);
+		}
+
+		if (type == DashboardComponentType.GAUGE) {
+			createDataLabelFields();
+		}
+
+	}
+
+	public void update() {
 
 	}
 }

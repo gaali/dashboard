@@ -18,6 +18,7 @@ import com.vimukti.dashboard.client.data.DashboardComponent;
 import com.vimukti.dashboard.client.data.DashboardComponentType;
 import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
 import com.vimukti.dashboard.client.data.Report;
+import com.vimukti.dashboard.client.reportdata.ReportResults;
 import com.vimukti.dashboard.client.ui.controls.ChartComponent;
 import com.vimukti.dashboard.client.ui.controls.DataSourceListType;
 import com.vimukti.dashboard.client.ui.controls.DraggabelLableControl;
@@ -29,6 +30,7 @@ public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
 	private DashboardComponentType type;
 	private PortletType portletTyp;
 	private String objectId;
+	private ReportResults results;
 	IDashboardServiceAsync dashboardServiceObject = Dashboard
 			.getDashboardServiceObject();
 
@@ -68,11 +70,10 @@ public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
 				@Override
 				public void onClick(ClickEvent event) {
 					if (type == DashboardComponentType.PAGE) {
-						ComponentEdiDialog componentEditor = new ComponentEdiDialog(
-								component);
+						// TODsO
 					} else {
 						ComponentEdiDialog componentEditor = new ComponentEdiDialog(
-								component);
+								component, results);
 					}
 				}
 			});
@@ -292,8 +293,7 @@ public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
 
 								@Override
 								public void onSuccess(Report result) {
-									// TODO Auto-generated method stub
-
+									Portlet.this.results = results;
 								}
 
 								@Override

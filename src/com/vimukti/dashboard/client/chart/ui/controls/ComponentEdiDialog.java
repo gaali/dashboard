@@ -10,13 +10,14 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.vimukti.dashboard.client.data.DashboardComponent;
 import com.vimukti.dashboard.client.data.DashboardComponentType;
+import com.vimukti.dashboard.client.reportdata.ReportResults;
 import com.vimukti.dashboard.client.ui.utils.BaseDialog;
 import com.vimukti.dashboard.client.ui.utils.TabControl;
 import com.vimukti.dashboard.client.ui.utils.TextItem;
 
 public class ComponentEdiDialog extends BaseDialog {
-	private ChartComponentData data;
 	private ChartFormatting formatting;
+	private ChartComponentData data;
 	private DashboardComponent chartData;
 	private TabLayoutPanel settingsPanel;
 	private SimplePanel targetPanel;
@@ -32,7 +33,8 @@ public class ComponentEdiDialog extends BaseDialog {
 	private FlowPanel metric;
 	private FlowPanel tabel;
 
-	public ComponentEdiDialog(DashboardComponent chartData) {
+	public ComponentEdiDialog(DashboardComponent chartData,
+			ReportResults reportData) {
 		this.chartData = chartData;
 		this.addStyleName("chart-settings-dialog");
 	}
@@ -119,6 +121,7 @@ public class ComponentEdiDialog extends BaseDialog {
 				horizontalBar.addStyleName("selected-chart");
 				chartData.setComponentType(DashboardComponentType.BAR);
 				data.reRendar(chartData);
+				formatting.reRender(chartData);
 				// TODO Auto-generated method stub
 
 			}
@@ -135,6 +138,7 @@ public class ComponentEdiDialog extends BaseDialog {
 				vertical.addStyleName("selected-chart");
 				chartData.setComponentType(DashboardComponentType.COLUMN);
 				data.reRendar(chartData);
+				formatting.reRender(chartData);
 				// TODO Auto-generated method stub
 
 			}
@@ -150,6 +154,7 @@ public class ComponentEdiDialog extends BaseDialog {
 				line.addStyleName("selected-chart");
 				chartData.setComponentType(DashboardComponentType.LINE);
 				data.reRendar(chartData);
+				formatting.reRender(chartData);
 				// TODO Auto-generated method stub
 			}
 		}, ClickEvent.getType());
@@ -164,6 +169,7 @@ public class ComponentEdiDialog extends BaseDialog {
 				pie.addStyleName("selected-chart");
 				chartData.setComponentType(DashboardComponentType.PIE);
 				data.reRendar(chartData);
+				formatting.reRender(chartData);
 				// TODO Auto-generated method stub
 			}
 		}, ClickEvent.getType());
@@ -178,6 +184,7 @@ public class ComponentEdiDialog extends BaseDialog {
 				donut.addStyleName("selected-chart");
 				chartData.setComponentType(DashboardComponentType.DONUT);
 				data.reRendar(chartData);
+				formatting.reRender(chartData);
 				// TODO Auto-generated method stub
 
 			}
@@ -193,6 +200,7 @@ public class ComponentEdiDialog extends BaseDialog {
 				funnel.addStyleName("selected-chart");
 				chartData.setComponentType(DashboardComponentType.FUNNEL);
 				data.reRendar(chartData);
+				formatting.reRender(chartData);
 				// TODO Auto-generated method stub
 
 			}
@@ -208,6 +216,7 @@ public class ComponentEdiDialog extends BaseDialog {
 				scatter.addStyleName("selected-chart");
 				chartData.setComponentType(DashboardComponentType.SCATTER);
 				data.reRendar(chartData);
+				formatting.reRender(chartData);
 				// TODO Auto-generated method stub
 			}
 		}, ClickEvent.getType());
@@ -222,6 +231,7 @@ public class ComponentEdiDialog extends BaseDialog {
 				gauge.addStyleName("selected-chart");
 				chartData.setComponentType(DashboardComponentType.GAUGE);
 				data.reRendar(chartData);
+				formatting.reRender(chartData);
 				// TODO Auto-generated method stub
 
 			}
@@ -237,6 +247,7 @@ public class ComponentEdiDialog extends BaseDialog {
 				metric.addStyleName("selected-chart");
 				chartData.setComponentType(DashboardComponentType.METRIC);
 				data.reRendar(chartData);
+				formatting.reRender(chartData);
 				// TODO Auto-generated method stub
 
 			}
@@ -252,6 +263,7 @@ public class ComponentEdiDialog extends BaseDialog {
 				tabel.addStyleName("selected-chart");
 				chartData.setComponentType(DashboardComponentType.TABLE);
 				data.reRendar(chartData);
+				formatting.reRender(chartData);
 				// TODO Auto-generated method stub
 
 			}
@@ -268,10 +280,11 @@ public class ComponentEdiDialog extends BaseDialog {
 		hPanel.add(gauge);
 		hPanel.add(metric);
 		hPanel.add(tabel);
+		this.add(hPanel);
+		setSelectedStyleToPanel();
+	}
 
-		DashboardComponentType componentType = chartData.getComponentType();
-		componentType = componentType == null ? DashboardComponentType.BAR
-				: componentType;
+	private void setSelectedStyleToPanel() {
 
 		switch (chartData.getComponentType()) {
 		case BAR:
@@ -289,6 +302,7 @@ public class ComponentEdiDialog extends BaseDialog {
 		case COLUMN_STACKED:
 		case COLUMN_STACKED100:
 			vertical.addStyleName("selected-chart");
+			break;
 		case DONUT:
 			donut.addStyleName("selected-chart");
 			break;
@@ -296,38 +310,31 @@ public class ComponentEdiDialog extends BaseDialog {
 			funnel.addStyleName("selected-chart");
 			break;
 		case GAUGE:
-
+			gauge.addStyleName("selected-chart");
 			break;
 		case LINE:
-			break;
 		case LINE_CUMULATIVE:
-			break;
 		case LINE_GROUPED:
-			break;
 		case LINE_GROUPED_CUMULATIVE:
+			line.addStyleName("selected-chart");
 			break;
 		case METRIC:
-			break;
-		case PAGE:
+			metric.addStyleName("selected-chart");
 			break;
 		case PIE:
-			break;
-		case REPORT:
+			pie.addStyleName("selected-chart");
 			break;
 		case SCATTER:
-			break;
 		case SCATTER_GROUPED:
-			break;
-		case SCONTROL:
+			scatter.addStyleName("selected-chart");
 			break;
 		case TABLE:
+			tabel.addStyleName("selected-chart");
 			break;
 		default:
 			break;
-
 		}
 
-		this.add(hPanel);
 	}
 
 	private void clearSelectedStyleName() {
@@ -343,19 +350,9 @@ public class ComponentEdiDialog extends BaseDialog {
 		tabel.removeStyleName("selected-chart");
 	}
 
-	private void componentPanelControls() {
-		FlowPanel componentPanel = new FlowPanel();
-
-	}
-
-	private void formattingPanel() {
-		FlowPanel formattingPanel = new FlowPanel();
-
-	}
-
 	@Override
 	protected boolean onOK() {
-		// TODO Auto-generated method stub
+		update();
 		return false;
 	}
 
@@ -363,6 +360,11 @@ public class ComponentEdiDialog extends BaseDialog {
 	public void setFocus() {
 		// TODO Auto-generated method stub
 
+	}
+
+	public void update() {
+		data.update();
+		formatting.update();
 	}
 
 }

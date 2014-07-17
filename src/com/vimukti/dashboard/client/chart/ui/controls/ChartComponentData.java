@@ -96,6 +96,8 @@ public class ChartComponentData extends FlowPanel {
 	public void createControlsForBarColumnLine() {
 		if (type == DashboardComponentType.SCATTER) {
 			plotBy = new SelectListBox<Object>();
+			String groupingColumn = component.getGroupingColumn();
+			// TODO
 		}
 		xAxis = new SelectListBox<Object>();
 		yAxis = new SelectListBox<Object>();
@@ -221,6 +223,10 @@ public class ChartComponentData extends FlowPanel {
 		hPanel.add(combinationCharts);
 		hPanel.add(fPanel);
 		this.add(hPanel);
+	}
+
+	public void update() {
+
 	}
 
 }
