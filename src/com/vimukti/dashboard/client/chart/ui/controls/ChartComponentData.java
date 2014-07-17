@@ -9,6 +9,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.vimukti.dashboard.client.data.ChartUnits;
+import com.vimukti.dashboard.client.data.DashboardComponent;
 import com.vimukti.dashboard.client.data.DashboardComponentType;
 import com.vimukti.dashboard.client.ui.utils.SelectListBox;
 import com.vimukti.dashboard.client.ui.utils.TextItem;
@@ -22,12 +23,21 @@ public class ChartComponentData extends FlowPanel {
 	private HorizontalPanel combinationCharts;
 	private SelectListBox<ChartUnits> displayUnits;
 	private CheckBox cumulative;
+	private SelectListBox<Object> plotBy;
+
+	private DashboardComponent component;
 
 	// needCreate object for this field
 	private SelectListBox<Object> drillDownTo;
 
-	public ChartComponentData(DashboardComponentType type) {
-		this.type = type;
+	public ChartComponentData(DashboardComponent component) {
+		this.component = component;
+		createControls();
+	}
+
+	public void reRendar(DashboardComponent component) {
+		this.clear();
+		this.component = component;
 		createControls();
 	}
 
@@ -49,20 +59,20 @@ public class ChartComponentData extends FlowPanel {
 		case LINE_CUMULATIVE:
 		case LINE_GROUPED:
 		case LINE_GROUPED_CUMULATIVE:
+		case SCATTER:
+		case SCATTER_GROUPED:
 			createControlsForBarColumnLine();
+			break;
 		case DONUT:
 		case FUNNEL:
+		case PIE:
+			pieDonutFunnelChartType();
+			break;
 		case GAUGE:
-			pieChartType();
 		case METRIC:
-			metricChart();
+			gaugeMetricChart();
 		case PAGE:
 			pageSettings();
-		case PIE:
-			break;
-		case SCATTER:
-			break;
-		case SCATTER_GROUPED:
 			break;
 		case TABLE:
 			break;
@@ -84,55 +94,70 @@ public class ChartComponentData extends FlowPanel {
 	}
 
 	public void createControlsForBarColumnLine() {
+		if (type == DashboardComponentType.SCATTER) {
+			plotBy = new SelectListBox<Object>();
+		}
 		xAxis = new SelectListBox<Object>();
 		yAxis = new SelectListBox<Object>();
 		if (type == DashboardComponentType.COLUMN
 				|| type == DashboardComponentType.LINE) {
-			this.add(xAxis);
-			this.add(yAxis);
-		} else if (type == DashboardComponentType.BAR) {
 			this.add(yAxis);
 			this.add(xAxis);
+		} else if (type == DashboardComponentType.BAR
+				|| type == DashboardComponentType.SCATTER) {
+			this.add(xAxis);
+			this.add(yAxis);
 		}
 		if (type == DashboardComponentType.LINE) {
 			SelectListBox<Object> groupByListBox = new SelectListBox<Object>();
 			groupByListBox.addStyleName("groupByList");
-		} else if (type == DashboardComponentType.COLUMN
-				|| type == DashboardComponentType.LINE) {
-			createGroupByPanel();
+			this.add(groupByListBox);
+		} else if (type == DashboardComponentType.BAR
+				|| type == DashboardComponentType.COLUMN) {
+			createGroupByPanel(type);
+		}
+		if (type == DashboardComponentType.LINE) {
+			cumulative = new CheckBox("Cumulative");
+			cumulative.addStyleName("cumulative");
 		}
 		if (type == DashboardComponentType.COLUMN
 				|| type == DashboardComponentType.LINE
 				|| type == DashboardComponentType.BAR) {
 			createCombinationChartsPanel();
 		}
-		if (type == DashboardComponentType.LINE) {
-			cumulative = new CheckBox("Cumulative");
-			cumulative.addStyleName("cumulative");
-		}
+
 	}
 
-	private void pieChartType() {
+	private void pieDonutFunnelChartType() {
 		SelectListBox<Object> values = new SelectListBox<Object>("values");
 		values.addStyleName("values-list");
 		this.add(values);
-		SelectListBox<Object> wedges = new SelectListBox<Object>("Wedges");
-		wedges.addStyleName("wedges-list");
-		this.add(wedges);
-		SelectListBox<Object> segments = new SelectListBox<Object>("Segments");
-		segments.addStyleName("segmets-list");
+
+		if (type != DashboardComponentType.FUNNEL) {
+			SelectListBox<Object> wedges = new SelectListBox<Object>("Wedges");
+			wedges.addStyleName("wedges-list");
+			this.add(wedges);
+		} else {
+			SelectListBox<Object> segments = new SelectListBox<Object>(
+					"Segments");
+			segments.addStyleName("segmets-list");
+		}
 	}
 
-	private void metricChart() {
+	private void gaugeMetricChart() {
 		SelectListBox<Object> value = new SelectListBox<Object>("Value");
 		value.addStyleName("value");
+		this.add(value);
 	}
 
 	private void pageSettings() {
+		// TODO method not belongs here
+		// it may moves to other class
 		TextItem heightInPixels = new TextItem("Height ");
+		this.add(heightInPixels);
 	}
 
-	private void createGroupByPanel() {
+	private void createGroupByPanel(DashboardComponentType type) {
 		groupBy = new HorizontalPanel();
 
 		Label name = new Label();
@@ -151,7 +176,7 @@ public class ChartComponentData extends FlowPanel {
 
 			}
 		}, ClickEvent.getType());
-		sideBySide.addStyleName("sidebyside");
+		sideBySide.addStyleName("sidebyside-" + type.toString().toLowerCase());
 
 		FlowPanel stacked = new FlowPanel();
 		stacked.addDomHandler(new ClickHandler() {
@@ -162,7 +187,7 @@ public class ChartComponentData extends FlowPanel {
 
 			}
 		}, ClickEvent.getType());
-		stacked.addStyleName("stacked");
+		stacked.addStyleName("stacked-" + type.toString().toLowerCase());
 
 		FlowPanel fullStacked = new FlowPanel();
 		fullStacked.addDomHandler(new ClickHandler() {
@@ -173,7 +198,8 @@ public class ChartComponentData extends FlowPanel {
 
 			}
 		}, ClickEvent.getType());
-		fullStacked.addStyleName("fullStacked");
+		fullStacked
+				.addStyleName("fullStacked-" + type.toString().toLowerCase());
 
 		fPanel.add(sideBySide);
 		fPanel.add(stacked);
@@ -182,6 +208,7 @@ public class ChartComponentData extends FlowPanel {
 		vPanel.add(fPanel);
 		groupBy.add(name);
 		groupBy.add(vPanel);
+		this.add(groupBy);
 	}
 
 	private void createCombinationChartsPanel() {
@@ -193,6 +220,7 @@ public class ChartComponentData extends FlowPanel {
 		fPanel.add(additonalValues);
 		hPanel.add(combinationCharts);
 		hPanel.add(fPanel);
+		this.add(hPanel);
 	}
 
 }

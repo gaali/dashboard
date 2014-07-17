@@ -21,6 +21,17 @@ public class ComponentEdiDialog extends BaseDialog {
 	private TabLayoutPanel settingsPanel;
 	private SimplePanel targetPanel;
 
+	private FlowPanel horizontalBar;
+	private FlowPanel vertical;
+	private FlowPanel line;
+	private FlowPanel pie;
+	private FlowPanel donut;
+	private FlowPanel funnel;
+	private FlowPanel scatter;
+	private FlowPanel gauge;
+	private FlowPanel metric;
+	private FlowPanel tabel;
+
 	public ComponentEdiDialog(DashboardComponent chartData) {
 		this.chartData = chartData;
 		this.addStyleName("chart-settings-dialog");
@@ -49,6 +60,9 @@ public class ComponentEdiDialog extends BaseDialog {
 
 	private void CreateChartDataAndChartPanel() {
 		HorizontalPanel hPanel = new HorizontalPanel();
+
+		data = new ChartComponentData(chartData);
+		formatting = new ChartFormatting(chartData);
 
 		settingsPanel = new TabLayoutPanel(1.5, Unit.EM);
 		settingsPanel.addStyleName("settings-tabLayouts");
@@ -95,122 +109,156 @@ public class ComponentEdiDialog extends BaseDialog {
 		Label selectChart = new Label("Select Type:");
 		selectChart.addStyleName("lable-selectChart");
 
-		final FlowPanel horizontal = new FlowPanel();
-		horizontal.addStyleName("horizontal-chart");
-		horizontal.addDomHandler(new ClickHandler() {
+		horizontalBar = new FlowPanel();
+		horizontalBar.addStyleName("horizontal-chart");
+		horizontalBar.addDomHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
+				clearSelectedStyleName();
+				horizontalBar.addStyleName("selected-chart");
+				chartData.setComponentType(DashboardComponentType.BAR);
+				data.reRendar(chartData);
 				// TODO Auto-generated method stub
-				horizontal.addStyleName("selectedChart");
-				targetPanel.setWidget(settingsPanel);
 
 			}
 		}, ClickEvent.getType());
-		horizontal.addStyleName("horizontalbarchart");
+		horizontalBar.addStyleName("horizontalbarchart");
 
-		final FlowPanel vertical = new FlowPanel();
+		vertical = new FlowPanel();
 		vertical.addStyleName("verticalbarchart");
 		vertical.addDomHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
+				clearSelectedStyleName();
+				vertical.addStyleName("selected-chart");
+				chartData.setComponentType(DashboardComponentType.COLUMN);
+				data.reRendar(chartData);
 				// TODO Auto-generated method stub
-				vertical.addStyleName("selectedChart");
 
 			}
 		}, ClickEvent.getType());
 
-		final FlowPanel line = new FlowPanel();
+		line = new FlowPanel();
 		line.addStyleName("linechart");
 		line.addDomHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
+				clearSelectedStyleName();
+				line.addStyleName("selected-chart");
+				chartData.setComponentType(DashboardComponentType.LINE);
+				data.reRendar(chartData);
 				// TODO Auto-generated method stub
-				line.addStyleName("selectedChart");
 			}
 		}, ClickEvent.getType());
 
-		final FlowPanel pie = new FlowPanel();
+		pie = new FlowPanel();
 		pie.addStyleName("pie");
 		pie.addDomHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
+				clearSelectedStyleName();
+				pie.addStyleName("selected-chart");
+				chartData.setComponentType(DashboardComponentType.PIE);
+				data.reRendar(chartData);
 				// TODO Auto-generated method stub
-				pie.addStyleName("seletedChart");
 			}
 		}, ClickEvent.getType());
 
-		FlowPanel donut = new FlowPanel();
+		donut = new FlowPanel();
 		donut.addStyleName("donutChart");
 		donut.addDomHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
+				clearSelectedStyleName();
+				donut.addStyleName("selected-chart");
+				chartData.setComponentType(DashboardComponentType.DONUT);
+				data.reRendar(chartData);
 				// TODO Auto-generated method stub
 
 			}
 		}, ClickEvent.getType());
 
-		FlowPanel funnel = new FlowPanel();
+		funnel = new FlowPanel();
 		funnel.addStyleName("funnelchart");
 		funnel.addDomHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
+				clearSelectedStyleName();
+				funnel.addStyleName("selected-chart");
+				chartData.setComponentType(DashboardComponentType.FUNNEL);
+				data.reRendar(chartData);
 				// TODO Auto-generated method stub
 
 			}
 		}, ClickEvent.getType());
 
-		FlowPanel scatter = new FlowPanel();
+		scatter = new FlowPanel();
 		scatter.addStyleName("sacatterchar");
 		scatter.addDomHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
+				clearSelectedStyleName();
+				scatter.addStyleName("selected-chart");
+				chartData.setComponentType(DashboardComponentType.SCATTER);
+				data.reRendar(chartData);
 				// TODO Auto-generated method stub
-
 			}
 		}, ClickEvent.getType());
 
-		FlowPanel gauge = new FlowPanel();
+		gauge = new FlowPanel();
 		gauge.addStyleName("gauge");
 		gauge.addDomHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
+				clearSelectedStyleName();
+				gauge.addStyleName("selected-chart");
+				chartData.setComponentType(DashboardComponentType.GAUGE);
+				data.reRendar(chartData);
 				// TODO Auto-generated method stub
 
 			}
 		}, ClickEvent.getType());
 
-		FlowPanel metric = new FlowPanel();
+		metric = new FlowPanel();
 		metric.addStyleName("metricchart");
 		metric.addDomHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
+				clearSelectedStyleName();
+				metric.addStyleName("selected-chart");
+				chartData.setComponentType(DashboardComponentType.METRIC);
+				data.reRendar(chartData);
 				// TODO Auto-generated method stub
 
 			}
 		}, ClickEvent.getType());
 
-		FlowPanel tabel = new FlowPanel();
+		tabel = new FlowPanel();
 		tabel.addStyleName("tabel");
 		tabel.addDomHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
+				clearSelectedStyleName();
+				tabel.addStyleName("selected-chart");
+				chartData.setComponentType(DashboardComponentType.TABLE);
+				data.reRendar(chartData);
 				// TODO Auto-generated method stub
 
 			}
 		}, ClickEvent.getType());
 
 		hPanel.add(selectChart);
-		hPanel.add(horizontal);
+		hPanel.add(horizontalBar);
 		hPanel.add(vertical);
 		hPanel.add(line);
 		hPanel.add(pie);
@@ -225,7 +273,74 @@ public class ComponentEdiDialog extends BaseDialog {
 		componentType = componentType == null ? DashboardComponentType.BAR
 				: componentType;
 
+		switch (chartData.getComponentType()) {
+		case BAR:
+		case BAR_GROUPED:
+		case BAR_STACKED:
+		case BAR_STACKED100:
+			horizontalBar.addStyleName("selected-chart");
+			break;
+		case COLUMN:
+		case COLUMN_GROUPED:
+		case COLUMN_LINE:
+		case COLUMN_LINE_GROUPED:
+		case COLUMN_LINE_STACKED:
+		case COLUMN_LINE_STACKED100:
+		case COLUMN_STACKED:
+		case COLUMN_STACKED100:
+			vertical.addStyleName("selected-chart");
+		case DONUT:
+			donut.addStyleName("selected-chart");
+			break;
+		case FUNNEL:
+			funnel.addStyleName("selected-chart");
+			break;
+		case GAUGE:
+
+			break;
+		case LINE:
+			break;
+		case LINE_CUMULATIVE:
+			break;
+		case LINE_GROUPED:
+			break;
+		case LINE_GROUPED_CUMULATIVE:
+			break;
+		case METRIC:
+			break;
+		case PAGE:
+			break;
+		case PIE:
+			break;
+		case REPORT:
+			break;
+		case SCATTER:
+			break;
+		case SCATTER_GROUPED:
+			break;
+		case SCONTROL:
+			break;
+		case TABLE:
+			break;
+		default:
+			break;
+
+		}
+
 		this.add(hPanel);
+	}
+
+	private void clearSelectedStyleName() {
+		horizontalBar.removeStyleName("selected-chart");
+		vertical.removeStyleName("selected-chart");
+		line.removeStyleName("selected-chart");
+		pie.removeStyleName("selected-chart");
+		donut.removeStyleName("selected-chart");
+		funnel.removeStyleName("selected-chart");
+		scatter.removeStyleName("selected-chart");
+		gauge.removeStyleName("selected-chart");
+		metric.removeStyleName("selected-chart");
+		tabel.removeStyleName("selected-chart");
 	}
 
 	private void componentPanelControls() {

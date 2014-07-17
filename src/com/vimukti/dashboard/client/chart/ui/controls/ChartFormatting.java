@@ -8,6 +8,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.vimukti.dashboard.client.colorPicker.ColorItem;
 import com.vimukti.dashboard.client.data.ChartLegendPosition;
 import com.vimukti.dashboard.client.data.ChartRangeType;
+import com.vimukti.dashboard.client.data.DashboardComponent;
 import com.vimukti.dashboard.client.data.DashboardComponentFilter;
 import com.vimukti.dashboard.client.data.DashboardComponentType;
 import com.vimukti.dashboard.client.ui.utils.SelectListBox;
@@ -29,8 +30,12 @@ public class ChartFormatting extends FlowPanel {
 	private ColorItem highRangeColor;
 	private TextItem maximum;
 
-	public ChartFormatting() {
+	public ChartFormatting( ) {
 		createControls();
+	}
+
+	public ChartFormatting(DashboardComponent chartData) {
+		// TODO Auto-generated constructor stub
 	}
 
 	private void createControls() {
