@@ -10,6 +10,7 @@ import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
 import com.vimukti.dashboard.client.data.ReportsAndPageListType;
 import com.vimukti.dashboard.client.data.ReportsAndPagesList;
 import com.vimukti.dashboard.client.ui.utils.TabControl;
+import com.vimukti.dashboard.client.ui.utils.TextItem;
 
 public class LeftPanel extends FlowPanel {
 
@@ -27,6 +28,7 @@ public class LeftPanel extends FlowPanel {
 	private void createControls() {
 
 		componentsPanel = new ComponentsPanel();
+		final TextItem b = new TextItem("bbbbbbbbb");
 
 		final SimplePanel sPanel = new SimplePanel();
 		TabControl tabs = new TabControl();
@@ -34,7 +36,7 @@ public class LeftPanel extends FlowPanel {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				sPanel.setWidget(getComponetsPanel());
+				sPanel.setWidget(b);
 			}
 		});
 		tabs.addTab("Data Source", new ClickHandler() {
@@ -63,11 +65,6 @@ public class LeftPanel extends FlowPanel {
 		});
 		this.add(tabs);
 		this.add(sPanel);
-	}
-
-	private ComponentsPanel getComponetsPanel() {
-		componentsPanel = new ComponentsPanel();
-		return componentsPanel;
 	}
 
 	private void init() {

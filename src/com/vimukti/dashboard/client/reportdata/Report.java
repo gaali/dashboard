@@ -3,7 +3,6 @@ package com.vimukti.dashboard.client.reportdata;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.vimukti.dashboard.client.data.Folder;
 import com.vimukti.dashboard.client.data.MetaObject;
 
 @SuppressWarnings("serial")
@@ -11,65 +10,23 @@ public class Report extends MetaObject {
 
 	private List<ReportAggregate> aggregates = new ArrayList<ReportAggregate>();
 
-	private List<Report> block;
-
-	private ReportBlockInfo blockInfo;
+	private List<ReportColumn> columns = new ArrayList<>();
 
 	private List<ReportBucketField> buckets = new ArrayList<ReportBucketField>();
 
 	private ReportChart chart;
 
-	private List<ReportColorRange> colorRanges = new ArrayList<>();
-
-	private List<ReportColumn> columns = new ArrayList<>();
-
-	private List<ReportCrossFilter> crossFilters = new ArrayList<>();
-
 	private String currency;
-
-	private String description;
-
-	private String division;
-
-	private ReportFilter filter;
-
-	private String format;
 
 	private String fullName;
 
-	private List<ReportGrouping> groupingsAcross = new ArrayList<>();
-
-	private List<ReportGrouping> groupingsDown = new ArrayList<>();
-
-	private ReportHistoricalSelector historicalSelector;
+	private List<ReportGrouping> groupings = new ArrayList<>();
 
 	private String name;
 
-	private List<ReportParam> params = new ArrayList<>();
-
 	private String reportType;
 
-	private String roleHierarchyFilter;
-
-	private int rowLimit;
-
 	private String scope;
-
-	private boolean showCurrentDate;
-
-	private boolean showDetails;
-
-	private String sortColumn;
-
-	private String sortOrder;
-
-	private String territoryHierarchyFilter;
-
-	private ReportTimeFrameFilter timeFrameFilter;
-
-	private String userFilter;
-
-	private Folder folder;
 
 	/**
 	 * @return the aggregates
@@ -84,36 +41,6 @@ public class Report extends MetaObject {
 	 */
 	public void setAggregates(List<ReportAggregate> aggregates) {
 		this.aggregates = aggregates;
-	}
-
-	/**
-	 * @return the block
-	 */
-	public List<Report> getBlock() {
-		return block;
-	}
-
-	/**
-	 * @param block
-	 *            the block to set
-	 */
-	public void setBlock(List<Report> block) {
-		this.block = block;
-	}
-
-	/**
-	 * @return the blockInfo
-	 */
-	public ReportBlockInfo getBlockInfo() {
-		return blockInfo;
-	}
-
-	/**
-	 * @param blockInfo
-	 *            the blockInfo to set
-	 */
-	public void setBlockInfo(ReportBlockInfo blockInfo) {
-		this.blockInfo = blockInfo;
 	}
 
 	/**
@@ -147,51 +74,6 @@ public class Report extends MetaObject {
 	}
 
 	/**
-	 * @return the colorRanges
-	 */
-	public List<ReportColorRange> getColorRanges() {
-		return colorRanges;
-	}
-
-	/**
-	 * @param colorRanges
-	 *            the colorRanges to set
-	 */
-	public void setColorRanges(List<ReportColorRange> colorRanges) {
-		this.colorRanges = colorRanges;
-	}
-
-	/**
-	 * @return the columns
-	 */
-	public List<ReportColumn> getColumns() {
-		return columns;
-	}
-
-	/**
-	 * @param columns
-	 *            the columns to set
-	 */
-	public void setColumns(List<ReportColumn> columns) {
-		this.columns = columns;
-	}
-
-	/**
-	 * @return the crossFilters
-	 */
-	public List<ReportCrossFilter> getCrossFilters() {
-		return crossFilters;
-	}
-
-	/**
-	 * @param crossFilters
-	 *            the crossFilters to set
-	 */
-	public void setCrossFilters(List<ReportCrossFilter> crossFilters) {
-		this.crossFilters = crossFilters;
-	}
-
-	/**
 	 * @return the currency
 	 */
 	public String getCurrency() {
@@ -204,66 +86,6 @@ public class Report extends MetaObject {
 	 */
 	public void setCurrency(String currency) {
 		this.currency = currency;
-	}
-
-	/**
-	 * @return the description
-	 */
-	public String getDescription() {
-		return description;
-	}
-
-	/**
-	 * @param description
-	 *            the description to set
-	 */
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	/**
-	 * @return the division
-	 */
-	public String getDivision() {
-		return division;
-	}
-
-	/**
-	 * @param division
-	 *            the division to set
-	 */
-	public void setDivision(String division) {
-		this.division = division;
-	}
-
-	/**
-	 * @return the filter
-	 */
-	public ReportFilter getFilter() {
-		return filter;
-	}
-
-	/**
-	 * @param filter
-	 *            the filter to set
-	 */
-	public void setFilter(ReportFilter filter) {
-		this.filter = filter;
-	}
-
-	/**
-	 * @return the format
-	 */
-	public String getFormat() {
-		return format;
-	}
-
-	/**
-	 * @param format
-	 *            the format to set
-	 */
-	public void setFormat(String format) {
-		this.format = format;
 	}
 
 	/**
@@ -282,52 +104,6 @@ public class Report extends MetaObject {
 	}
 
 	/**
-	 * @return the groupingsAcross
-	 */
-	public List<ReportGrouping> getGroupingsAcross() {
-		return groupingsAcross;
-	}
-
-	/**
-	 * @param groupingsAcross
-	 *            the groupingsAcross to set
-	 */
-	public void setGroupingsAcross(List<ReportGrouping> groupingsAcross) {
-		this.groupingsAcross = groupingsAcross;
-	}
-
-	/**
-	 * @return the groupingsDown
-	 */
-	public List<ReportGrouping> getGroupingsDown() {
-		return groupingsDown;
-	}
-
-	/**
-	 * @param groupingsDown
-	 *            the groupingsDown to set
-	 */
-	public void setGroupingsDown(List<ReportGrouping> groupingsDown) {
-		this.groupingsDown = groupingsDown;
-	}
-
-	/**
-	 * @return the historicalSelector
-	 */
-	public ReportHistoricalSelector getHistoricalSelector() {
-		return historicalSelector;
-	}
-
-	/**
-	 * @param historicalSelector
-	 *            the historicalSelector to set
-	 */
-	public void setHistoricalSelector(
-			ReportHistoricalSelector historicalSelector) {
-		this.historicalSelector = historicalSelector;
-	}
-
-	/**
 	 * @return the name
 	 */
 	public String getName() {
@@ -340,21 +116,6 @@ public class Report extends MetaObject {
 	 */
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	/**
-	 * @return the params
-	 */
-	public List<ReportParam> getParams() {
-		return params;
-	}
-
-	/**
-	 * @param params
-	 *            the params to set
-	 */
-	public void setParams(List<ReportParam> params) {
-		this.params = params;
 	}
 
 	/**
@@ -373,33 +134,33 @@ public class Report extends MetaObject {
 	}
 
 	/**
-	 * @return the roleHierarchyFilter
+	 * @return the columns
 	 */
-	public String getRoleHierarchyFilter() {
-		return roleHierarchyFilter;
+	public List<ReportColumn> getColumns() {
+		return columns;
 	}
 
 	/**
-	 * @param roleHierarchyFilter
-	 *            the roleHierarchyFilter to set
+	 * @param columns
+	 *            the columns to set
 	 */
-	public void setRoleHierarchyFilter(String roleHierarchyFilter) {
-		this.roleHierarchyFilter = roleHierarchyFilter;
+	public void setColumns(List<ReportColumn> columns) {
+		this.columns = columns;
 	}
 
 	/**
-	 * @return the rowLimit
+	 * @return the groupings
 	 */
-	public int getRowLimit() {
-		return rowLimit;
+	public List<ReportGrouping> getGroupings() {
+		return groupings;
 	}
 
 	/**
-	 * @param rowLimit
-	 *            the rowLimit to set
+	 * @param groupings
+	 *            the groupings to set
 	 */
-	public void setRowLimit(int rowLimit) {
-		this.rowLimit = rowLimit;
+	public void setGroupings(List<ReportGrouping> groupings) {
+		this.groupings = groupings;
 	}
 
 	/**
@@ -415,126 +176,6 @@ public class Report extends MetaObject {
 	 */
 	public void setScope(String scope) {
 		this.scope = scope;
-	}
-
-	/**
-	 * @return the showCurrentDate
-	 */
-	public boolean isShowCurrentDate() {
-		return showCurrentDate;
-	}
-
-	/**
-	 * @param showCurrentDate
-	 *            the showCurrentDate to set
-	 */
-	public void setShowCurrentDate(boolean showCurrentDate) {
-		this.showCurrentDate = showCurrentDate;
-	}
-
-	/**
-	 * @return the showDetails
-	 */
-	public boolean isShowDetails() {
-		return showDetails;
-	}
-
-	/**
-	 * @param showDetails
-	 *            the showDetails to set
-	 */
-	public void setShowDetails(boolean showDetails) {
-		this.showDetails = showDetails;
-	}
-
-	/**
-	 * @return the sortColumn
-	 */
-	public String getSortColumn() {
-		return sortColumn;
-	}
-
-	/**
-	 * @param sortColumn
-	 *            the sortColumn to set
-	 */
-	public void setSortColumn(String sortColumn) {
-		this.sortColumn = sortColumn;
-	}
-
-	/**
-	 * @return the sortOrder
-	 */
-	public String getSortOrder() {
-		return sortOrder;
-	}
-
-	/**
-	 * @param sortOrder
-	 *            the sortOrder to set
-	 */
-	public void setSortOrder(String sortOrder) {
-		this.sortOrder = sortOrder;
-	}
-
-	/**
-	 * @return the territoryHierarchyFilter
-	 */
-	public String getTerritoryHierarchyFilter() {
-		return territoryHierarchyFilter;
-	}
-
-	/**
-	 * @param territoryHierarchyFilter
-	 *            the territoryHierarchyFilter to set
-	 */
-	public void setTerritoryHierarchyFilter(String territoryHierarchyFilter) {
-		this.territoryHierarchyFilter = territoryHierarchyFilter;
-	}
-
-	/**
-	 * @return the timeFrameFilter
-	 */
-	public ReportTimeFrameFilter getTimeFrameFilter() {
-		return timeFrameFilter;
-	}
-
-	/**
-	 * @param timeFrameFilter
-	 *            the timeFrameFilter to set
-	 */
-	public void setTimeFrameFilter(ReportTimeFrameFilter timeFrameFilter) {
-		this.timeFrameFilter = timeFrameFilter;
-	}
-
-	/**
-	 * @return the userFilter
-	 */
-	public String getUserFilter() {
-		return userFilter;
-	}
-
-	/**
-	 * @param userFilter
-	 *            the userFilter to set
-	 */
-	public void setUserFilter(String userFilter) {
-		this.userFilter = userFilter;
-	}
-
-	/**
-	 * @return the folder
-	 */
-	public Folder getFolder() {
-		return folder;
-	}
-
-	/**
-	 * @param folder
-	 *            the folder to set
-	 */
-	public void setFolder(Folder folder) {
-		this.folder = folder;
 	}
 
 }
