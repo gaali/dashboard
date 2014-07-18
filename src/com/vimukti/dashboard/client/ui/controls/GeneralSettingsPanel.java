@@ -5,10 +5,10 @@ import java.util.List;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-import com.vimukti.dashboard.client.data.Dashboard;
+import com.vimukti.dashboard.client.data.DashboardData;
 import com.vimukti.dashboard.client.data.Folder;
 import com.vimukti.dashboard.client.ui.utils.LabelItem;
 import com.vimukti.dashboard.client.ui.utils.SelectListBox;
@@ -20,9 +20,9 @@ public class GeneralSettingsPanel extends FlowPanel {
 	private TextItem dashBoardUniqName;
 	private LabelItem nameSpacePrefix;
 	private SelectListBox<Folder> saveTo;
-	private Dashboard settings;
+	private DashboardData settings;
 
-	public GeneralSettingsPanel(Dashboard settings) {
+	public GeneralSettingsPanel(DashboardData settings) {
 		this.settings = settings;
 		this.addStyleName("dashboard-general-settings-panel");
 		createControls();
@@ -32,28 +32,34 @@ public class GeneralSettingsPanel extends FlowPanel {
 	public void createControls() {
 		title = new TextItem("Title", true);
 		title.addStyleName("title");
+
 		prepareDafaultUniqueDashboardName();
+
 		HorizontalPanel hPanel = new HorizontalPanel();
 		dashBoardUniqName = new TextItem("Dashboard Unique Name", true);
 		dashBoardUniqName.addStyleName("dashboard-unique-name");
-		HTML helpIcon = new HTML();
+		Image helpIcon = new Image();
 		helpIcon.addStyleName("help-icon");
 		hPanel.add(dashBoardUniqName);
 		hPanel.add(helpIcon);
 		helpIcon.addStyleName("help-icon");
+
 		nameSpacePrefix = new LabelItem("Name Space Prefix");
 		// need To provide NameSapace of this user onLoad current loged in user
 		// Fix me
 		nameSpacePrefix.setText("");
 		nameSpacePrefix.addStyleName("namespace-prefix");
+
 		Label folder = new Label("Folder");
 		folder.addStyleName("folder-label");
 		Label folderDescription = new Label(
 				"To avoid exposing sensitive data to the wrong people, choose a folder visible only to the right users.");
 		folderDescription.addStyleName("folder-description");
+
 		// need To getCollection set to saveTo selectList
 		saveTo = new SelectListBox<Folder>("SaveTo");
 		saveTo.addStyleName("saveto-folder selectlist-box");
+
 		this.add(title);
 		this.add(hPanel);
 		this.add(nameSpacePrefix);
@@ -96,13 +102,16 @@ public class GeneralSettingsPanel extends FlowPanel {
 		List<Folder> saveToFolder = settings.getDashBoardFolders();
 		if (saveToFolder != null) {
 			saveTo.setItems(saveToFolder);
+			saveTo.setSelectedValue(settings.getSaveToFolder());
 		}
 	}
 
 	public void update() {
+		if (settings == null) {
+			settings = new DashboardData();
+		}
 		settings.setTitle(title.getText());
 		settings.setFullName(dashBoardUniqName.getText());
-		settings.setRunningUser(nameSpacePrefix.getText());
 		settings.setSaveToFolder(saveTo.getSelectedValue());
 	}
 

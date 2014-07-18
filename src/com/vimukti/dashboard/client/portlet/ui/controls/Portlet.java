@@ -13,12 +13,11 @@ import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.vimukti.dashboard.client.Dashboard;
-import com.vimukti.dashboard.client.chart.ui.controls.ComponentEdiDialog;
+import com.vimukti.dashboard.client.chart.ui.controls.ComponentEditorDialog;
 import com.vimukti.dashboard.client.data.DashboardComponent;
 import com.vimukti.dashboard.client.data.DashboardComponentType;
 import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
-import com.vimukti.dashboard.client.data.Report;
-import com.vimukti.dashboard.client.reportdata.ReportResults;
+import com.vimukti.dashboard.client.reportdata.Report;
 import com.vimukti.dashboard.client.ui.controls.ChartComponent;
 import com.vimukti.dashboard.client.ui.controls.DataSourceListType;
 import com.vimukti.dashboard.client.ui.controls.DraggabelLableControl;
@@ -30,7 +29,7 @@ public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
 	private DashboardComponentType type;
 	private PortletType portletTyp;
 	private String objectId;
-	private ReportResults results;
+	private Report results;
 	IDashboardServiceAsync dashboardServiceObject = Dashboard
 			.getDashboardServiceObject();
 
@@ -70,9 +69,9 @@ public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
 				@Override
 				public void onClick(ClickEvent event) {
 					if (type == DashboardComponentType.PAGE) {
-						// TODsO
+						ComponentEditorDialogForPage editorPage = new ComponentEditorDialogForPage(component);
 					} else {
-						ComponentEdiDialog componentEditor = new ComponentEdiDialog(
+						ComponentEditorDialog componentEditor = new ComponentEditorDialog(
 								component, results);
 					}
 				}

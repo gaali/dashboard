@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.vimukti.dashboard.client.data.ChartUnits;
 import com.vimukti.dashboard.client.data.DashboardComponent;
 import com.vimukti.dashboard.client.data.DashboardComponentType;
+import com.vimukti.dashboard.client.reportdata.Report;
 import com.vimukti.dashboard.client.ui.utils.SelectListBox;
 import com.vimukti.dashboard.client.ui.utils.TextItem;
 
@@ -24,14 +25,16 @@ public class ChartComponentData extends FlowPanel {
 	private SelectListBox<ChartUnits> displayUnits;
 	private CheckBox cumulative;
 	private SelectListBox<Object> plotBy;
+	private Report result;
 
 	private DashboardComponent component;
 
 	// needCreate object for this field
 	private SelectListBox<Object> drillDownTo;
 
-	public ChartComponentData(DashboardComponent component) {
+	public ChartComponentData(DashboardComponent component, Report results) {
 		this.component = component;
+		this.result = results;
 		createControls();
 	}
 
@@ -96,7 +99,6 @@ public class ChartComponentData extends FlowPanel {
 	public void createControlsForBarColumnLine() {
 		if (type == DashboardComponentType.SCATTER) {
 			plotBy = new SelectListBox<Object>();
-			String groupingColumn = component.getGroupingColumn();
 			// TODO
 		}
 		xAxis = new SelectListBox<Object>();

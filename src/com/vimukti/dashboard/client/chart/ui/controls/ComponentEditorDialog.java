@@ -10,17 +10,18 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.vimukti.dashboard.client.data.DashboardComponent;
 import com.vimukti.dashboard.client.data.DashboardComponentType;
-import com.vimukti.dashboard.client.reportdata.ReportResults;
+import com.vimukti.dashboard.client.reportdata.Report;
 import com.vimukti.dashboard.client.ui.utils.BaseDialog;
 import com.vimukti.dashboard.client.ui.utils.TabControl;
 import com.vimukti.dashboard.client.ui.utils.TextItem;
 
-public class ComponentEdiDialog extends BaseDialog {
+public class ComponentEditorDialog extends BaseDialog {
 	private ChartFormatting formatting;
 	private ChartComponentData data;
 	private DashboardComponent chartData;
 	private TabLayoutPanel settingsPanel;
 	private SimplePanel targetPanel;
+	private Report reportData;
 
 	private FlowPanel horizontalBar;
 	private FlowPanel vertical;
@@ -33,9 +34,9 @@ public class ComponentEdiDialog extends BaseDialog {
 	private FlowPanel metric;
 	private FlowPanel tabel;
 
-	public ComponentEdiDialog(DashboardComponent chartData,
-			ReportResults reportData) {
+	public ComponentEditorDialog(DashboardComponent chartData, Report reportData) {
 		this.chartData = chartData;
+		this.reportData = reportData;
 		this.addStyleName("chart-settings-dialog");
 	}
 
@@ -63,7 +64,7 @@ public class ComponentEdiDialog extends BaseDialog {
 	private void CreateChartDataAndChartPanel() {
 		HorizontalPanel hPanel = new HorizontalPanel();
 
-		data = new ChartComponentData(chartData);
+		data = new ChartComponentData(chartData, reportData);
 		formatting = new ChartFormatting(chartData);
 
 		settingsPanel = new TabLayoutPanel(1.5, Unit.EM);
@@ -100,8 +101,8 @@ public class ComponentEdiDialog extends BaseDialog {
 	}
 
 	private FlowPanel createChartPreviewPanel() {
-		// TODO
-		return null;
+		ChartPanel chart = new ChartPanel();
+		return chart;
 	}
 
 	private void createChartTypesPanel() {

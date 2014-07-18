@@ -6,7 +6,7 @@ import java.util.List;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.vimukti.dashboard.client.colorPicker.ColorItem;
 import com.vimukti.dashboard.client.data.ChartBackgroundDirection;
-import com.vimukti.dashboard.client.data.Dashboard;
+import com.vimukti.dashboard.client.data.DashboardData;
 import com.vimukti.dashboard.client.ui.utils.SelectListBox;
 
 public class ComponentSettingsPanel extends FlowPanel {
@@ -17,9 +17,9 @@ public class ComponentSettingsPanel extends FlowPanel {
 	private SelectListBox<ChartBackgroundDirection> backgrounFadeDirection;
 	private ColorItem startingColor;
 	private ColorItem endingColor;
-	private Dashboard settings;
+	private DashboardData settings;
 
-	public ComponentSettingsPanel(Dashboard settings) {
+	public ComponentSettingsPanel(DashboardData settings) {
 		this.settings = settings;
 		this.addStyleName("dashboard-component-settings-panel");
 		createControls();
@@ -30,15 +30,22 @@ public class ComponentSettingsPanel extends FlowPanel {
 		titleColor = new ColorItem("Title Color");
 		titleColor.addStyleName("title-color");
 		titleColor.setColor("000000");
+
 		prepareTextSizeCombo();
+
 		textColor = new ColorItem("Text Color");
+		textColor.addStyleName("textcolor");
+
 		prepareBackgroundStylesComobo();
+
 		startingColor = new ColorItem("Start Color");
 		startingColor.addStyleName("starting-color");
 		startingColor.setColor("FFFFFF");
+
 		endingColor = new ColorItem("Ending Color");
 		endingColor.addStyleName("ending-color");
 		endingColor.setColor("FFFFFF");
+
 		this.add(titleColor);
 		this.add(titleSize);
 		this.add(textColor);

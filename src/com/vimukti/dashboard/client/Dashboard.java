@@ -74,7 +74,7 @@ public class Dashboard implements EntryPoint {
 
 	private DashboardMainPage addDasboardMainPage() {
 		DashboardMainPage mainPage = new DashboardMainPage(
-				new com.vimukti.dashboard.client.data.Dashboard());
+				new com.vimukti.dashboard.client.data.DashboardData());
 		return mainPage;
 	}
 

@@ -2,8 +2,12 @@ package com.vimukti.dashboard.client.ui.controls;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.vimukti.dashboard.client.Dashboard;
+import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
+import com.vimukti.dashboard.client.data.ReportsAndPageListType;
 import com.vimukti.dashboard.client.data.ReportsAndPagesList;
 import com.vimukti.dashboard.client.ui.utils.TabControl;
 
@@ -12,6 +16,8 @@ public class LeftPanel extends FlowPanel {
 	private ComponentsPanel componentsPanel;
 	private DataSourcePanel dataPanel;
 	private ReportsAndPagesList list;
+	private IDashboardServiceAsync dashboardServiceObject = Dashboard
+			.getDashboardServiceObject();
 
 	public LeftPanel(ReportsAndPagesList list) {
 		createControls();
@@ -20,7 +26,7 @@ public class LeftPanel extends FlowPanel {
 
 	private void createControls() {
 
-		dataPanel = new DataSourcePanel(list);
+		componentsPanel = new ComponentsPanel();
 
 		final SimplePanel sPanel = new SimplePanel();
 		TabControl tabs = new TabControl();
@@ -35,6 +41,23 @@ public class LeftPanel extends FlowPanel {
 
 			@Override
 			public void onClick(ClickEvent event) {
+				if (list == null) {
+					dashboardServiceObject.getReportsAndPagesList(
+							ReportsAndPageListType.ALL,
+							new AsyncCallback<ReportsAndPagesList>() {
+
+								@Override
+								public void onSuccess(ReportsAndPagesList result) {
+									list = result;
+									dataPanel = new DataSourcePanel(list);
+								}
+
+								@Override
+								public void onFailure(Throwable caught) {
+									// TODO Auto-generated method stub
+								}
+							});
+				}
 				sPanel.setWidget(dataPanel);
 			}
 		});

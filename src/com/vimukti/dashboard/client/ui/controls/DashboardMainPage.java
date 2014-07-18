@@ -4,17 +4,17 @@ import java.util.List;
 
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.vimukti.dashboard.client.column.DashboardColumnsPanel;
-import com.vimukti.dashboard.client.data.Dashboard;
+import com.vimukti.dashboard.client.data.DashboardData;
 import com.vimukti.dashboard.client.data.DashboardFilters;
 
 public class DashboardMainPage extends VerticalPanel {
 
-	private Dashboard dashboard;
+	private DashboardData dashboard;
 	private FiltersPanel filtersPanel;
 	private DescriptionPanel descriptionPanel;
 	private DashboardColumnsPanel columnsPanel;
 
-	public DashboardMainPage(Dashboard dashBoard) {
+	public DashboardMainPage(DashboardData dashBoard) {
 		this.dashboard = dashBoard;
 		createControls();
 	}

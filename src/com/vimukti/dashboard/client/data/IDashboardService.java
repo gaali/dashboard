@@ -3,12 +3,13 @@ package com.vimukti.dashboard.client.data;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.RemoteService;
+import com.vimukti.dashboard.client.reportdata.Report;
 
 public interface IDashboardService extends RemoteService {
 
-	ReportsAndPagesList getReportList();
+	ReportsAndPagesList getReportsAndPagesList(ReportsAndPageListType type);
 
-	Dashboard getDashboard();
+	DashboardData getDashboard();
 
 	List<Folder> getDashBoarFolders();
 
@@ -16,5 +17,5 @@ public interface IDashboardService extends RemoteService {
 
 	Report getReport(String id);
 
-	void saveDashBoard(Dashboard dashboard);
+	void saveDashBoard(DashboardData dashboard);
 }

@@ -6,6 +6,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -14,17 +15,24 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.vimukti.dashboard.client.Dashboard;
 import com.vimukti.dashboard.client.data.Folder;
+import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
 import com.vimukti.dashboard.client.data.PagesList;
 import com.vimukti.dashboard.client.data.ReportList;
+import com.vimukti.dashboard.client.data.ReportsAndPageListType;
 import com.vimukti.dashboard.client.data.ReportsAndPagesList;
 
 public class DataSourcePanel extends VerticalPanel {
 
-	private Button recent;
-	private Button my;
-	private Button all;
+	private Button recentB;
+	private Button myB;
+	private Button allB;
 	private ReportsAndPagesList source;
+	private ReportsAndPagesList recent;
+	private ReportsAndPagesList my;
+	private IDashboardServiceAsync dashboardServiceObject = Dashboard
+			.getDashboardServiceObject();
 
 	public DataSourcePanel(ReportsAndPagesList source) {
 		this.source = source;
@@ -34,26 +42,68 @@ public class DataSourcePanel extends VerticalPanel {
 	private void createControls() {
 		createButtonsBar();
 		createSearchBox();
-
 	}
 
 	private void createButtonsBar() {
 		HorizontalPanel hPanel = new HorizontalPanel();
 		hPanel.setStyleName("dashboard-datasourcetab-btn-group");
-		all = createButton("All", hPanel);
-		recent = createButton("Recent", hPanel);
-		my = createButton("My", hPanel);
-		ClickHandler clickHandler = new ClickHandler() {
+		allB = createButton("All", hPanel);
+		allB.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				// TODO
+				showReportsPages(source);
 			}
-		};
-		recent.addClickHandler(clickHandler);
-		my.addClickHandler(clickHandler);
-		all.addClickHandler(clickHandler);
-		all.addStyleName("active");
+		});
+
+		recentB = createButton("Recent", hPanel);
+		recentB.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				dashboardServiceObject.getReportsAndPagesList(
+						ReportsAndPageListType.RECENT,
+						new AsyncCallback<ReportsAndPagesList>() {
+
+							@Override
+							public void onSuccess(ReportsAndPagesList result) {
+								recent = result;
+							}
+
+							@Override
+							public void onFailure(Throwable caught) {
+								// TODO Auto-generated method stub
+
+							}
+						});
+				showReportsPages(recent);
+			}
+		});
+		myB = createButton("My", hPanel);
+		myB.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				dashboardServiceObject.getReportsAndPagesList(
+						ReportsAndPageListType.MY,
+						new AsyncCallback<ReportsAndPagesList>() {
+
+							@Override
+							public void onSuccess(ReportsAndPagesList result) {
+								my = result;
+							}
+
+							@Override
+							public void onFailure(Throwable caught) {
+
+							}
+
+						});
+				showReportsPages(my);
+			}
+		});
+
+		allB.addStyleName("active");
 		this.add(hPanel);
 	}
 
@@ -69,15 +119,12 @@ public class DataSourcePanel extends VerticalPanel {
 		final TextBox searchBox = new TextBox();
 		searchBox.getElement().setId("Search");
 		searchBox.addKeyDownHandler(new KeyDownHandler() {
-
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				String value = searchBox.getValue();
 				getSearchResult(value);
-
 			}
 		});
-
 		searchPanel.add(searchBox);
 		this.add(searchPanel);
 	}
@@ -87,14 +134,13 @@ public class DataSourcePanel extends VerticalPanel {
 
 	}
 
-	public void showReportsPages() {
+	public void showReportsPages(ReportsAndPagesList list) {
 		FlowPanel dataPanel = new FlowPanel();
-
-		if (source == null) {
+		dataPanel.clear();
+		if (list == null) {
 			return;
 		}
-
-		List<Folder> folders = source.getFolders();
+		List<Folder> folders = list.getFolders();
 		Tree reportsTree = new Tree();
 		for (Folder folder : folders) {
 			TreeItem reportFolderItem = new TreeItem(
@@ -108,8 +154,7 @@ public class DataSourcePanel extends VerticalPanel {
 			}
 			reportsTree.addItem(reportFolderItem);
 		}
-
-		List<PagesList> pages = source.getPages();
+		List<PagesList> pages = list.getPages();
 		Tree pagesTree = new Tree();
 		for (PagesList page : pages) {
 			DraggabelLableControl item = new DraggabelLableControl(page);
@@ -120,7 +165,6 @@ public class DataSourcePanel extends VerticalPanel {
 		dataPanel.add(reportsTree);
 		dataPanel.add(pagesTree);
 		this.add(dataPanel);
-
 	}
 
 }

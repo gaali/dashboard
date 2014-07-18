@@ -111,6 +111,6 @@ public class TextItem extends HorizontalPanel {
 
 	public void setFocus(boolean b) {
 		textBox.setFocus(true);
-		
 	}
+
 }

@@ -3,7 +3,7 @@ package com.vimukti.dashboard.client.data;
 import java.util.List;
 
 @SuppressWarnings("serial")
-public class Dashboard extends MetaObject {
+public class DashboardData extends MetaObject {
 
 	private String backgroundEndColor;
 

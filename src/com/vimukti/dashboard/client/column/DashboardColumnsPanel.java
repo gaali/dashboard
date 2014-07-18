@@ -3,15 +3,15 @@ package com.vimukti.dashboard.client.column;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.vimukti.dashboard.client.data.Dashboard;
+import com.vimukti.dashboard.client.data.DashboardData;
 
 public class DashboardColumnsPanel extends FlowPanel {
 
 	private DashboardColumn columnPanel;
 	private FlowPanel addIcon;
-	private Dashboard dashboard;
+	private DashboardData dashboard;
 
-	public DashboardColumnsPanel(Dashboard dashboard) {
+	public DashboardColumnsPanel(DashboardData dashboard) {
 		this.dashboard = dashboard;
 		this.addStyleName("columns-panel");
 		CreateControls();
@@ -38,7 +38,7 @@ public class DashboardColumnsPanel extends FlowPanel {
 
 	private DashboardColumn createColumn() {
 		if (dashboard == null) {
-			dashboard = new Dashboard();
+			dashboard = new DashboardData();
 		}
 		columnPanel = new DashboardColumn(dashboard.getLeftSection());
 		columnPanel = new DashboardColumn(dashboard.getMiddleSection());
