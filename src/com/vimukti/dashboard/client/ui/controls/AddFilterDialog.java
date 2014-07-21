@@ -53,8 +53,9 @@ public class AddFilterDialog extends BaseDialog {
 		super.createControls();
 		if (isNewFilter) {
 			prepareFields();
+			setDefaultValueForDisplayName();
 		}
-		setDefaultValueForDisplayName();
+
 		displayName = new TextItem("DispalayName");
 		displayName.addStyleName("displayname");
 		HorizontalPanel hpanel = new HorizontalPanel();

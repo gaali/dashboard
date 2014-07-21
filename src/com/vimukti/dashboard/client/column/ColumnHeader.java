@@ -16,6 +16,7 @@ public class ColumnHeader extends FlowPanel {
 
 	private DashboardComponentSize columnSize;
 	private Image remvoveIcon;
+	DeleteDashboardColumn col;
 
 	public ColumnHeader() {
 		this.addStyleName("columnheader");
@@ -31,7 +32,8 @@ public class ColumnHeader extends FlowPanel {
 		final ListBox box = new ListBox();
 		box.addStyleName("columsizebox");
 		DashboardComponentSize.values();
-		final List<DashboardComponentSize> asList = Arrays.asList(DashboardComponentSize.values());
+		final List<DashboardComponentSize> asList = Arrays
+				.asList(DashboardComponentSize.values());
 		for (DashboardComponentSize size : asList) {
 			String string = size.toString().toLowerCase();
 			box.addItem(string);
@@ -55,11 +57,14 @@ public class ColumnHeader extends FlowPanel {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				remvoveIcon.getParent().getParent().removeFromParent();
-				// TODO save this column has been removed
+				col.deleteColumn();
 			}
 		});
 		this.add(remvoveIcon);
+	}
+
+	public void setDeletecolumn(DeleteDashboardColumn col) {
+		this.col = col;
 	}
 
 }

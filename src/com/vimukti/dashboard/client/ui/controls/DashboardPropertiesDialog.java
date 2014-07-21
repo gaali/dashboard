@@ -37,7 +37,7 @@ public class DashboardPropertiesDialog extends BaseDialog {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				sPanel.add(general);
+				sPanel.setWidget(general);
 			}
 		});
 		tabs.addTab("Component Settings", new ClickHandler() {
@@ -63,8 +63,11 @@ public class DashboardPropertiesDialog extends BaseDialog {
 	}
 
 	public void update() {
-		general.update();
-		componentSettings.update();
+		if (dashBoard == null) {
+			dashBoard = new DashboardData();
+		}
+		general.update(dashBoard);
+		componentSettings.update(dashBoard);
 	}
 
 }

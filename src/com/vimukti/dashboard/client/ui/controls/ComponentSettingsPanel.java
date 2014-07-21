@@ -116,11 +116,11 @@ public class ComponentSettingsPanel extends FlowPanel {
 		}
 	}
 
-	public void update() {
+	public void update(DashboardData settings) {
 		settings.setTitleColor(titleColor.getColor());
 		String selectedValue = titleSize.getSelectedValue();
-		String[] split = selectedValue.split("px");
-		settings.setTitleSize(Integer.parseInt(split[0]));
+		String[] split = selectedValue.split("pt");
+		settings.setTitleSize(Integer.parseInt(split[0].trim()));
 		settings.setTextColor(textColor.getColor());
 		settings.setBackgroundFadeDirection(backgrounFadeDirection
 				.getSelectedValue());

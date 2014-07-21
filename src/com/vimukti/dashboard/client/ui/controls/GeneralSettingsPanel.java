@@ -106,10 +106,7 @@ public class GeneralSettingsPanel extends FlowPanel {
 		}
 	}
 
-	public void update() {
-		if (settings == null) {
-			settings = new DashboardData();
-		}
+	public void update(DashboardData settings) {
 		settings.setTitle(title.getText());
 		settings.setFullName(dashBoardUniqName.getText());
 		settings.setSaveToFolder(saveTo.getSelectedValue());

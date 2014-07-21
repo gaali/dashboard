@@ -24,10 +24,10 @@ import com.vimukti.dashboard.client.ui.controls.DraggabelLableControl;
 import com.vimukti.dashboard.client.ui.controls.dnd.IDraggable;
 import com.vimukti.dashboard.client.ui.controls.dnd.IDroppable;
 
-public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
+public class Portlet extends AbsolutePanel implements RequiresResize,
+		IDraggable {
 	private DashboardComponent component;
 	private DashboardComponentType type;
-	private PortletType portletTyp;
 	private String objectId;
 	private Report results;
 	IDashboardServiceAsync dashboardServiceObject = Dashboard
@@ -37,11 +37,6 @@ public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
 		this.component = component;
 		type = component.getComponentType();
 		createControls();
-		setPortletType();
-	}
-
-	private void setPortletType() {
-
 	}
 
 	private void createControls() {
@@ -69,7 +64,8 @@ public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
 				@Override
 				public void onClick(ClickEvent event) {
 					if (type == DashboardComponentType.PAGE) {
-						ComponentEditorDialogForPage editorPage = new ComponentEditorDialogForPage(component);
+						ComponentEditorDialogForPage editorPage = new ComponentEditorDialogForPage(
+								component);
 					} else {
 						ComponentEditorDialog componentEditor = new ComponentEditorDialog(
 								component, results);
@@ -163,7 +159,7 @@ public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
 		this.objectId = objectId;
 	}
 
-	class ChartContainer extends FlowPanel implements IDroppable {
+	class ChartContainer extends AbsolutePanel implements IDroppable {
 
 		public ChartContainer() {
 			super();
@@ -224,7 +220,6 @@ public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
 				chartPanel.add(icon);
 				chartPanel.add(helpText);
 			} else {
-				prepareChart(chartPanel);
 				final HorizontalPanel datasourceTitle = new HorizontalPanel();
 				datasourceTitle.addStyleName("datasource title");
 				Label soureceTitle = new Label();
@@ -248,12 +243,15 @@ public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
 			return bodyPanel;
 		}
 
-		private void prepareChart(VerticalPanel bodyPanel) {
+		private void preparePagePanel(VerticalPanel bodyPanel) {
 			if (type == DashboardComponentType.PAGE) {
 				String pageLink = getPageObject(objectId);
 				Frame frame = new Frame(pageLink);
 				bodyPanel.add(frame);
 			}
+		}
+
+		private void prepareChart() {
 		}
 
 		private String getPageObject(String id) {
@@ -293,6 +291,7 @@ public class Portlet extends FlowPanel implements RequiresResize, IDraggable {
 								@Override
 								public void onSuccess(Report result) {
 									Portlet.this.results = results;
+									prepareChart();
 								}
 
 								@Override

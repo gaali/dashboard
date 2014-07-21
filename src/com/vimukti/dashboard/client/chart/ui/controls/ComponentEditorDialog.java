@@ -101,8 +101,7 @@ public class ComponentEditorDialog extends BaseDialog {
 	}
 
 	private FlowPanel createChartPreviewPanel() {
-		ChartPanel chart = new ChartPanel();
-		return chart;
+		return null;
 	}
 
 	private void createChartTypesPanel() {

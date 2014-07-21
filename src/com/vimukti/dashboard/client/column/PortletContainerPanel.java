@@ -2,6 +2,7 @@ package com.vimukti.dashboard.client.column;
 
 import java.util.List;
 
+import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.vimukti.dashboard.client.data.DashboardComponent;
@@ -14,7 +15,7 @@ import com.vimukti.dashboard.client.ui.controls.DraggabelLableControl;
 import com.vimukti.dashboard.client.ui.controls.dnd.IDraggable;
 import com.vimukti.dashboard.client.ui.controls.dnd.IDroppable;
 
-public class PortletContainerPanel extends FlowPanel implements IDroppable {
+public class PortletContainerPanel extends AbsolutePanel implements IDroppable {
 
 	private PortletFactory portletFactory = PortletFactory.getPortletFactory();
 

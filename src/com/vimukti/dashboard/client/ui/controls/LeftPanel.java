@@ -28,15 +28,16 @@ public class LeftPanel extends FlowPanel {
 	private void createControls() {
 
 		componentsPanel = new ComponentsPanel();
-		final TextItem b = new TextItem("bbbbbbbbb");
 
 		final SimplePanel sPanel = new SimplePanel();
+		sPanel.addStyleName("simpanel");
+		sPanel.add(componentsPanel);
 		TabControl tabs = new TabControl();
 		tabs.addTab("Componts", new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				sPanel.setWidget(b);
+				sPanel.setWidget(componentsPanel);
 			}
 		});
 		tabs.addTab("Data Source", new ClickHandler() {

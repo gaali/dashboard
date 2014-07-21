@@ -14,11 +14,7 @@ public class ReportAggregate extends MetaObject {
 
 	private String description;
 
-	private String developerName;
-
 	private String downGroupingContext;
-
-	private boolean isActive;
 
 	private boolean isCrossBlock;
 
@@ -89,21 +85,6 @@ public class ReportAggregate extends MetaObject {
 	}
 
 	/**
-	 * @return the developerName
-	 */
-	public String getDeveloperName() {
-		return developerName;
-	}
-
-	/**
-	 * @param developerName
-	 *            the developerName to set
-	 */
-	public void setDeveloperName(String developerName) {
-		this.developerName = developerName;
-	}
-
-	/**
 	 * @return the downGroupingContext
 	 */
 	public String getDownGroupingContext() {
@@ -116,21 +97,6 @@ public class ReportAggregate extends MetaObject {
 	 */
 	public void setDownGroupingContext(String downGroupingContext) {
 		this.downGroupingContext = downGroupingContext;
-	}
-
-	/**
-	 * @return the isActive
-	 */
-	public boolean isActive() {
-		return isActive;
-	}
-
-	/**
-	 * @param isActive
-	 *            the isActive to set
-	 */
-	public void setActive(boolean isActive) {
-		this.isActive = isActive;
 	}
 
 	/**

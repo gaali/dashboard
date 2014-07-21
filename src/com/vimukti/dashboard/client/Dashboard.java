@@ -6,10 +6,15 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.vimukti.dashboard.client.data.DashboardData;
 import com.vimukti.dashboard.client.data.IDashboardService;
 import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
+import com.vimukti.dashboard.client.data.ReportsAndPagesList;
+import com.vimukti.dashboard.client.ui.controls.AddFilterDialog;
 import com.vimukti.dashboard.client.ui.controls.DashboardMainPage;
 import com.vimukti.dashboard.client.ui.controls.DashboardPropertiesDialog;
 import com.vimukti.dashboard.client.ui.controls.LeftPanel;
@@ -44,15 +49,31 @@ public class Dashboard implements EntryPoint {
 	private void createDashboardForTest() {
 		RootPanel rootPanel = RootPanel.get();
 		rootPanel.clear();
-
 		VerticalPanel vPanel = new VerticalPanel();
-		HorizontalPanel hpanel = new HorizontalPanel();
-		HorizontalPanel h2Panel = new HorizontalPanel();
-		rootPanel.add(hpanel);
+		HorizontalPanel createDashbordBar = createDashbordBar();
+		HorizontalPanel addMainPanel = addMainPanel();
+		vPanel.add(createDashbordBar);
+		vPanel.add(addMainPanel);
+		rootPanel.add(vPanel);
+	}
 
-		Button dashboardPropertiesDialog = new Button(
-				"dashboardPropertiesDialog");
-		dashboardPropertiesDialog.addClickHandler(new ClickHandler() {
+	public HorizontalPanel createDashbordBar() {
+		HorizontalPanel hPanel = new HorizontalPanel();
+
+		Button save = new Button("save");
+		save.addStyleName("save-btn");
+		hPanel.add(save);
+
+		Button saveNclose = new Button("Save And Close");
+		saveNclose.addStyleName("saveclose-btn");
+		hPanel.add(saveNclose);
+
+		Button close = new Button("Close");
+		close.addStyleName("Close");
+		hPanel.add(close);
+
+		Button dashProperties = new Button("Dashboard Properties");
+		dashProperties.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
@@ -62,24 +83,60 @@ public class Dashboard implements EntryPoint {
 				dialog.center();
 			}
 		});
-		hpanel.add(dashboardPropertiesDialog);
-		LeftPanel addDashboardLeftPanel = addDashboardLeftPanel();
-		h2Panel.add(addDashboardLeftPanel);
-		DashboardMainPage mainPage = addDasboardMainPage();
-		h2Panel.add(mainPage);
-		vPanel.add(hpanel);
-		vPanel.add(h2Panel);
-		rootPanel.add(vPanel);
+		dashProperties.addStyleName("Dashboard Properties");
+		hPanel.add(dashProperties);
+
+		Button addFilter = new Button("Add Fillter");
+		addFilter.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				AddFilterDialog filterDialog = new AddFilterDialog(null, true);
+				filterDialog.show();
+				filterDialog.center();
+			}
+		});
+		addFilter.addStyleName("addfilter");
+		hPanel.add(addFilter);
+
+		HorizontalPanel searchPanel = new HorizontalPanel();
+		searchPanel.addStyleName("searchPanel");
+
+		Label viewDashboardAs = new Label("View Dashboard As");
+		searchPanel.add(viewDashboardAs);
+
+		TextBox box = new TextBox();
+		searchPanel.add(box);
+
+		Button but = new Button("s");
+		but.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+		searchPanel.add(but);
+		hPanel.add(searchPanel);
+
+		return hPanel;
 	}
 
-	private DashboardMainPage addDasboardMainPage() {
-		DashboardMainPage mainPage = new DashboardMainPage(
-				new com.vimukti.dashboard.client.data.DashboardData());
-		return mainPage;
+	private HorizontalPanel addMainPanel() {
+
+		HorizontalPanel panel = new HorizontalPanel();
+		panel.addStyleName("mainPanel");
+
+		LeftPanel leftPanel = new LeftPanel(new ReportsAndPagesList());
+		leftPanel.addStyleName("leftPanel");
+		panel.add(leftPanel);
+
+		DashboardMainPage mainPage = new DashboardMainPage(new DashboardData());
+		mainPage.addStyleName("main-panel");
+		panel.add(mainPage);
+
+		return panel;
 	}
 
-	private LeftPanel addDashboardLeftPanel() {
-		LeftPanel leftPanel = new LeftPanel(null);
-		return leftPanel;
-	}
 }

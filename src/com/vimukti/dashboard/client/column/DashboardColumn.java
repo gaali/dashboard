@@ -12,7 +12,7 @@ import com.vimukti.dashboard.client.data.DashboardComponentSize;
 import com.vimukti.dashboard.client.portlet.ui.controls.Portlet;
 import com.vimukti.dashboard.client.portlet.ui.controls.PortletFactory;
 
-public class DashboardColumn extends FlowPanel {
+public abstract class DashboardColumn extends FlowPanel {
 	private VerticalPanel column;
 	private PortletContainerPanel portletContainer;
 	private ColumnHeader columnHeader;
@@ -30,8 +30,8 @@ public class DashboardColumn extends FlowPanel {
 		createHeder();
 		createColumn();
 		String size = DashboardComponentSize.MEDIUM.toString().toLowerCase();
-		if (section != null) {
-			size = section.getColumnSize().toString().toLowerCase();
+		if (getSection() != null) {
+			size = getSection().getColumnSize().toString().toLowerCase();
 		}
 		setColumnSize(size);
 		createAddColumnIcon();
@@ -48,11 +48,12 @@ public class DashboardColumn extends FlowPanel {
 		addIcon.addDomHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DashboardColumn.this.removeFromParent();
-
+				addColumn();
 			}
 		}, ClickEvent.getType());
 	}
+
+	protected abstract void addColumn();
 
 	private void createColumn() {
 		column = new VerticalPanel();
@@ -62,8 +63,8 @@ public class DashboardColumn extends FlowPanel {
 		column.add(columnHeader);
 		// Portlet Container Panel which is Droppable
 		List<DashboardComponent> components = null;
-		if (section != null) {
-			components = section.getComponents();
+		if (getSection() != null) {
+			components = getSection().getComponents();
 		}
 		portletContainer = new PortletContainerPanel();
 		portletContainer.addPortlets(components);
@@ -84,7 +85,6 @@ public class DashboardColumn extends FlowPanel {
 			this.addStyleName("column-medium");
 			break;
 		}
-
 	}
 
 	private void clearSizeStyle() {
@@ -94,15 +94,34 @@ public class DashboardColumn extends FlowPanel {
 	}
 
 	private void init() {
-		if (section == null) {
+		if (getSection() == null) {
 			return;
 		}
 		PortletFactory portletFactory = PortletFactory.getPortletFactory();
-		List<DashboardComponent> components = section.getComponents();
+		List<DashboardComponent> components = getSection().getComponents();
 		for (DashboardComponent component : components) {
 			Portlet Portlet = portletFactory.createPortlet(component);
 			this.add(Portlet);
 		}
 
 	}
+
+	public void deleteColun(DeleteDashboardColumn col) {
+		columnHeader.setDeletecolumn(col);
+
+	}
+
+	public DashboardComponentSection getSection() {
+		return section;
+	}
+
+	public void setSection(DashboardComponentSection section) {
+		this.section = section;
+	}
+
+	public void disableRemoveIcon() {
+		// TODO Auto-generated method stub
+
+	}
+
 }
