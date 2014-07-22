@@ -1,6 +1,6 @@
 package com.vimukti.dashboard.client.column;
 
-public interface DeleteDashboardColumn {
+public interface IDeleteDashboardColumn {
 
 	void deleteColumn();
 }

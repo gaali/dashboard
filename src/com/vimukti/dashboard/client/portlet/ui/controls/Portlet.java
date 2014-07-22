@@ -12,8 +12,10 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.vimukti.dashboard.client.Dashboard;
 import com.vimukti.dashboard.client.chart.ui.controls.ComponentEditorDialog;
+import com.vimukti.dashboard.client.column.PortletContainerPanel;
 import com.vimukti.dashboard.client.data.DashboardComponent;
 import com.vimukti.dashboard.client.data.DashboardComponentType;
 import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
@@ -66,9 +68,13 @@ public class Portlet extends AbsolutePanel implements RequiresResize,
 					if (type == DashboardComponentType.PAGE) {
 						ComponentEditorDialogForPage editorPage = new ComponentEditorDialogForPage(
 								component);
+						editorPage.show();
+						editorPage.center();
 					} else {
 						ComponentEditorDialog componentEditor = new ComponentEditorDialog(
 								component, results);
+						componentEditor.show();
+						componentEditor.center();
 					}
 				}
 			});
@@ -80,12 +86,12 @@ public class Portlet extends AbsolutePanel implements RequiresResize,
 
 			@Override
 			public void onClick(ClickEvent event) {
-				Portlet.this.removeFromParent();
-
+				PortletContainerPanel parent = (PortletContainerPanel) Portlet.this
+						.getParent();
+				parent.removePortlet(Portlet.this);
 			}
 		});
 		removeIcon.addStyleName("portlet-remove-icon");
-
 		headerBar.add(removeIcon);
 		this.add(headerBar);
 	}
@@ -134,7 +140,6 @@ public class Portlet extends AbsolutePanel implements RequiresResize,
 			break;
 
 		}
-
 		return null;
 	}
 

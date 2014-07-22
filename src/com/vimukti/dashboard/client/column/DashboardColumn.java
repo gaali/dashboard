@@ -9,29 +9,27 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.vimukti.dashboard.client.data.DashboardComponent;
 import com.vimukti.dashboard.client.data.DashboardComponentSection;
 import com.vimukti.dashboard.client.data.DashboardComponentSize;
-import com.vimukti.dashboard.client.portlet.ui.controls.Portlet;
-import com.vimukti.dashboard.client.portlet.ui.controls.PortletFactory;
 
 public abstract class DashboardColumn extends FlowPanel {
 	private VerticalPanel column;
 	private PortletContainerPanel portletContainer;
 	private ColumnHeader columnHeader;
 	private FlowPanel addIcon;
+	// column section:left,middle,right
 	private DashboardComponentSection section;
 
 	public DashboardColumn(DashboardComponentSection section) {
 		this.section = section;
 		this.addStyleName("dashboard-column");
 		createControls();
-		init();
 	}
 
 	private void createControls() {
 		createHeder();
 		createColumn();
 		String size = DashboardComponentSize.MEDIUM.toString().toLowerCase();
-		if (getSection() != null) {
-			size = getSection().getColumnSize().toString().toLowerCase();
+		if (section != null) {
+			size = section.getColumnSize().toString().toLowerCase();
 		}
 		setColumnSize(size);
 		createAddColumnIcon();
@@ -48,9 +46,19 @@ public abstract class DashboardColumn extends FlowPanel {
 		addIcon.addDomHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				addColumn();
+				if (!isAddIconDisabled()) {
+					addColumn();
+				}
 			}
 		}, ClickEvent.getType());
+	}
+
+	public boolean isAddIconDisabled() {
+		return addIcon.getElement().getPropertyBoolean("disabled");
+	}
+
+	public void setdisableAddIcon(boolean value) {
+		addIcon.getElement().setPropertyBoolean("disabled", value);
 	}
 
 	protected abstract void addColumn();
@@ -63,7 +71,7 @@ public abstract class DashboardColumn extends FlowPanel {
 		column.add(columnHeader);
 		// Portlet Container Panel which is Droppable
 		List<DashboardComponent> components = null;
-		if (getSection() != null) {
+		if (section != null) {
 			components = getSection().getComponents();
 		}
 		portletContainer = new PortletContainerPanel();
@@ -93,35 +101,20 @@ public abstract class DashboardColumn extends FlowPanel {
 		this.removeStyleName("column-medium");
 	}
 
-	private void init() {
-		if (getSection() == null) {
-			return;
-		}
-		PortletFactory portletFactory = PortletFactory.getPortletFactory();
-		List<DashboardComponent> components = getSection().getComponents();
-		for (DashboardComponent component : components) {
-			Portlet Portlet = portletFactory.createPortlet(component);
-			this.add(Portlet);
-		}
-
-	}
-
-	public void deleteColun(DeleteDashboardColumn col) {
-		columnHeader.setDeletecolumn(col);
-
+	public void deleteColumnListner(IDeleteDashboardColumn calBack) {
+		columnHeader.setDeletecolumn(calBack);
 	}
 
 	public DashboardComponentSection getSection() {
 		return section;
 	}
 
-	public void setSection(DashboardComponentSection section) {
-		this.section = section;
+	public void setDisableRemovieIcon(boolean value) {
+		columnHeader.setDisableRemovieIcon(value);
 	}
 
-	public void disableRemoveIcon() {
-		// TODO Auto-generated method stub
-
+	public void clearPortlets() {
+		portletContainer.clearAllPortlets();
 	}
 
 }

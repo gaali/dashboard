@@ -2,7 +2,7 @@ package com.vimukti.dashboard.client.data;
 
 
 @SuppressWarnings("serial")
-public class ReportList extends MetaObject {
+public class ReportDetails extends MetaObject {
 
 	String name;
 	String id;

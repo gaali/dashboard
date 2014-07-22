@@ -14,9 +14,8 @@ import com.vimukti.dashboard.client.data.DashboardComponentSize;
 
 public class ColumnHeader extends FlowPanel {
 
-	private DashboardComponentSize columnSize;
 	private Image remvoveIcon;
-	DeleteDashboardColumn col;
+	private IDeleteDashboardColumn callBack;
 
 	public ColumnHeader() {
 		this.addStyleName("columnheader");
@@ -57,14 +56,22 @@ public class ColumnHeader extends FlowPanel {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				col.deleteColumn();
+				boolean propertyBoolean = remvoveIcon.getElement()
+						.getPropertyBoolean("disabled");
+				if (!propertyBoolean) {
+					callBack.deleteColumn();
+				}
 			}
 		});
 		this.add(remvoveIcon);
 	}
 
-	public void setDeletecolumn(DeleteDashboardColumn col) {
-		this.col = col;
+	public void setDeletecolumn(IDeleteDashboardColumn callBack) {
+		this.callBack = callBack;
+	}
+
+	public void setDisableRemovieIcon(boolean value) {
+		remvoveIcon.getElement().setPropertyBoolean("disabled", value);
 	}
 
 }

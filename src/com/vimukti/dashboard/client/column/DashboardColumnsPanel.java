@@ -31,7 +31,10 @@ public class DashboardColumnsPanel extends FlowPanel {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				removeAllColumns();
+
+				if (isAddIconDisabled()) {
+					return;
+				}
 
 				rightSection = middleSection;
 				middleSection = leftSection;
@@ -45,13 +48,12 @@ public class DashboardColumnsPanel extends FlowPanel {
 				DashboardColumnsPanel.this.add(leftSection);
 				DashboardColumnsPanel.this.add(middleSection);
 				DashboardColumnsPanel.this.add(rightSection);
+
+				setdisableAddIcon(true);
+				setDisableRemoveIcon(false);
 			}
 		}, ClickEvent.getType());
 		this.add(addIcon);
-	}
-
-	public void icon2() {
-
 	}
 
 	private DashboardColumn createLeftColumn() {
@@ -59,26 +61,27 @@ public class DashboardColumnsPanel extends FlowPanel {
 
 			@Override
 			protected void addColumn() {
-				middleSection.removeFromParent();
+				if (!isAddIconDisabled()) {
+					middleSection.removeFromParent();
 
-				rightSection = middleSection;
+					rightSection = middleSection;
 
-				dashboard.setRightSection(middleSection.getSection());
-				dashboard.setMiddleSection(null);
-				middleSection = createMiddleColumn();
+					dashboard.setRightSection(middleSection.getSection());
+					dashboard.setMiddleSection(null);
+					middleSection = createMiddleColumn();
 
-				DashboardColumnsPanel.this.add(middleSection);
-				DashboardColumnsPanel.this.add(rightSection);
-
+					DashboardColumnsPanel.this.add(middleSection);
+					DashboardColumnsPanel.this.add(rightSection);
+					DashboardColumnsPanel.this.setdisableAddIcon(true);
+					setDisableRemoveIcon(false);
+				}
 			}
 		};
-		leftSection.deleteColun(new DeleteDashboardColumn() {
+		leftSection.deleteColumnListner(new IDeleteDashboardColumn() {
 
 			@Override
 			public void deleteColumn() {
-
-				removeAllColumns();
-
+				leftSection.clearPortlets();
 				leftSection = middleSection;
 				middleSection = rightSection;
 
@@ -89,6 +92,8 @@ public class DashboardColumnsPanel extends FlowPanel {
 
 				DashboardColumnsPanel.this.add(leftSection);
 				DashboardColumnsPanel.this.add(middleSection);
+				setdisableAddIcon(false);
+
 			}
 		});
 		return leftSection;
@@ -99,15 +104,19 @@ public class DashboardColumnsPanel extends FlowPanel {
 
 			@Override
 			protected void addColumn() {
-				rightSection = createRightColumn();
-				DashboardColumnsPanel.this.add(rightSection);
+				if (!isAddIconDisabled()) {
+					rightSection = createRightColumn();
+					DashboardColumnsPanel.this.add(rightSection);
+					DashboardColumnsPanel.this.setdisableAddIcon(true);
+				}
+
 			}
 		};
-		middleSection.deleteColun(new DeleteDashboardColumn() {
+		middleSection.deleteColumnListner(new IDeleteDashboardColumn() {
 
 			@Override
 			public void deleteColumn() {
-
+				middleSection.clearPortlets();
 				middleSection.removeFromParent();
 				rightSection.removeFromParent();
 
@@ -118,6 +127,9 @@ public class DashboardColumnsPanel extends FlowPanel {
 
 				dashboard.setRightSection(null);
 				rightSection.clear();
+
+				setdisableAddIcon(false);
+
 			}
 		});
 		return middleSection;
@@ -128,16 +140,17 @@ public class DashboardColumnsPanel extends FlowPanel {
 
 			@Override
 			protected void addColumn() {
-				// TODO Auto-generated method stub
-
+				return;
 			}
 		};
-		rightSection.deleteColun(new DeleteDashboardColumn() {
+		rightSection.deleteColumnListner(new IDeleteDashboardColumn() {
 
 			@Override
 			public void deleteColumn() {
+				rightSection.clearPortlets();
 				rightSection.removeFromParent();
 				dashboard.setRightSection(null);
+				setdisableAddIcon(false);
 			}
 		});
 		return rightSection;
@@ -155,10 +168,20 @@ public class DashboardColumnsPanel extends FlowPanel {
 		this.add(rightPanel);
 	}
 
-	private void removeAllColumns() {
-		leftSection.removeFromParent();
-		middleSection.removeFromParent();
-		rightSection.removeFromParent();
+	private boolean isAddIconDisabled() {
+		return addIcon.getElement().getPropertyBoolean("disabled");
+	}
+
+	private void setDisableRemoveIcon(boolean value) {
+		leftSection.setDisableRemovieIcon(value);
+		middleSection.setDisableRemovieIcon(value);
+	}
+
+	private void setdisableAddIcon(boolean value) {
+		leftSection.setdisableAddIcon(value);
+		rightSection.setdisableAddIcon(value);
+		middleSection.setdisableAddIcon(value);
+		addIcon.getElement().setPropertyBoolean("disabled", value);
 	}
 
 }

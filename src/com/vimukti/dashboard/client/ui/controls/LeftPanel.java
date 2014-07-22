@@ -10,7 +10,6 @@ import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
 import com.vimukti.dashboard.client.data.ReportsAndPageListType;
 import com.vimukti.dashboard.client.data.ReportsAndPagesList;
 import com.vimukti.dashboard.client.ui.utils.TabControl;
-import com.vimukti.dashboard.client.ui.utils.TextItem;
 
 public class LeftPanel extends FlowPanel {
 
@@ -20,9 +19,9 @@ public class LeftPanel extends FlowPanel {
 	private IDashboardServiceAsync dashboardServiceObject = Dashboard
 			.getDashboardServiceObject();
 
-	public LeftPanel(ReportsAndPagesList list) {
+	public LeftPanel() {
+		this.addStyleName("left-panel");
 		createControls();
-		init();
 	}
 
 	private void createControls() {
@@ -66,10 +65,6 @@ public class LeftPanel extends FlowPanel {
 		});
 		this.add(tabs);
 		this.add(sPanel);
-	}
-
-	private void init() {
-		// TODO Auto-generated method stub
 	}
 
 }

@@ -2,6 +2,11 @@ package com.vimukti.dashboard.client.ui.controls;
 
 import java.util.List;
 
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.vimukti.dashboard.client.column.DashboardColumnsPanel;
 import com.vimukti.dashboard.client.data.DashboardData;
@@ -13,6 +18,7 @@ public class DashboardMainPage extends VerticalPanel {
 	private FiltersPanel filtersPanel;
 	private DescriptionPanel descriptionPanel;
 	private DashboardColumnsPanel columnsPanel;
+	private Label showDescription;
 
 	public DashboardMainPage(DashboardData dashBoard) {
 		this.dashboard = dashBoard;
@@ -40,9 +46,35 @@ public class DashboardMainPage extends VerticalPanel {
 		if (dashboard.getDescription() != null) {
 			description = dashboard.getDescription();
 		}
-		descriptionPanel = new DescriptionPanel(description);
+		showDescription = new Label(description);
+		showDescription.addStyleName("show description");
+
+		showDescription.addDomHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				int widgetIndex = DashboardMainPage.this
+						.getWidgetIndex(showDescription);
+				DashboardMainPage.this.remove(showDescription);
+
+				addEditableDescriptionPanel(widgetIndex);
+			}
+		}, ClickEvent.getType());
+	}
+
+	private void addEditableDescriptionPanel(final int widgetIndex) {
+		descriptionPanel = new DescriptionPanel(dashboard.getDescription());
+		descriptionPanel.addDomHandler(new BlurHandler() {
+
+			@Override
+			public void onBlur(BlurEvent event) {
+				String description = descriptionPanel.getDescription();
+				DashboardMainPage.this.remove(descriptionPanel);
+				DashboardMainPage.this.insert(showDescription, widgetIndex);
+				showDescription.setText(description);
+			}
+		}, BlurEvent.getType());
 		descriptionPanel.addStyleName("descriptionPanel");
-		this.add(descriptionPanel);
+		DashboardMainPage.this.insert(descriptionPanel, widgetIndex);
 	}
 
 	private void createColumnPanel() {

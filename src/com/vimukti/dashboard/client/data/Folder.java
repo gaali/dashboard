@@ -5,7 +5,7 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class Folder extends MetaObject {
 	private String name;
-	private List<ReportList> reports;
+	private List<ReportDetails> reports;
 
 	/**
 	 * @return the name
@@ -25,7 +25,7 @@ public class Folder extends MetaObject {
 	/**
 	 * @return the reports
 	 */
-	public List<ReportList> getReports() {
+	public List<ReportDetails> getReports() {
 		return reports;
 	}
 
@@ -33,7 +33,7 @@ public class Folder extends MetaObject {
 	 * @param reports
 	 *            the reports to set
 	 */
-	public void setReports(List<ReportList> reports) {
+	public void setReports(List<ReportDetails> reports) {
 		this.reports = reports;
 	}
 

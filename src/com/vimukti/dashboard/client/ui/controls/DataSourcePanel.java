@@ -19,7 +19,7 @@ import com.vimukti.dashboard.client.Dashboard;
 import com.vimukti.dashboard.client.data.Folder;
 import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
 import com.vimukti.dashboard.client.data.PagesList;
-import com.vimukti.dashboard.client.data.ReportList;
+import com.vimukti.dashboard.client.data.ReportDetails;
 import com.vimukti.dashboard.client.data.ReportsAndPageListType;
 import com.vimukti.dashboard.client.data.ReportsAndPagesList;
 
@@ -28,14 +28,17 @@ public class DataSourcePanel extends VerticalPanel {
 	private Button recentB;
 	private Button myB;
 	private Button allB;
-	private ReportsAndPagesList source;
+	private ReportsAndPagesList all;
 	private ReportsAndPagesList recent;
 	private ReportsAndPagesList my;
+	private ReportsAndPagesList source;
+	private FlowPanel dataPanel;
 	private IDashboardServiceAsync dashboardServiceObject = Dashboard
 			.getDashboardServiceObject();
 
 	public DataSourcePanel(ReportsAndPagesList source) {
 		this.source = source;
+		dataPanel = new FlowPanel();
 		createControls();
 	}
 
@@ -52,6 +55,7 @@ public class DataSourcePanel extends VerticalPanel {
 
 			@Override
 			public void onClick(ClickEvent event) {
+				all = source;
 				showReportsPages(source);
 			}
 		});
@@ -68,6 +72,7 @@ public class DataSourcePanel extends VerticalPanel {
 							@Override
 							public void onSuccess(ReportsAndPagesList result) {
 								recent = result;
+								source = recent;
 							}
 
 							@Override
@@ -76,7 +81,7 @@ public class DataSourcePanel extends VerticalPanel {
 
 							}
 						});
-				showReportsPages(recent);
+				showReportsPages(source);
 			}
 		});
 		myB = createButton("My", hPanel);
@@ -91,6 +96,7 @@ public class DataSourcePanel extends VerticalPanel {
 							@Override
 							public void onSuccess(ReportsAndPagesList result) {
 								my = result;
+								source = my;
 							}
 
 							@Override
@@ -99,7 +105,7 @@ public class DataSourcePanel extends VerticalPanel {
 							}
 
 						});
-				showReportsPages(my);
+				showReportsPages(source);
 			}
 		});
 
@@ -130,13 +136,12 @@ public class DataSourcePanel extends VerticalPanel {
 	}
 
 	protected void getSearchResult(String value) {
-		// TODO Auto-generated method stub
-
+		// TODO
 	}
 
 	public void showReportsPages(ReportsAndPagesList list) {
-		FlowPanel dataPanel = new FlowPanel();
 		dataPanel.clear();
+		dataPanel.addStyleName("data-panel");
 		if (list == null) {
 			return;
 		}
@@ -145,8 +150,8 @@ public class DataSourcePanel extends VerticalPanel {
 		for (Folder folder : folders) {
 			TreeItem reportFolderItem = new TreeItem(
 					new Label(folder.getName()));
-			List<ReportList> reports = folder.getReports();
-			for (ReportList report : reports) {
+			List<ReportDetails> reports = folder.getReports();
+			for (ReportDetails report : reports) {
 				DraggabelLableControl item = new DraggabelLableControl(report);
 				item.setType(DataSourceListType.REPORT);
 				TreeItem reportItem = new TreeItem(item);

@@ -1,10 +1,22 @@
 package com.vimukti.dashboard.client.ui.controls;
 
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.TextArea;
 
-public class DescriptionPanel extends Label {
+public class DescriptionPanel extends FlowPanel {
+
+	private TextArea textArea;
 
 	public DescriptionPanel(String description) {
-		// TODO Auto-generated constructor stub
+		this.addStyleName("description-panel");
+		textArea = new TextArea();
+		textArea.addStyleName("description-textarea");
+		textArea.setText(description);
+		this.add(textArea);
+	}
+
+	public String getDescription() {
+		String value = textArea.getValue();
+		return value;
 	}
 }

@@ -4,6 +4,7 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -13,7 +14,6 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.vimukti.dashboard.client.data.DashboardData;
 import com.vimukti.dashboard.client.data.IDashboardService;
 import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
-import com.vimukti.dashboard.client.data.ReportsAndPagesList;
 import com.vimukti.dashboard.client.ui.controls.AddFilterDialog;
 import com.vimukti.dashboard.client.ui.controls.DashboardMainPage;
 import com.vimukti.dashboard.client.ui.controls.DashboardPropertiesDialog;
@@ -127,16 +127,28 @@ public class Dashboard implements EntryPoint {
 
 		HorizontalPanel panel = new HorizontalPanel();
 		panel.addStyleName("mainPanel");
-
-		LeftPanel leftPanel = new LeftPanel(new ReportsAndPagesList());
-		leftPanel.addStyleName("leftPanel");
+		getMainPage(panel);
+		LeftPanel leftPanel = new LeftPanel();
 		panel.add(leftPanel);
-
-		DashboardMainPage mainPage = new DashboardMainPage(new DashboardData());
-		mainPage.addStyleName("main-panel");
-		panel.add(mainPage);
-
 		return panel;
 	}
 
+	private void getMainPage(final HorizontalPanel panel) {
+		greetingService.getDashboard(new AsyncCallback<DashboardData>() {
+
+			@Override
+			public void onSuccess(DashboardData result) {
+				DashboardMainPage mainPage = new DashboardMainPage(result);
+				mainPage.addStyleName("main-panel");
+				panel.add(mainPage);
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+
+			}
+
+		});
+	}
 }
