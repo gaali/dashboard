@@ -93,7 +93,6 @@ public class DashboardColumnsPanel extends FlowPanel {
 				DashboardColumnsPanel.this.add(leftSection);
 				DashboardColumnsPanel.this.add(middleSection);
 				setdisableAddIcon(false);
-
 			}
 		});
 		return leftSection;
@@ -109,7 +108,6 @@ public class DashboardColumnsPanel extends FlowPanel {
 					DashboardColumnsPanel.this.add(rightSection);
 					DashboardColumnsPanel.this.setdisableAddIcon(true);
 				}
-
 			}
 		};
 		middleSection.deleteColumnListner(new IDeleteDashboardColumn() {
@@ -129,7 +127,6 @@ public class DashboardColumnsPanel extends FlowPanel {
 				rightSection.clear();
 
 				setdisableAddIcon(false);
-
 			}
 		});
 		return middleSection;
@@ -157,9 +154,6 @@ public class DashboardColumnsPanel extends FlowPanel {
 	}
 
 	private void createColumn() {
-		if (dashboard == null) {
-			dashboard = new DashboardData();
-		}
 		DashboardColumn leftPanel = createLeftColumn();
 		DashboardColumn middlePanel = createMiddleColumn();
 		DashboardColumn rightPanel = createRightColumn();

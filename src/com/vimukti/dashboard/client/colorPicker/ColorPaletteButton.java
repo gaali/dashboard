@@ -17,6 +17,7 @@ public class ColorPaletteButton extends FlowPanel implements
 
 	public ColorPaletteButton(Widget widget) {
 		this.widget = widget;
+		this.add(widget);
 		createControls();
 		this.setStyleName("colorPalertte-btn");
 	}

@@ -27,9 +27,11 @@ public abstract class DashboardColumn extends FlowPanel {
 	private void createControls() {
 		createHeder();
 		createColumn();
-		String size = DashboardComponentSize.MEDIUM.toString().toLowerCase();
+		String size;
 		if (section != null) {
 			size = section.getColumnSize().toString().toLowerCase();
+		} else {
+			size = DashboardComponentSize.MEDIUM.toString().toLowerCase();
 		}
 		setColumnSize(size);
 		createAddColumnIcon();

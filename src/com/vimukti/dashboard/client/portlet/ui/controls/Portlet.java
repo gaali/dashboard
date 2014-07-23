@@ -12,7 +12,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 import com.vimukti.dashboard.client.Dashboard;
 import com.vimukti.dashboard.client.chart.ui.controls.ComponentEditorDialog;
 import com.vimukti.dashboard.client.column.PortletContainerPanel;
@@ -36,7 +35,7 @@ public class Portlet extends AbsolutePanel implements RequiresResize,
 			.getDashboardServiceObject();
 
 	public Portlet(DashboardComponent component) {
-		this.component = component;
+		this.setComponent(component);
 		type = component.getComponentType();
 		createControls();
 	}
@@ -67,12 +66,12 @@ public class Portlet extends AbsolutePanel implements RequiresResize,
 				public void onClick(ClickEvent event) {
 					if (type == DashboardComponentType.PAGE) {
 						ComponentEditorDialogForPage editorPage = new ComponentEditorDialogForPage(
-								component);
+								getComponent());
 						editorPage.show();
 						editorPage.center();
 					} else {
 						ComponentEditorDialog componentEditor = new ComponentEditorDialog(
-								component, results);
+								getComponent(), results);
 						componentEditor.show();
 						componentEditor.center();
 					}
@@ -164,6 +163,25 @@ public class Portlet extends AbsolutePanel implements RequiresResize,
 		this.objectId = objectId;
 	}
 
+	/**
+	 * @return the component
+	 */
+	public DashboardComponent getComponent() {
+		return component;
+	}
+
+	/**
+	 * @param component
+	 *            the component to set
+	 */
+	public void setComponent(DashboardComponent component) {
+		this.component = component;
+	}
+
+	public void update() {
+
+	}
+
 	class ChartContainer extends AbsolutePanel implements IDroppable {
 
 		public ChartContainer() {
@@ -216,7 +234,8 @@ public class Portlet extends AbsolutePanel implements RequiresResize,
 			final VerticalPanel chartPanel = new VerticalPanel();
 			chartPanel.addStyleName("ChartPanel");
 
-			if (component.getPage() == null && component.getReport() == null) {
+			if (getComponent().getPage() == null
+					&& getComponent().getReport() == null) {
 				FlowPanel icon = new FlowPanel();
 				icon.addStyleName(type.toString().toLowerCase() + "-icon");
 				Label helpText = new Label(
@@ -248,19 +267,18 @@ public class Portlet extends AbsolutePanel implements RequiresResize,
 			return bodyPanel;
 		}
 
-		private void preparePagePanel(VerticalPanel bodyPanel) {
-			if (type == DashboardComponentType.PAGE) {
-				String pageLink = getPageObject(objectId);
-				Frame frame = new Frame(pageLink);
-				bodyPanel.add(frame);
-			}
-		}
-
 		private void prepareChart() {
+			// prapreChart in here
 		}
 
-		private String getPageObject(String id) {
+		private void getPageObject(String id) {
 			dashboardServiceObject.getPage(id, new AsyncCallback<String>() {
+
+				@Override
+				public void onSuccess(String result) {
+					Frame frame = new Frame(result);
+					ChartContainer.this.add(frame);
+				}
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -268,13 +286,7 @@ public class Portlet extends AbsolutePanel implements RequiresResize,
 
 				}
 
-				@Override
-				public void onSuccess(String result) {
-					// TODO Auto-generated method stub
-
-				}
 			});
-			return null;
 		}
 
 		@Override
@@ -307,8 +319,7 @@ public class Portlet extends AbsolutePanel implements RequiresResize,
 							});
 
 				} else if (type2 == DataSourceListType.PAGE) {
-					String pageObject = getPageObject(widget.getId());
-					// TODO
+					getPageObject(widget.getId());
 				}
 
 			}

@@ -1,6 +1,5 @@
 package com.vimukti.dashboard.server;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -18,20 +17,17 @@ public class DashboardServiceImpl extends RemoteServiceServlet implements
 	@Override
 	public ReportsAndPagesList getReportsAndPagesList(
 			ReportsAndPageListType type) {
-		ReportsAndPagesList list = new ReportsAndPagesList();
-		return list;
+		return null;
 	}
 
 	@Override
 	public DashboardData getDashboard() {
-		DashboardData d = new DashboardData();
-		return d;
+		return null;
 	}
 
 	@Override
 	public List<Folder> getDashBoarFolders() {
-		List<Folder> list=new ArrayList<Folder>();
-		return list;
+		return null;
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package com.vimukti.dashboard.client;
 
+import java.util.List;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -11,12 +13,19 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.vimukti.dashboard.client.data.ChartBackgroundDirection;
+import com.vimukti.dashboard.client.data.DashboardComponentSection;
+import com.vimukti.dashboard.client.data.DashboardComponentSize;
 import com.vimukti.dashboard.client.data.DashboardData;
+import com.vimukti.dashboard.client.data.DashboardType;
+import com.vimukti.dashboard.client.data.Folder;
 import com.vimukti.dashboard.client.data.IDashboardService;
 import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
 import com.vimukti.dashboard.client.ui.controls.AddFilterDialog;
+import com.vimukti.dashboard.client.ui.controls.DashboardCloseConformationDialog;
 import com.vimukti.dashboard.client.ui.controls.DashboardMainPage;
 import com.vimukti.dashboard.client.ui.controls.DashboardPropertiesDialog;
+import com.vimukti.dashboard.client.ui.controls.DashboardRunningUserDialog;
 import com.vimukti.dashboard.client.ui.controls.LeftPanel;
 
 /**
@@ -25,6 +34,7 @@ import com.vimukti.dashboard.client.ui.controls.LeftPanel;
 public class Dashboard implements EntryPoint {
 	private static final IDashboardServiceAsync greetingService = GWT
 			.create(IDashboardService.class);
+	private DashboardData dashboard;
 
 	/**
 	 * This is the entry point method.
@@ -37,7 +47,7 @@ public class Dashboard implements EntryPoint {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				createDashboardForTest();
+				loadDashboardDesigner();
 			}
 		});
 	}
@@ -46,7 +56,7 @@ public class Dashboard implements EntryPoint {
 		return greetingService;
 	}
 
-	private void createDashboardForTest() {
+	private void loadDashboardDesigner() {
 		RootPanel rootPanel = RootPanel.get();
 		rootPanel.clear();
 		VerticalPanel vPanel = new VerticalPanel();
@@ -61,6 +71,13 @@ public class Dashboard implements EntryPoint {
 		HorizontalPanel hPanel = new HorizontalPanel();
 
 		Button save = new Button("save");
+		save.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				saveDashboard();
+			}
+		});
 		save.addStyleName("save-btn");
 		hPanel.add(save);
 
@@ -69,6 +86,27 @@ public class Dashboard implements EntryPoint {
 		hPanel.add(saveNclose);
 
 		Button close = new Button("Close");
+		close.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				DashboardCloseConformationDialog conformDialog = new DashboardCloseConformationDialog() {
+					@Override
+					protected boolean onOK() {
+						saveDashboard();
+						return true;
+					}
+
+					@Override
+					protected void onClose() {
+						// redirect the page without save the object
+					}
+				};
+				conformDialog.show();
+				conformDialog.center();
+
+			}
+		});
 		close.addStyleName("Close");
 		hPanel.add(close);
 
@@ -78,7 +116,7 @@ public class Dashboard implements EntryPoint {
 			@Override
 			public void onClick(ClickEvent event) {
 				DashboardPropertiesDialog dialog = new DashboardPropertiesDialog(
-						null);
+						dashboard);
 				dialog.show();
 				dialog.center();
 			}
@@ -91,7 +129,7 @@ public class Dashboard implements EntryPoint {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				AddFilterDialog filterDialog = new AddFilterDialog(null, true);
+				AddFilterDialog filterDialog = new AddFilterDialog(dashboard, true);
 				filterDialog.show();
 				filterDialog.center();
 			}
@@ -108,12 +146,13 @@ public class Dashboard implements EntryPoint {
 		TextBox box = new TextBox();
 		searchPanel.add(box);
 
-		Button but = new Button("s");
+		final Button but = new Button("s");
 		but.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				// TODO Auto-generated method stub
+				DashboardRunningUserDialog runningUserDialog = new DashboardRunningUserDialog();
+				runningUserDialog.showRelativeTo(but);
 
 			}
 		});
@@ -146,9 +185,67 @@ public class Dashboard implements EntryPoint {
 			@Override
 			public void onFailure(Throwable caught) {
 				// TODO Auto-generated method stub
+				caught.printStackTrace();
 
 			}
 
 		});
 	}
+
+	private void saveDashboard() {
+		greetingService.saveDashBoard(dashboard, new AsyncCallback<Void>() {
+
+			@Override
+			public void onSuccess(Void result) {
+				// TODO Auto-generated method stub
+				// redirect the page to .... (decided page)
+
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				// need print in logger
+				caught.printStackTrace();
+			}
+
+		});
+	}
+
+	private void prepateNewDashborad() {
+		dashboard = new DashboardData();
+		dashboard.setBackgroundFadeDirection(ChartBackgroundDirection.DIAGONAL);
+		dashboard.setBackgroundEndColor("FFFFFF");
+		dashboard.setBackgroundStartColor("FFFFFF");
+		dashboard.setDashboardType(DashboardType.SPECIFIED_USER);
+		dashboard.setDescription("");
+		dashboard.setFullName("");
+		dashboard.setLeftSection(getDashboardComponentSection());
+		dashboard.setMiddleSection(getDashboardComponentSection());
+		dashboard.setRightSection(getDashboardComponentSection());
+		dashboard.setRunningUser("");
+		dashboard.setTextColor("000000");
+		dashboard.setTitle("");
+		dashboard.setTitleColor("000000");
+		dashboard.setTitleSize(8);
+		greetingService.getDashBoarFolders(new AsyncCallback<List<Folder>>() {
+
+			@Override
+			public void onSuccess(List<Folder> result) {
+				dashboard.setDashBoardFolders(result);
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+	}
+
+	private DashboardComponentSection getDashboardComponentSection() {
+		DashboardComponentSection section = new DashboardComponentSection();
+		section.setColumnSize(DashboardComponentSize.MEDIUM);
+		return section;
+	}
+
 }

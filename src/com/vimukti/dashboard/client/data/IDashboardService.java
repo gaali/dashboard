@@ -3,8 +3,10 @@ package com.vimukti.dashboard.client.data;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.vimukti.dashboard.client.reportdata.Report;
 
+@RemoteServiceRelativePath("Dashboard")
 public interface IDashboardService extends RemoteService {
 
 	ReportsAndPagesList getReportsAndPagesList(ReportsAndPageListType type);

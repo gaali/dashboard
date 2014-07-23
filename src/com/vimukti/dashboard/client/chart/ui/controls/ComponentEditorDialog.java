@@ -15,6 +15,7 @@ import com.vimukti.dashboard.client.ui.utils.BaseDialog;
 import com.vimukti.dashboard.client.ui.utils.TabControl;
 import com.vimukti.dashboard.client.ui.utils.TextItem;
 
+@SuppressWarnings("rawtypes")
 public class ComponentEditorDialog extends BaseDialog {
 	private ChartFormatting formatting;
 	private ChartComponentData data;

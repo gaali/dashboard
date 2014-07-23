@@ -30,6 +30,7 @@ public class LabelItem extends HorizontalPanel {
 		labelPanel.addStyleName("textbox-panel");
 
 		label = new Label();
+		label.addStyleName("color-label");
 		labelPanel.add(label);
 
 		errorPanel = new FlowPanel();

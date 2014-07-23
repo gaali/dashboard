@@ -37,16 +37,11 @@ public class DashboardMainPage extends VerticalPanel {
 			dashboardFilters = dashboard.getDashboardFilters();
 		}
 		filtersPanel = new FiltersPanel(dashboardFilters);
-		filtersPanel.addStyleName("filterspanel");
 		this.add(filtersPanel);
 	}
 
 	private void createDescriptionPanel() {
-		String description = "";
-		if (dashboard.getDescription() != null) {
-			description = dashboard.getDescription();
-		}
-		showDescription = new Label(description);
+		showDescription = new Label(dashboard.getDescription());
 		showDescription.addStyleName("show description");
 
 		showDescription.addDomHandler(new ClickHandler() {
@@ -74,7 +69,7 @@ public class DashboardMainPage extends VerticalPanel {
 			}
 		}, BlurEvent.getType());
 		descriptionPanel.addStyleName("descriptionPanel");
-		DashboardMainPage.this.insert(descriptionPanel, widgetIndex);
+		this.insert(descriptionPanel, widgetIndex);
 	}
 
 	private void createColumnPanel() {

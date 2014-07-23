@@ -8,6 +8,7 @@ import com.vimukti.dashboard.client.data.IDashboardService;
 import com.vimukti.dashboard.client.ui.utils.BaseDialog;
 import com.vimukti.dashboard.client.ui.utils.TabControl;
 
+@SuppressWarnings("rawtypes")
 public class DashboardPropertiesDialog extends BaseDialog {
 
 	private DashboardData dashBoard;
@@ -63,9 +64,6 @@ public class DashboardPropertiesDialog extends BaseDialog {
 	}
 
 	public void update() {
-		if (dashBoard == null) {
-			dashBoard = new DashboardData();
-		}
 		general.update(dashBoard);
 		componentSettings.update(dashBoard);
 	}

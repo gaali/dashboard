@@ -15,7 +15,6 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.vimukti.dashboard.client.Dashboard;
 import com.vimukti.dashboard.client.data.CustomObject;
 import com.vimukti.dashboard.client.data.DashboardData;
 import com.vimukti.dashboard.client.data.DashboardFilterOperation;
@@ -23,11 +22,11 @@ import com.vimukti.dashboard.client.data.DashboardFilterOptions;
 import com.vimukti.dashboard.client.data.DashboardFilters;
 import com.vimukti.dashboard.client.data.Field;
 import com.vimukti.dashboard.client.data.Field.FieldType;
-import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
 import com.vimukti.dashboard.client.ui.utils.BaseDialog;
 import com.vimukti.dashboard.client.ui.utils.SelectListBox;
 import com.vimukti.dashboard.client.ui.utils.TextItem;
 
+@SuppressWarnings("rawtypes")
 public class AddFilterDialog extends BaseDialog {
 
 	private SelectListBox<Field> fields;
@@ -38,14 +37,11 @@ public class AddFilterDialog extends BaseDialog {
 	private DashboardData dashboard;
 	private DashboardFilters options;
 	private boolean isNewFilter;
-	private IDashboardServiceAsync dashboardServiceObject = Dashboard
-			.getDashboardServiceObject();
 
 	// use this dialog to as edit Filter dialog
 	public AddFilterDialog(DashboardData dashboard, boolean isNewFilter) {
 		this.dashboard = dashboard;
 		this.addStyleName("dashboard-filter-dialog");
-		createControls();
 	}
 
 	@Override
@@ -58,17 +54,20 @@ public class AddFilterDialog extends BaseDialog {
 
 		displayName = new TextItem("DispalayName");
 		displayName.addStyleName("displayname");
+		this.add(displayName);
+
 		HorizontalPanel hpanel = new HorizontalPanel();
 		Label filterOptions = new Label("Filter Options");
-		// TODO to show help text use externalization (using properties file)
 		HTML helpText = new HTML();
 		helpText.addStyleName("helpText-icon");
 		hpanel.add(filterOptions);
 		hpanel.add(helpText);
+		this.add(hpanel);
 		prepareFilterOptionsPanel();
 		if (!isNewFilter) {
 			init();
 		}
+
 	}
 
 	private void init() {
@@ -83,7 +82,8 @@ public class AddFilterDialog extends BaseDialog {
 			}
 		};
 		fields.addStyleName("fields");
-
+		// need to add fields here depending on reports we have in columns
+		this.add(fields);
 	}
 
 	public List<Field> prepareFieldsFromCustomObject(CustomObject object) {
@@ -113,46 +113,57 @@ public class AddFilterDialog extends BaseDialog {
 	private void prepareFilterOptionsPanel() {
 		FlowPanel optionsPanel = new FlowPanel();
 		optionsPanel.addStyleName("filter-optionspanel");
-		VerticalPanel vPanel = new VerticalPanel();
-		HorizontalPanel headerName = new HorizontalPanel();
+
+		final VerticalPanel vPanel = new VerticalPanel();
+
+		HorizontalPanel header = new HorizontalPanel();
+		header.addStyleName("header-hpanel");
 		Label operator = new Label("Operator");
 		operator.addStyleName("header-operator");
 		Label value = new Label("value");
 		value.addStyleName("header-value");
-		headerName.add(operator);
-		headerName.add(value);
-		vPanel.add(headerName);
+		header.add(operator);
+		header.add(value);
+
+		vPanel.add(header);
+
 		FlowPanel fPanel = new FlowPanel();
 		fPanel.addStyleName("addButton-panel");
 		addRow = new Button("Add Row");
-		addRow.addStyleName("addRow-icon");
-		addRow(vPanel);
-		fPanel.add(addRow);
-		this.add(optionsPanel);
-	}
-
-	private void addRow(final VerticalPanel vPanel) {
 		addRow.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				FilterOptions createOptionRow = new FilterOptions();
-				createOptionRow.addStyleName("options-row");
-				filterOptionsPanels = new ArrayList<FilterOptions>();
-				filterOptionsPanels.add(createOptionRow);
-				vPanel.add(createOptionRow);
-
-				if (options != null) {
-					List<DashboardFilterOptions> dashboardFilterOptions = options
-							.getDashboardFilterOptions();
-					for (DashboardFilterOptions filter : dashboardFilterOptions) {
-						FilterOptions createOptionRow1 = new FilterOptions();
-						createOptionRow1.operator.setSelectedValue(filter
-								.getOperator());
-					}
-				}
+				addRow(vPanel);
 			}
 		});
+		addRow.addStyleName("addRow-icon");
+		addRow(vPanel);
+
+		fPanel.add(addRow);
+
+		vPanel.add(fPanel);
+
+		optionsPanel.add(vPanel);
+		this.add(optionsPanel);
+	}
+
+	private void addRow(VerticalPanel vPanel) {
+		FilterOptions createOptionRow = new FilterOptions();
+		createOptionRow.addStyleName("options-row");
+		filterOptionsPanels = new ArrayList<FilterOptions>();
+		filterOptionsPanels.add(createOptionRow);
+		vPanel.add(createOptionRow);
+
+		if (options != null) {
+			List<DashboardFilterOptions> dashboardFilterOptions = options
+					.getDashboardFilterOptions();
+			for (DashboardFilterOptions filter : dashboardFilterOptions) {
+				FilterOptions createOptionRow1 = new FilterOptions();
+				createOptionRow1.operator
+						.setSelectedValue(filter.getOperator());
+			}
+		}
 	}
 
 	@Override
