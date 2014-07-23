@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -37,21 +39,22 @@ public class AddFilterDialog extends BaseDialog {
 	private DashboardData dashboard;
 	private DashboardFilters options;
 	private boolean isNewFilter;
+	private FlowPanel optionsPanel;
+	private FlowPanel addRowfPanel;
 
 	// use this dialog to as edit Filter dialog
 	public AddFilterDialog(DashboardData dashboard, boolean isNewFilter) {
 		this.dashboard = dashboard;
+		this.isNewFilter = isNewFilter;
 		this.addStyleName("dashboard-filter-dialog");
+		createControlsw();
 	}
 
-	@Override
-	protected void createControls() {
-		super.createControls();
+	protected void createControlsw() {
 		if (isNewFilter) {
 			prepareFields();
 			setDefaultValueForDisplayName();
 		}
-
 		displayName = new TextItem("DispalayName");
 		displayName.addStyleName("displayname");
 		this.add(displayName);
@@ -82,6 +85,13 @@ public class AddFilterDialog extends BaseDialog {
 			}
 		};
 		fields.addStyleName("fields");
+		fields.addChangeHandler(new ChangeHandler() {
+
+			@Override
+			public void onChange(ChangeEvent event) {
+				optionsPanel.getElement().setPropertyBoolean("disabled", false);
+			}
+		});
 		// need to add fields here depending on reports we have in columns
 		this.add(fields);
 	}
@@ -111,7 +121,10 @@ public class AddFilterDialog extends BaseDialog {
 	}
 
 	private void prepareFilterOptionsPanel() {
-		FlowPanel optionsPanel = new FlowPanel();
+		optionsPanel = new FlowPanel();
+		if (isNewFilter) {
+			optionsPanel.getElement().setPropertyBoolean("disabled", true);
+		}
 		optionsPanel.addStyleName("filter-optionspanel");
 
 		final VerticalPanel vPanel = new VerticalPanel();
@@ -127,22 +140,23 @@ public class AddFilterDialog extends BaseDialog {
 
 		vPanel.add(header);
 
-		FlowPanel fPanel = new FlowPanel();
-		fPanel.addStyleName("addButton-panel");
+		addRowfPanel = new FlowPanel();
+		addRowfPanel.addStyleName("addButton-panel");
 		addRow = new Button("Add Row");
 		addRow.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				addRow(vPanel);
+				if (vPanel.getWidgetCount() <= 12) {
+					addRow(vPanel);
+				}
 			}
 		});
 		addRow.addStyleName("addRow-icon");
+		addRowfPanel.add(addRow);
+
+		vPanel.add(addRowfPanel);
 		addRow(vPanel);
-
-		fPanel.add(addRow);
-
-		vPanel.add(fPanel);
 
 		optionsPanel.add(vPanel);
 		this.add(optionsPanel);
@@ -153,7 +167,7 @@ public class AddFilterDialog extends BaseDialog {
 		createOptionRow.addStyleName("options-row");
 		filterOptionsPanels = new ArrayList<FilterOptions>();
 		filterOptionsPanels.add(createOptionRow);
-		vPanel.add(createOptionRow);
+		vPanel.insert(createOptionRow, vPanel.getWidgetIndex(addRowfPanel));
 
 		if (options != null) {
 			List<DashboardFilterOptions> dashboardFilterOptions = options
@@ -298,19 +312,21 @@ public class AddFilterDialog extends BaseDialog {
 			List<DashboardFilterOperation> operatersList = Arrays
 					.asList(values);
 			List<DashboardFilterOperation> filteredOperaters = new ArrayList<DashboardFilterOperation>();
-			if (fields.getSelectedValue().getFieldType() == FieldType.INT) {
-				operatersList.remove(DashboardFilterOperation.INCLUDES);
-				operatersList.remove(DashboardFilterOperation.EXCLUDES);
-				filteredOperaters.addAll(operatersList);
-			} else if (fields.getSelectedValue().getFieldType() == FieldType.BOOLEAN) {
-				filteredOperaters.add(DashboardFilterOperation.EQUALS);
-				filteredOperaters.add(DashboardFilterOperation.NOT_EQUAL);
-			} else if (fields.getSelectedValue().getFieldType() == FieldType.STRING) {
-				operatersList.remove(DashboardFilterOperation.INCLUDES);
-				operatersList.remove(DashboardFilterOperation.EXCLUDES);
-				filteredOperaters.addAll(operatersList);
-			} else if (fields.getSelectedValue().getFieldType() == FieldType.DATEANDTIME) {
-				// TODO show operators by fields type
+			if (fields.getSelectedValue() != null) {
+				if (fields.getSelectedValue().getFieldType() == FieldType.INT) {
+					operatersList.remove(DashboardFilterOperation.INCLUDES);
+					operatersList.remove(DashboardFilterOperation.EXCLUDES);
+					filteredOperaters.addAll(operatersList);
+				} else if (fields.getSelectedValue().getFieldType() == FieldType.BOOLEAN) {
+					filteredOperaters.add(DashboardFilterOperation.EQUALS);
+					filteredOperaters.add(DashboardFilterOperation.NOT_EQUAL);
+				} else if (fields.getSelectedValue().getFieldType() == FieldType.STRING) {
+					operatersList.remove(DashboardFilterOperation.INCLUDES);
+					operatersList.remove(DashboardFilterOperation.EXCLUDES);
+					filteredOperaters.addAll(operatersList);
+				} else if (fields.getSelectedValue().getFieldType() == FieldType.DATEANDTIME) {
+					// TODO show operators by fields type
+				}
 			}
 			operator.setItems(filteredOperaters);
 

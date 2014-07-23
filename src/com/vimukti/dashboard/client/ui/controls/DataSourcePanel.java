@@ -1,5 +1,6 @@
 package com.vimukti.dashboard.client.ui.controls;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -36,8 +37,8 @@ public class DataSourcePanel extends VerticalPanel {
 	private IDashboardServiceAsync dashboardServiceObject = Dashboard
 			.getDashboardServiceObject();
 
-	public DataSourcePanel(ReportsAndPagesList source) {
-		this.source = source;
+	public DataSourcePanel(ReportsAndPagesList all) {
+		this.all = all;
 		dataPanel = new FlowPanel();
 		createControls();
 	}
@@ -55,8 +56,7 @@ public class DataSourcePanel extends VerticalPanel {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				all = source;
-				showReportsPages(source);
+				showReportsPages(all);
 			}
 		});
 
@@ -65,6 +65,10 @@ public class DataSourcePanel extends VerticalPanel {
 
 			@Override
 			public void onClick(ClickEvent event) {
+				if (recent != null) {
+					showReportsPages(recent);
+					return;
+				}
 				dashboardServiceObject.getReportsAndPagesList(
 						ReportsAndPageListType.RECENT,
 						new AsyncCallback<ReportsAndPagesList>() {
@@ -72,7 +76,7 @@ public class DataSourcePanel extends VerticalPanel {
 							@Override
 							public void onSuccess(ReportsAndPagesList result) {
 								recent = result;
-								source = recent;
+								showReportsPages(recent);
 							}
 
 							@Override
@@ -81,7 +85,6 @@ public class DataSourcePanel extends VerticalPanel {
 
 							}
 						});
-				showReportsPages(source);
 			}
 		});
 		myB = createButton("My", hPanel);
@@ -89,6 +92,9 @@ public class DataSourcePanel extends VerticalPanel {
 
 			@Override
 			public void onClick(ClickEvent event) {
+				if (my != null) {
+					showReportsPages(my);
+				}
 				dashboardServiceObject.getReportsAndPagesList(
 						ReportsAndPageListType.MY,
 						new AsyncCallback<ReportsAndPagesList>() {
@@ -96,7 +102,7 @@ public class DataSourcePanel extends VerticalPanel {
 							@Override
 							public void onSuccess(ReportsAndPagesList result) {
 								my = result;
-								source = my;
+								showReportsPages(my);
 							}
 
 							@Override
@@ -105,7 +111,7 @@ public class DataSourcePanel extends VerticalPanel {
 							}
 
 						});
-				showReportsPages(source);
+
 			}
 		});
 
@@ -136,10 +142,53 @@ public class DataSourcePanel extends VerticalPanel {
 	}
 
 	protected void getSearchResult(String value) {
-		// TODO
+		ReportsAndPagesList searchResult = new ReportsAndPagesList();
+
+		List<Folder> sFolders = new ArrayList<Folder>();
+
+		List<Folder> folders = source.getFolders();
+
+		for (Folder folder : folders) {
+			Folder sFolder = new Folder();
+			String name = folder.getName();
+			String id = folder.getId();
+			sFolder.setName(name);
+			sFolder.setId(id);
+			sFolders.add(sFolder);
+
+			List<ReportDetails> sReports = new ArrayList<ReportDetails>();
+			List<ReportDetails> reports = folder.getReports();
+			for (ReportDetails reportDetails : reports) {
+				boolean contains = reportDetails.getName().contains(value);
+				if (contains) {
+					sReports.add(reportDetails);
+				}
+			}
+			sFolder.setReports(sReports);
+		}
+		searchResult.setFolders(sFolders);
+
+		List<PagesList> pages = source.getPages();
+		List<PagesList> sPages = new ArrayList<PagesList>();
+		for (PagesList pagesList : pages) {
+			boolean contains = pagesList.getName().contains(value);
+			if (contains) {
+				sPages.add(pagesList);
+			}
+		}
+		searchResult.setPages(sPages);
+
+		showReportsPages(searchResult, true);
 	}
 
 	public void showReportsPages(ReportsAndPagesList list) {
+		showReportsPages(list, false);
+	}
+
+	public void showReportsPages(ReportsAndPagesList list, boolean isForSearch) {
+		if (!isForSearch) {
+			source = list;
+		}
 		dataPanel.clear();
 		dataPanel.addStyleName("data-panel");
 		if (list == null) {
@@ -147,6 +196,9 @@ public class DataSourcePanel extends VerticalPanel {
 		}
 		List<Folder> folders = list.getFolders();
 		Tree reportsTree = new Tree();
+		TreeItem rootTree = new TreeItem();
+		rootTree.setText("Rports");
+		reportsTree.addItem(rootTree);
 		for (Folder folder : folders) {
 			TreeItem reportFolderItem = new TreeItem(
 					new Label(folder.getName()));
@@ -157,15 +209,17 @@ public class DataSourcePanel extends VerticalPanel {
 				TreeItem reportItem = new TreeItem(item);
 				reportFolderItem.addItem(reportItem);
 			}
-			reportsTree.addItem(reportFolderItem);
+			rootTree.addItem(reportFolderItem);
 		}
 		List<PagesList> pages = list.getPages();
 		Tree pagesTree = new Tree();
+		TreeItem pageRootPage = new TreeItem();
+		pagesTree.addItem(pageRootPage);
 		for (PagesList page : pages) {
 			DraggabelLableControl item = new DraggabelLableControl(page);
 			item.setType(DataSourceListType.PAGE);
 			TreeItem pageItem = new TreeItem(item);
-			pagesTree.addItem(pageItem);
+			pageRootPage.addItem(pageItem);
 		}
 		dataPanel.add(reportsTree);
 		dataPanel.add(pagesTree);
