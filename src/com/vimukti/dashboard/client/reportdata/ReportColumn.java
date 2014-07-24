@@ -3,12 +3,13 @@ package com.vimukti.dashboard.client.reportdata;
 import java.util.List;
 
 import com.vimukti.dashboard.client.data.MetaObject;
+import com.vimukti.dashboard.client.data.ReportSummaryType;
 
 @SuppressWarnings("serial")
 public class ReportColumn extends MetaObject {
 
 	// ReportSummaryType
-	private List<String> aggregateTypes;
+	private List<ReportSummaryType> aggregateTypes;
 
 	private String field;
 
@@ -19,11 +20,11 @@ public class ReportColumn extends MetaObject {
 	public ReportColumn() {
 	}
 
-	public List<String> getAggregateTypes() {
+	public List<ReportSummaryType> getAggregateTypes() {
 		return aggregateTypes;
 	}
 
-	public void setAggregateTypes(List<String> aggregateTypes) {
+	public void setAggregateTypes(List<ReportSummaryType> aggregateTypes) {
 		this.aggregateTypes = aggregateTypes;
 	}
 

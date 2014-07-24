@@ -4,7 +4,7 @@ package com.vimukti.dashboard.client.data;
 public class ChartSummary extends MetaObject {
 
 	// ReportSummaryType
-	private String aggregate;
+	private ReportSummaryType aggregate;
 
 	// ChartAxis
 	private String axisBinding;
@@ -14,11 +14,11 @@ public class ChartSummary extends MetaObject {
 	public ChartSummary() {
 	}
 
-	public String getAggregate() {
+	public ReportSummaryType getAggregate() {
 		return aggregate;
 	}
 
-	public void setAggregate(String aggregate) {
+	public void setAggregate(ReportSummaryType aggregate) {
 		this.aggregate = aggregate;
 	}
 

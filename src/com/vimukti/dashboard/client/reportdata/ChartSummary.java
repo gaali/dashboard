@@ -1,34 +1,35 @@
 package com.vimukti.dashboard.client.reportdata;
 
 import com.vimukti.dashboard.client.data.MetaObject;
+import com.vimukti.dashboard.client.data.ReportSummaryType;
 
 @SuppressWarnings("serial")
 public class ChartSummary extends MetaObject {
 
 	// ReportSummaryType
-	private String aggregate;
+	private ReportSummaryType aggregate;
 
 	// ChartAxis
-	private String axisBinding;
+	private ChartAxis axisBinding;
 
 	private String column;
 
 	public ChartSummary() {
 	}
 
-	public String getAggregate() {
+	public ReportSummaryType getAggregate() {
 		return aggregate;
 	}
 
-	public void setAggregate(String aggregate) {
+	public void setAggregate(ReportSummaryType aggregate) {
 		this.aggregate = aggregate;
 	}
 
-	public String getAxisBinding() {
+	public ChartAxis getAxisBinding() {
 		return axisBinding;
 	}
 
-	public void setAxisBinding(String axisBinding) {
+	public void setAxisBinding(ChartAxis axisBinding) {
 		this.axisBinding = axisBinding;
 	}
 

@@ -77,4 +77,12 @@ public class DashboardMainPage extends VerticalPanel {
 		this.add(columnsPanel);
 	}
 
+	public void reRender(DashboardData dashboard) {
+		this.clear();
+		if (dashboard != null) {
+			this.dashboard = dashboard;
+		}
+		createControls();
+	}
+
 }

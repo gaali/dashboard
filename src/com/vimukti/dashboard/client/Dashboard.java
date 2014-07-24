@@ -1,5 +1,6 @@
 package com.vimukti.dashboard.client;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -17,7 +18,9 @@ import com.vimukti.dashboard.client.data.ChartBackgroundDirection;
 import com.vimukti.dashboard.client.data.DashboardComponentSection;
 import com.vimukti.dashboard.client.data.DashboardComponentSize;
 import com.vimukti.dashboard.client.data.DashboardData;
+import com.vimukti.dashboard.client.data.DashboardFilters;
 import com.vimukti.dashboard.client.data.DashboardType;
+import com.vimukti.dashboard.client.data.Field;
 import com.vimukti.dashboard.client.data.Folder;
 import com.vimukti.dashboard.client.data.IDashboardService;
 import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
@@ -34,26 +37,23 @@ import com.vimukti.dashboard.client.ui.controls.LeftPanel;
 public class Dashboard implements EntryPoint {
 	private static final IDashboardServiceAsync greetingService = GWT
 			.create(IDashboardService.class);
+
+	public static final int MAXIMUM_FILTERS_SIZE = 3;
 	private DashboardData dashboard;
+	private Button addFilter;
+	private List<Field> fields;
+	private DashboardMainPage mainPage;
 
 	/**
 	 * This is the entry point method.
 	 */
-	public void onModuleLoad() {
-		Button sendButton = new Button("Send");
-		sendButton.addStyleName("sendButton");
-		RootPanel.get("sendButtonContainer").add(sendButton);
-		sendButton.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				loadDashboardDesigner();
-			}
-		});
-	}
 
 	public static IDashboardServiceAsync getDashboardServiceObject() {
 		return greetingService;
+	}
+
+	public void onModuleLoad() {
+		loadDashboardDesigner();
 	}
 
 	private void loadDashboardDesigner() {
@@ -124,14 +124,12 @@ public class Dashboard implements EntryPoint {
 		dashProperties.addStyleName("Dashboard Properties");
 		hPanel.add(dashProperties);
 
-		Button addFilter = new Button("Add Fillter");
+		addFilter = new Button("Add Fillter");
 		addFilter.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				AddFilterDialog filterDialog = new AddFilterDialog(dashboard, true);
-				filterDialog.show();
-				filterDialog.center();
+				addFilter();
 			}
 		});
 		addFilter.addStyleName("addfilter");
@@ -146,20 +144,40 @@ public class Dashboard implements EntryPoint {
 		TextBox box = new TextBox();
 		searchPanel.add(box);
 
-		final Button but = new Button("s");
-		but.addClickHandler(new ClickHandler() {
+		final Button runningUserDialiog = new Button("s");
+		runningUserDialiog.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
 				DashboardRunningUserDialog runningUserDialog = new DashboardRunningUserDialog();
-				runningUserDialog.showRelativeTo(but);
-
+				runningUserDialog.showRelativeTo(runningUserDialiog);
 			}
 		});
-		searchPanel.add(but);
+		searchPanel.add(runningUserDialiog);
 		hPanel.add(searchPanel);
 
 		return hPanel;
+	}
+
+	private void addFilter() {
+		final DashboardFilters filter = new DashboardFilters();
+		AddFilterDialog filterDialog = new AddFilterDialog(filter, fields) {
+			@Override
+			protected boolean onOK() {
+				super.onOK();
+				if (dashboard.getDashboardFilters() == null) {
+					List<DashboardFilters> filtersList = new ArrayList<DashboardFilters>();
+					filtersList.add(filter);
+					if (dashboard.getDashboardFilters().size() == MAXIMUM_FILTERS_SIZE) {
+						addFilter.setEnabled(false);
+					}
+					mainPage.reRender(dashboard);
+				}
+				return true;
+			}
+		};
+		filterDialog.show();
+		filterDialog.center();
 	}
 
 	private HorizontalPanel addMainPanel() {
@@ -177,7 +195,7 @@ public class Dashboard implements EntryPoint {
 
 			@Override
 			public void onSuccess(DashboardData result) {
-				DashboardMainPage mainPage = new DashboardMainPage(result);
+				mainPage = new DashboardMainPage(result);
 				mainPage.addStyleName("main-panel");
 				panel.add(mainPage);
 			}
@@ -216,6 +234,7 @@ public class Dashboard implements EntryPoint {
 		dashboard.setBackgroundFadeDirection(ChartBackgroundDirection.DIAGONAL);
 		dashboard.setBackgroundEndColor("FFFFFF");
 		dashboard.setBackgroundStartColor("FFFFFF");
+		dashboard.setDashboardFilters(null);
 		dashboard.setDashboardType(DashboardType.SPECIFIED_USER);
 		dashboard.setDescription("");
 		dashboard.setFullName("");

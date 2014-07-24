@@ -22,6 +22,7 @@ import com.vimukti.dashboard.client.reportdata.Report;
 import com.vimukti.dashboard.client.ui.controls.ChartComponent;
 import com.vimukti.dashboard.client.ui.controls.DataSourceListType;
 import com.vimukti.dashboard.client.ui.controls.DraggabelLableControl;
+import com.vimukti.dashboard.client.ui.controls.charts.ChartPanel;
 import com.vimukti.dashboard.client.ui.controls.dnd.IDraggable;
 import com.vimukti.dashboard.client.ui.controls.dnd.IDroppable;
 
@@ -268,7 +269,7 @@ public class Portlet extends AbsolutePanel implements RequiresResize,
 		}
 
 		private void prepareChart() {
-			// prapreChart in here
+			ChartPanel chart=new ChartPanel(results);
 		}
 
 		private void getPageObject(String id) {

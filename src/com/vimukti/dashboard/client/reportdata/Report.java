@@ -12,8 +12,6 @@ public class Report extends MetaObject {
 
 	private List<ReportColumn> columns = new ArrayList<>();
 
-	private List<ReportBucketField> buckets = new ArrayList<ReportBucketField>();
-
 	private ReportChart chart;
 
 	private String currency;
@@ -25,8 +23,6 @@ public class Report extends MetaObject {
 	private String name;
 
 	private String reportType;
-
-	private String scope;
 
 	/**
 	 * @return the aggregates
@@ -41,21 +37,6 @@ public class Report extends MetaObject {
 	 */
 	public void setAggregates(List<ReportAggregate> aggregates) {
 		this.aggregates = aggregates;
-	}
-
-	/**
-	 * @return the buckets
-	 */
-	public List<ReportBucketField> getBuckets() {
-		return buckets;
-	}
-
-	/**
-	 * @param buckets
-	 *            the buckets to set
-	 */
-	public void setBuckets(List<ReportBucketField> buckets) {
-		this.buckets = buckets;
 	}
 
 	/**
@@ -161,21 +142,6 @@ public class Report extends MetaObject {
 	 */
 	public void setGroupings(List<ReportGrouping> groupings) {
 		this.groupings = groupings;
-	}
-
-	/**
-	 * @return the scope
-	 */
-	public String getScope() {
-		return scope;
-	}
-
-	/**
-	 * @param scope
-	 *            the scope to set
-	 */
-	public void setScope(String scope) {
-		this.scope = scope;
 	}
 
 }

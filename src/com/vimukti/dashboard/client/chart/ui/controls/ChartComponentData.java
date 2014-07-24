@@ -1,5 +1,7 @@
 package com.vimukti.dashboard.client.chart.ui.controls;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -12,14 +14,16 @@ import com.vimukti.dashboard.client.data.ChartUnits;
 import com.vimukti.dashboard.client.data.DashboardComponent;
 import com.vimukti.dashboard.client.data.DashboardComponentType;
 import com.vimukti.dashboard.client.reportdata.Report;
+import com.vimukti.dashboard.client.reportdata.ReportAggregate;
+import com.vimukti.dashboard.client.reportdata.ReportGrouping;
 import com.vimukti.dashboard.client.ui.utils.SelectListBox;
 import com.vimukti.dashboard.client.ui.utils.TextItem;
 
 public class ChartComponentData extends FlowPanel {
 
 	private DashboardComponentType type;
-	private SelectListBox<Object> xAxis;
-	private SelectListBox<Object> yAxis;
+	private SelectListBox<ReportAggregate> xAxis;
+	private SelectListBox<ReportGrouping> yAxis;
 	private HorizontalPanel groupBy;
 	private HorizontalPanel combinationCharts;
 	private SelectListBox<ChartUnits> displayUnits;
@@ -35,6 +39,7 @@ public class ChartComponentData extends FlowPanel {
 	public ChartComponentData(DashboardComponent component, Report results) {
 		this.component = component;
 		this.result = results;
+		type = component.getComponentType();
 		createControls();
 	}
 
@@ -101,8 +106,7 @@ public class ChartComponentData extends FlowPanel {
 			plotBy = new SelectListBox<Object>();
 			// TODO
 		}
-		xAxis = new SelectListBox<Object>();
-		yAxis = new SelectListBox<Object>();
+		prepareAxises();
 		if (type == DashboardComponentType.COLUMN
 				|| type == DashboardComponentType.LINE) {
 			this.add(yAxis);
@@ -129,6 +133,30 @@ public class ChartComponentData extends FlowPanel {
 				|| type == DashboardComponentType.BAR) {
 			createCombinationChartsPanel();
 		}
+
+	}
+
+	private void prepareAxises() {
+		xAxis = new SelectListBox<ReportAggregate>();
+		xAxis.addChangeHandler(new ChangeHandler() {
+
+			@Override
+			public void onChange(ChangeEvent event) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+		xAxis.setItems(result.getAggregates());
+		yAxis = new SelectListBox<ReportGrouping>();
+		yAxis.addChangeHandler(new ChangeHandler() {
+
+			@Override
+			public void onChange(ChangeEvent event) {
+				// TODO Auto-generated method stubs
+
+			}
+		});
+		yAxis.setItems(result.getGroupings());
 
 	}
 

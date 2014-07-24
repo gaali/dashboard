@@ -18,7 +18,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.vimukti.dashboard.client.data.CustomObject;
-import com.vimukti.dashboard.client.data.DashboardData;
 import com.vimukti.dashboard.client.data.DashboardFilterOperation;
 import com.vimukti.dashboard.client.data.DashboardFilterOptions;
 import com.vimukti.dashboard.client.data.DashboardFilters;
@@ -30,28 +29,28 @@ import com.vimukti.dashboard.client.ui.utils.TextItem;
 
 @SuppressWarnings("rawtypes")
 public class AddFilterDialog extends BaseDialog {
-
+	public static final int MAXIMUM_FILTERS_OPTIONS_SIZE = 12;
 	private SelectListBox<Field> fields;
 	private TextItem displayName;
 	private Button addRow;
 	private List<DashboardFilterOptions> filterOptionsList;
 	private List<FilterOptions> filterOptionsPanels;
-	private DashboardData dashboard;
 	private DashboardFilters options;
-	private boolean isNewFilter;
+	private DashboardFilters filter;
 	private FlowPanel optionsPanel;
 	private FlowPanel addRowfPanel;
+	private List<Field> fieldsList;
 
 	// use this dialog to as edit Filter dialog
-	public AddFilterDialog(DashboardData dashboard, boolean isNewFilter) {
-		this.dashboard = dashboard;
-		this.isNewFilter = isNewFilter;
+	public AddFilterDialog(DashboardFilters filter, List<Field> fieldsList) {
+		this.filter = filter;
+		this.fieldsList = fieldsList;
 		this.addStyleName("dashboard-filter-dialog");
 		createControlsw();
 	}
 
 	protected void createControlsw() {
-		if (isNewFilter) {
+		if (fieldsList == null) {
 			prepareFields();
 			setDefaultValueForDisplayName();
 		}
@@ -67,10 +66,9 @@ public class AddFilterDialog extends BaseDialog {
 		hpanel.add(helpText);
 		this.add(hpanel);
 		prepareFilterOptionsPanel();
-		if (!isNewFilter) {
+		if (fieldsList != null) {
 			init();
 		}
-
 	}
 
 	private void init() {
@@ -85,6 +83,9 @@ public class AddFilterDialog extends BaseDialog {
 			}
 		};
 		fields.addStyleName("fields");
+		// need to call Rpc very time open this dialog or when insert report get
+		// all fields belongs to that report if 2 option is ok then where to
+		// save those fields and how to access them when open filter dialog
 		fields.addChangeHandler(new ChangeHandler() {
 
 			@Override
@@ -122,7 +123,7 @@ public class AddFilterDialog extends BaseDialog {
 
 	private void prepareFilterOptionsPanel() {
 		optionsPanel = new FlowPanel();
-		if (isNewFilter) {
+		if (fieldsList == null) {
 			optionsPanel.getElement().setPropertyBoolean("disabled", true);
 		}
 		optionsPanel.addStyleName("filter-optionspanel");
@@ -147,7 +148,7 @@ public class AddFilterDialog extends BaseDialog {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				if (vPanel.getWidgetCount() <= 12) {
+				if (vPanel.getWidgetCount() <= MAXIMUM_FILTERS_OPTIONS_SIZE) {
 					addRow(vPanel);
 				}
 			}
@@ -183,16 +184,9 @@ public class AddFilterDialog extends BaseDialog {
 	@Override
 	protected boolean onOK() {
 		update();
-		DashboardFilters filters = new DashboardFilters();
-		filters.setName(fields.getSelectedValue().getName());
-		filters.setDisplayLabel(displayName.getText());
-		filters.setDashboardFilterOptions(filterOptionsList);
-		List<DashboardFilters> dashboardFilters = dashboard
-				.getDashboardFilters();
-		if (dashboardFilters == null) {
-			dashboardFilters = new ArrayList<DashboardFilters>();
-		}
-		dashboardFilters.add(filters);
+		filter.setName(fields.getSelectedValue().getName());
+		filter.setDisplayLabel(displayName.getText());
+		filter.setDashboardFilterOptions(filterOptionsList);
 		return true;
 	}
 
