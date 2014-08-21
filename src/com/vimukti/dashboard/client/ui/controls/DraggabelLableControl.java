@@ -1,6 +1,7 @@
 package com.vimukti.dashboard.client.ui.controls;
 
 import com.google.gwt.user.client.ui.Label;
+import com.vimukti.dashboard.client.Dashboard;
 import com.vimukti.dashboard.client.data.MetaObject;
 import com.vimukti.dashboard.client.ui.controls.dnd.IDraggable;
 
@@ -14,6 +15,7 @@ public class DraggabelLableControl extends Label implements IDraggable {
 		setName(object.getName());
 		setId(object.getId());
 		createControls();
+		Dashboard.getDragAndDropController().addToMakeDraggable(this);
 	}
 
 	private void createControls() {

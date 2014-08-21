@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -12,7 +11,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.vimukti.dashboard.client.Dashboard;
 import com.vimukti.dashboard.client.data.DashboardData;
 import com.vimukti.dashboard.client.data.Folder;
-import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
 import com.vimukti.dashboard.client.ui.utils.LabelItem;
 import com.vimukti.dashboard.client.ui.utils.SelectListBox;
 import com.vimukti.dashboard.client.ui.utils.TextItem;
@@ -24,8 +22,6 @@ public class GeneralSettingsPanel extends FlowPanel {
 	private LabelItem nameSpacePrefix;
 	private SelectListBox<Folder> saveTo;
 	private DashboardData settings;
-	private IDashboardServiceAsync serviceObject = Dashboard
-			.getDashboardServiceObject();
 
 	public GeneralSettingsPanel(DashboardData settings) {
 		this.settings = settings;
@@ -104,7 +100,7 @@ public class GeneralSettingsPanel extends FlowPanel {
 			nameSpacePrefix.setText(nameSpacePrifix);
 		}
 		// saveTo.setItems(settings.getDashBoardFolders());
-		List<Folder> saveToFolders = settings.getDashBoardFolders();
+		List<Folder> saveToFolders = Dashboard.getDashboardFolders();
 
 		if (saveToFolders != null) {
 			saveTo.setItems(saveToFolders);

@@ -1,30 +1,38 @@
 package com.vimukti.dashboard.client.data;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
-
-@XmlEnum
 public enum ChartUnits {
 
-	@XmlEnumValue("Auto")
-	AUTO,
+	AUTO("Auto"),
 
-	@XmlEnumValue("Integer")
-	INTEGER,
+	INTEGER("Integer"),
 
-	@XmlEnumValue("Hundreds")
-	HUNDREDS,
+	HUNDREDS("Hundreds"),
 
-	@XmlEnumValue("Thousands")
-	THOUSANDS,
+	THOUSANDS("Thousands"),
 
-	@XmlEnumValue("Millions")
-	MILLIONS,
+	MILLIONS("Millions"),
 
-	@XmlEnumValue("Billions")
-	BILLIONS,
+	BILLIONS("Billions"),
 
-	@XmlEnumValue("Trillions")
-	TRILLIONS
+	TRILLIONS("Trillions");
 
+	private String name;
+
+	private ChartUnits(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return this.name;
+	}
+
+	public static ChartUnits getUnits(String value) {
+		for (ChartUnits unit : ChartUnits.values()) {
+			if (unit.name.equals(value)) {
+				return unit;
+			}
+		}
+		return null;
+	}
 }

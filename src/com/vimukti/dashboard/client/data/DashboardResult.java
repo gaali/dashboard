@@ -4,7 +4,7 @@ import java.util.List;
 
 public class DashboardResult {
 
-	private List<DashboardComponentResult> componetResultList;
+	// private List<DashboardComponentResult> componetResultList;
 
 	public DashboardResult() {
 		// TODO Auto-generated constructor stub

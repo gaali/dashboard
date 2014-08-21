@@ -1,13 +1,15 @@
 package com.vimukti.dashboard.client.ui.controls;
 
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.AbsolutePanel;
+import com.vimukti.dashboard.client.Dashboard;
 import com.vimukti.dashboard.client.data.DashboardComponentType;
 
-public class ComponentsPanel extends FlowPanel {
+public class ComponentsPanel extends AbsolutePanel {
 
 	public ComponentsPanel() {
 		this.getElement().setPropertyString("min-width:100px;", "25%");
 		this.addStyleName("components-panel");
+
 		createControls();
 	}
 
@@ -66,6 +68,8 @@ public class ComponentsPanel extends FlowPanel {
 	private ChartComponent createComponent(DashboardComponentType type,
 			String name) {
 		ChartComponent chartComponent = new ChartComponent(type, name);
+
+		Dashboard.getDragAndDropController().addToMakeDraggable(chartComponent);
 		return chartComponent;
 	}
 

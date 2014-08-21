@@ -1,13 +1,24 @@
 package com.vimukti.dashboard.client.ui.controls;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
+import com.google.gwt.dev.util.HttpHeaders;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -15,16 +26,14 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.vimukti.dashboard.client.Dashboard;
 import com.vimukti.dashboard.client.data.Folder;
-import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
 import com.vimukti.dashboard.client.data.PagesList;
 import com.vimukti.dashboard.client.data.ReportDetails;
 import com.vimukti.dashboard.client.data.ReportsAndPageListType;
 import com.vimukti.dashboard.client.data.ReportsAndPagesList;
 
-public class DataSourcePanel extends VerticalPanel {
+public class DataSourcePanel extends AbsolutePanel {
 
 	private Button recentB;
 	private Button myB;
@@ -34,12 +43,16 @@ public class DataSourcePanel extends VerticalPanel {
 	private ReportsAndPagesList my;
 	private ReportsAndPagesList source;
 	private FlowPanel dataPanel;
-	private IDashboardServiceAsync dashboardServiceObject = Dashboard
-			.getDashboardServiceObject();
+
+	private static Logger logger = Logger.getLogger("DataSourcePanel");
+
+	public static final String GET_REPORT_AND_PAGES_LIST = "/dashboard/getreportandpages";
+	private static final String CONTENT_TYPE_JSON = "application/json";
 
 	public DataSourcePanel(ReportsAndPagesList all) {
 		this.all = all;
 		dataPanel = new FlowPanel();
+
 		createControls();
 	}
 
@@ -69,22 +82,8 @@ public class DataSourcePanel extends VerticalPanel {
 					showReportsPages(recent);
 					return;
 				}
-				dashboardServiceObject.getReportsAndPagesList(
-						ReportsAndPageListType.RECENT,
-						new AsyncCallback<ReportsAndPagesList>() {
 
-							@Override
-							public void onSuccess(ReportsAndPagesList result) {
-								recent = result;
-								showReportsPages(recent);
-							}
-
-							@Override
-							public void onFailure(Throwable caught) {
-								// TODO Auto-generated method stub
-
-							}
-						});
+				requestToGetReportsAndPagesList(ReportsAndPageListType.RECENT);
 			}
 		});
 		myB = createButton("My", hPanel);
@@ -95,28 +94,64 @@ public class DataSourcePanel extends VerticalPanel {
 				if (my != null) {
 					showReportsPages(my);
 				}
-				dashboardServiceObject.getReportsAndPagesList(
-						ReportsAndPageListType.MY,
-						new AsyncCallback<ReportsAndPagesList>() {
 
-							@Override
-							public void onSuccess(ReportsAndPagesList result) {
-								my = result;
-								showReportsPages(my);
-							}
-
-							@Override
-							public void onFailure(Throwable caught) {
-
-							}
-
-						});
-
+				requestToGetReportsAndPagesList(ReportsAndPageListType.MY);
 			}
 		});
 
 		allB.addStyleName("active");
 		this.add(hPanel);
+	}
+
+	protected void requestToGetReportsAndPagesList(
+			final ReportsAndPageListType type) {
+
+		RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.POST,
+				GET_REPORT_AND_PAGES_LIST);
+
+		requestBuilder.setHeader(HttpHeaders.CONTENT_TYPE, CONTENT_TYPE_JSON);
+		requestBuilder.setRequestData("type=" + type.toString());
+		requestBuilder.setCallback(new RequestCallback() {
+
+			@Override
+			public void onResponseReceived(Request request, Response response) {
+
+				ReportsAndPagesList list = new ReportsAndPagesList();
+
+				String text = response.getText();
+
+				JSONValue jsonValue = JSONParser.parseStrict(text);
+				list.fromJSON(jsonValue.isObject());
+
+				switch (type) {
+				case ALL:
+
+					break;
+				case MY:
+					my = list;
+					showReportsPages(my);
+					break;
+				case RECENT:
+					recent = list;
+					showReportsPages(recent);
+					break;
+				}
+
+				logger.info("successfully saved report");
+			}
+
+			@Override
+			public void onError(Request request, Throwable exception) {
+				logger.info("failed to save report");
+			}
+
+		});
+
+		try {
+			requestBuilder.send();
+		} catch (RequestException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public Button createButton(String buttonName, HorizontalPanel panel) {
@@ -144,27 +179,20 @@ public class DataSourcePanel extends VerticalPanel {
 	protected void getSearchResult(String value) {
 		ReportsAndPagesList searchResult = new ReportsAndPagesList();
 
-		List<Folder> sFolders = new ArrayList<Folder>();
+		Map<String, List<ReportDetails>> sFolders = new HashMap<String, List<ReportDetails>>();
 
-		List<Folder> folders = source.getFolders();
+		Map<String, List<ReportDetails>> folders = source.getFolders();
 
-		for (Folder folder : folders) {
-			Folder sFolder = new Folder();
-			String name = folder.getName();
-			String id = folder.getId();
-			sFolder.setName(name);
-			sFolder.setId(id);
-			sFolders.add(sFolder);
-
+		for (String folderId : folders.keySet()) {
 			List<ReportDetails> sReports = new ArrayList<ReportDetails>();
-			List<ReportDetails> reports = folder.getReports();
-			for (ReportDetails reportDetails : reports) {
+
+			for (ReportDetails reportDetails : folders.get(folderId)) {
 				boolean contains = reportDetails.getName().contains(value);
 				if (contains) {
 					sReports.add(reportDetails);
 				}
 			}
-			sFolder.setReports(sReports);
+			sFolders.put(folderId, sReports);
 		}
 		searchResult.setFolders(sFolders);
 
@@ -194,15 +222,18 @@ public class DataSourcePanel extends VerticalPanel {
 		if (list == null) {
 			return;
 		}
-		List<Folder> folders = list.getFolders();
+		Map<String, List<ReportDetails>> folders = list.getFolders();
 		Tree reportsTree = new Tree();
 		TreeItem rootTree = new TreeItem();
 		rootTree.setText("Rports");
 		reportsTree.addItem(rootTree);
-		for (Folder folder : folders) {
+		for (String folderId : folders.keySet()) {
+
+			Folder folder = Dashboard.getFolderBy(folderId);
+
 			TreeItem reportFolderItem = new TreeItem(
 					new Label(folder.getName()));
-			List<ReportDetails> reports = folder.getReports();
+			List<ReportDetails> reports = folders.get(folderId);
 			for (ReportDetails report : reports) {
 				DraggabelLableControl item = new DraggabelLableControl(report);
 				item.setType(DataSourceListType.REPORT);

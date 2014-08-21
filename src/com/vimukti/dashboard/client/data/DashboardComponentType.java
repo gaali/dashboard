@@ -1,86 +1,76 @@
 package com.vimukti.dashboard.client.data;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
-
-@XmlEnum
 public enum DashboardComponentType {
 
-	@XmlEnumValue("Bar")
-	BAR,
+	BAR("Bar"),
 
-	@XmlEnumValue("BarGrouped")
-	BAR_GROUPED,
+	BAR_GROUPED("Bar Grouped"),
 
-	@XmlEnumValue("BarStacked")
-	BAR_STACKED,
+	BAR_STACKED("Bar Stacked"),
 
-	@XmlEnumValue("BarStacked100")
-	BAR_STACKED100,
+	BAR_STACKED100("Bar Stacked Full"),
 
-	@XmlEnumValue("Column")
-	COLUMN,
+	COLUMN("Column"),
 
-	@XmlEnumValue("ColumnGrouped")
-	COLUMN_GROUPED,
+	COLUMN_GROUPED("Column Grouped"),
 
-	@XmlEnumValue("ColumnLine")
-	COLUMN_LINE,
+	COLUMN_LINE("Column Line"),
 
-	@XmlEnumValue("ColumnLineGrouped")
-	COLUMN_LINE_GROUPED,
+	COLUMN_LINE_GROUPED("Column Line Grouped"),
 
-	@XmlEnumValue("ColumnLineStacked")
-	COLUMN_LINE_STACKED,
+	COLUMN_LINE_STACKED("Column Line Stacked"),
 
-	@XmlEnumValue("ColumnLineStacked100")
-	COLUMN_LINE_STACKED100,
+	COLUMN_LINE_STACKED100("Column Line Stacked Full"),
 
-	@XmlEnumValue("ColumnStacked")
-	COLUMN_STACKED,
+	COLUMN_STACKED("Column Stacked"),
 
-	@XmlEnumValue("ColumnStacked100")
-	COLUMN_STACKED100,
+	COLUMN_STACKED100("Column Stacked Full"),
 
-	@XmlEnumValue("Donut")
-	DONUT,
+	DONUT("Donut"),
 
-	@XmlEnumValue("Funnel")
-	FUNNEL,
+	FUNNEL("Funnel"),
 
-	@XmlEnumValue("Gauge")
-	GAUGE,
+	GAUGE("Gauge"),
 
-	@XmlEnumValue("Line")
-	LINE,
+	LINE("Line"),
 
-	@XmlEnumValue("lineCumulative")
-	LINE_CUMULATIVE,
+	LINE_CUMULATIVE("Line Cumulative"),
 
-	@XmlEnumValue("LineGrouped")
-	LINE_GROUPED,
+	LINE_GROUPED("LineGrouped"),
 
-	@XmlEnumValue("lineGroupedCumulative")
-	LINE_GROUPED_CUMULATIVE,
+	LINE_GROUPED_CUMULATIVE("Line Grouped Cumulative"),
 
-	@XmlEnumValue("Metric")
-	METRIC,
+	METRIC("Metric"),
 
-	@XmlEnumValue("Pie")
-	PIE,
+	PIE("Pie"),
 
-	@XmlEnumValue("Scatter")
-	SCATTER,
+	SCATTER("Scatter"),
 
-	@XmlEnumValue("ScatterGrouped")
-	SCATTER_GROUPED,
+	SCATTER_GROUPED("Scatter Grouped"),
 
-	@XmlEnumValue("Scontrol")
-	SCONTROL,
+	SCONTROL("Scontrol"),
 
-	@XmlEnumValue("Table")
-	TABLE,
+	TABLE("Table"),
 
-	PAGE, REPORT
+	PAGE("Page"), REPORT("Report");
 
+	private String name;
+
+	private DashboardComponentType(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return this.name;
+	}
+
+	public static DashboardComponentType getComponentType(String value) {
+		for (DashboardComponentType type : DashboardComponentType.values()) {
+			if (type.name.equals(value)) {
+				return type;
+			}
+		}
+		return null;
+	}
 }

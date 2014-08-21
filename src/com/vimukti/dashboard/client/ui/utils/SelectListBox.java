@@ -13,7 +13,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 
 public class SelectListBox<T> extends ListBox {
-	private List items = new ArrayList();
+	private List<T> items = new ArrayList<T>();
 	private FlowPanel errorPanel;
 
 	public SelectListBox() {

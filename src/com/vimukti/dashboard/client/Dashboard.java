@@ -2,13 +2,24 @@ package com.vimukti.dashboard.client;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.dev.util.HttpHeaders;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -22,37 +33,37 @@ import com.vimukti.dashboard.client.data.DashboardFilters;
 import com.vimukti.dashboard.client.data.DashboardType;
 import com.vimukti.dashboard.client.data.Field;
 import com.vimukti.dashboard.client.data.Folder;
-import com.vimukti.dashboard.client.data.IDashboardService;
-import com.vimukti.dashboard.client.data.IDashboardServiceAsync;
 import com.vimukti.dashboard.client.ui.controls.AddFilterDialog;
 import com.vimukti.dashboard.client.ui.controls.DashboardCloseConformationDialog;
 import com.vimukti.dashboard.client.ui.controls.DashboardMainPage;
 import com.vimukti.dashboard.client.ui.controls.DashboardPropertiesDialog;
 import com.vimukti.dashboard.client.ui.controls.DashboardRunningUserDialog;
 import com.vimukti.dashboard.client.ui.controls.LeftPanel;
+import com.vimukti.dashboard.client.ui.controls.dnd.DragAndDropController;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class Dashboard implements EntryPoint {
-	private static final IDashboardServiceAsync greetingService = GWT
-			.create(IDashboardService.class);
 
 	public static final int MAXIMUM_FILTERS_SIZE = 3;
 	private DashboardData dashboard;
 	private Button addFilter;
 	private List<Field> fields;
 	private DashboardMainPage mainPage;
+	public static DashboardData data;
 
-	/**
-	 * This is the entry point method.
-	 */
+	private static List<Folder> dashboardFolders;
 
-	public static IDashboardServiceAsync getDashboardServiceObject() {
-		return greetingService;
-	}
+	private static Logger logger = Logger.getLogger("DataSourcePanel");
+	private static final String CONTENT_TYPE_JSON = "application/json";
+	public static final String GET_DASHBOARD_DATA = "/dashboard/getdata";
+	public static final String GET_DASHBOARD_FOLDERS = "/dashboard/folders";
+	public static final String SAVE_DASHBOARD = "dashboard/save";
+	private static DragAndDropController dragAndDropController;
 
 	public void onModuleLoad() {
+		retrieveDashboardFolders();
 		loadDashboardDesigner();
 	}
 
@@ -60,15 +71,27 @@ public class Dashboard implements EntryPoint {
 		RootPanel rootPanel = RootPanel.get();
 		rootPanel.clear();
 		VerticalPanel vPanel = new VerticalPanel();
-		HorizontalPanel createDashbordBar = createDashbordBar();
-		HorizontalPanel addMainPanel = addMainPanel();
+		FlowPanel createDashbordBar = createDashbordBar();
+		FlowPanel addMainPanel = addMainPanel();
 		vPanel.add(createDashbordBar);
 		vPanel.add(addMainPanel);
-		rootPanel.add(vPanel);
+
+		AbsolutePanel panel = new AbsolutePanel();
+		addDragAndDropController(panel);
+		panel.add(vPanel);
+		rootPanel.add(panel);
 	}
 
-	public HorizontalPanel createDashbordBar() {
-		HorizontalPanel hPanel = new HorizontalPanel();
+	private void addDragAndDropController(AbsolutePanel panel) {
+		dragAndDropController = new DragAndDropController(panel);
+	}
+
+	public static DragAndDropController getDragAndDropController() {
+		return dragAndDropController;
+	}
+
+	public FlowPanel createDashbordBar() {
+		FlowPanel hPanel = new FlowPanel();
 
 		Button save = new Button("save");
 		save.addClickHandler(new ClickHandler() {
@@ -180,9 +203,9 @@ public class Dashboard implements EntryPoint {
 		filterDialog.center();
 	}
 
-	private HorizontalPanel addMainPanel() {
+	private FlowPanel addMainPanel() {
 
-		HorizontalPanel panel = new HorizontalPanel();
+		FlowPanel panel = new FlowPanel();
 		panel.addStyleName("mainPanel");
 		getMainPage(panel);
 		LeftPanel leftPanel = new LeftPanel();
@@ -190,43 +213,83 @@ public class Dashboard implements EntryPoint {
 		return panel;
 	}
 
-	private void getMainPage(final HorizontalPanel panel) {
-		greetingService.getDashboard(new AsyncCallback<DashboardData>() {
+	private void getMainPage(final FlowPanel panel) {
+
+		RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.POST,
+				GET_DASHBOARD_DATA);
+
+		requestBuilder.setHeader(HttpHeaders.CONTENT_TYPE, CONTENT_TYPE_JSON);
+
+		String dashboardId = getDashboardId();
+
+		requestBuilder.setRequestData("dashboardId=" + dashboardId);
+		requestBuilder.setCallback(new RequestCallback() {
 
 			@Override
-			public void onSuccess(DashboardData result) {
-				mainPage = new DashboardMainPage(result);
+			public void onResponseReceived(Request request, Response response) {
+
+				data = new DashboardData();
+
+				String text = response.getText();
+
+				JSONValue jsonValue = JSONParser.parseStrict(text);
+				data.fromJSON(jsonValue.isObject());
+
+				mainPage = new DashboardMainPage(data);
 				mainPage.addStyleName("main-panel");
 				panel.add(mainPage);
+
+				logger.info("successfully saved report");
 			}
 
 			@Override
-			public void onFailure(Throwable caught) {
-				// TODO Auto-generated method stub
-				caught.printStackTrace();
-
+			public void onError(Request request, Throwable exception) {
+				logger.info("failed to save report");
 			}
 
 		});
+
+		try {
+			requestBuilder.send();
+		} catch (RequestException e) {
+			e.printStackTrace();
+		}
 	}
 
+	private static native String getDashboardId() /*-{
+		return $wnd.dashboardId;
+	}-*/;
+
 	private void saveDashboard() {
-		greetingService.saveDashBoard(dashboard, new AsyncCallback<Void>() {
+
+		RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.POST,
+				SAVE_DASHBOARD);
+
+		requestBuilder.setHeader(HttpHeaders.CONTENT_TYPE, CONTENT_TYPE_JSON);
+
+		JSONObject object = dashboard.toJSON();
+
+		requestBuilder.setRequestData("dashboard=" + object.toString());
+
+		requestBuilder.setCallback(new RequestCallback() {
 
 			@Override
-			public void onSuccess(Void result) {
-				// TODO Auto-generated method stub
-				// redirect the page to .... (decided page)
-
+			public void onResponseReceived(Request request, Response response) {
+				logger.info("successfully saved report");
 			}
 
 			@Override
-			public void onFailure(Throwable caught) {
-				// need print in logger
-				caught.printStackTrace();
+			public void onError(Request request, Throwable exception) {
+				logger.info("failed to save report");
 			}
 
 		});
+
+		try {
+			requestBuilder.send();
+		} catch (RequestException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void prepateNewDashborad() {
@@ -246,25 +309,85 @@ public class Dashboard implements EntryPoint {
 		dashboard.setTitle("");
 		dashboard.setTitleColor("000000");
 		dashboard.setTitleSize(8);
-		greetingService.getDashBoarFolders(new AsyncCallback<List<Folder>>() {
+	}
+
+	private static void retrieveDashboardFolders() {
+		RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.POST,
+				GET_DASHBOARD_FOLDERS);
+
+		requestBuilder.setCallback(new RequestCallback() {
 
 			@Override
-			public void onSuccess(List<Folder> result) {
-				dashboard.setDashBoardFolders(result);
+			public void onResponseReceived(Request request, Response response) {
+
+				List<Folder> folders = new ArrayList<Folder>();
+
+				String text = response.getText();
+
+				JSONValue jsonValue = JSONParser.parseStrict(text);
+
+				JSONArray jsonArray = jsonValue.isArray();
+
+				for (int i = 0; i < jsonArray.size(); i++) {
+					JSONValue value = jsonArray.get(i);
+
+					Folder folder = new Folder();
+					folder.fromJSON(value.isObject());
+
+					folders.add(folder);
+				}
+
+				setDashboardFolders(folders);
+
+				logger.info("successfully saved report");
 			}
 
 			@Override
-			public void onFailure(Throwable caught) {
-				// TODO Auto-generated method stub
-
+			public void onError(Request request, Throwable exception) {
+				logger.info("failed to save report");
 			}
+
 		});
+
+		try {
+			requestBuilder.send();
+		} catch (RequestException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * @return the dashboardFolders
+	 */
+	public static List<Folder> getDashboardFolders() {
+		return dashboardFolders;
+	}
+
+	/**
+	 * @param dashboardFolders
+	 *            the dashboardFolders to set
+	 */
+	public static void setDashboardFolders(List<Folder> dashboardFolders) {
+		Dashboard.dashboardFolders = dashboardFolders;
 	}
 
 	private DashboardComponentSection getDashboardComponentSection() {
 		DashboardComponentSection section = new DashboardComponentSection();
 		section.setColumnSize(DashboardComponentSize.MEDIUM);
 		return section;
+	}
+
+	public static Folder getFolderBy(String folderId) {
+		for (Folder folder : dashboardFolders) {
+			if (folder.getId().equals(folderId)) {
+				return folder;
+			}
+		}
+		return null;
+	}
+
+	public static DashboardData getDashboardData() {
+		return data;
 	}
 
 }

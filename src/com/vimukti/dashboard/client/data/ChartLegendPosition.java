@@ -1,18 +1,31 @@
 package com.vimukti.dashboard.client.data;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
-
-@XmlEnum
 public enum ChartLegendPosition {
 
-	@XmlEnumValue("Bottom")
-	BOTTOM,
+	BOTTOM("Bottom"),
 
-	@XmlEnumValue("OnChart")
-	ON_CHART,
+	ON_CHART("OnChart"),
 
-	@XmlEnumValue("Right")
-	RIGHT
+	RIGHT("Right");
+
+	private String name;
+
+	@Override
+	public String toString() {
+		return this.name;
+	}
+
+	private ChartLegendPosition(String name) {
+		this.name = name;
+	}
+
+	public static ChartLegendPosition gtLegendPosition(String value) {
+		for (ChartLegendPosition position : ChartLegendPosition.values()) {
+			if (position.name.equals(value)) {
+				return position;
+			}
+		}
+		return null;
+	}
 
 }

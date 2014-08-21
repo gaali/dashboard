@@ -26,7 +26,6 @@ public class FiltersPanel extends FlowPanel {
 		if (dashboardFilters == null || dashboardFilters.isEmpty()) {
 			return;
 		}
-
 		final List<Label> listTOshow = new ArrayList<Label>();
 		for (final DashboardFilters filter : dashboardFilters) {
 			List<DashboardFilterOptions> dashboardFilterOptions = filter
@@ -46,7 +45,6 @@ public class FiltersPanel extends FlowPanel {
 				public void onChange(ChangeEvent event) {
 					if (filterbox.getSelectedIndex() == 0) {
 						clearFilter();
-
 					} else if (filterbox.getSelectedIndex() == listTOshow
 							.size() - 1) {
 						removeFilter(filterbox);

@@ -3,6 +3,9 @@ package com.vimukti.dashboard.client.reportdata;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONValue;
 import com.vimukti.dashboard.client.data.MetaObject;
 
 @SuppressWarnings("serial")
@@ -10,7 +13,7 @@ public class Report extends MetaObject {
 
 	private List<ReportAggregate> aggregates = new ArrayList<ReportAggregate>();
 
-	private List<ReportColumn> columns = new ArrayList<>();
+	private List<ReportColumn> columns = new ArrayList<ReportColumn>();
 
 	private ReportChart chart;
 
@@ -18,7 +21,7 @@ public class Report extends MetaObject {
 
 	private String fullName;
 
-	private List<ReportGrouping> groupings = new ArrayList<>();
+	private List<ReportGrouping> groupings = new ArrayList<ReportGrouping>();
 
 	private String name;
 
@@ -142,6 +145,37 @@ public class Report extends MetaObject {
 	 */
 	public void setGroupings(List<ReportGrouping> groupings) {
 		this.groupings = groupings;
+	}
+
+	@Override
+	public void fromJSON(JSONObject jsonObject) {
+		super.fromJSON(jsonObject);
+		JSONValue jAggregates = jsonObject.get("aggregates");
+		List<ReportAggregate> aggregateList = null;
+		if (jAggregates != null) {
+			JSONArray aggregaresArray = jAggregates.isArray();
+			aggregateList = new ArrayList<ReportAggregate>();
+			for (int i = 0; i < aggregaresArray.size(); i++) {
+				ReportAggregate rAggreate = new ReportAggregate();
+				JSONValue jsonValue = aggregaresArray.get(i);
+				rAggreate.fromJSON(jsonValue.isObject());
+				aggregateList.add(rAggreate);
+			}
+		}
+		aggregates = aggregateList;
+		JSONValue jColumns = jsonObject.get("columns");
+		List<ReportColumn> columnsList = null;
+		JSONArray columnArray = jColumns.isArray();
+		if (jColumns != null) {
+			columnsList = new ArrayList<ReportColumn>();
+			for (int i = 0; i < columnArray.size(); i++) {
+				ReportColumn col = new ReportColumn();
+				JSONValue jsonValue = columnArray.get(i);
+				col.fromJSON(jsonValue.isObject());
+				columnsList.add(col);
+			}
+		}
+		columns = columnsList;
 	}
 
 }

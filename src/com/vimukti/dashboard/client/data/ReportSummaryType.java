@@ -1,23 +1,33 @@
 package com.vimukti.dashboard.client.data;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
-
-@XmlEnum
 public enum ReportSummaryType {
 
-	@XmlEnumValue("Sum")
-	SUM,
+	SUM("Sum"),
 
-	@XmlEnumValue("Average")
-	AVERAGE,
+	AVERAGE("Average"),
 
-	@XmlEnumValue("Maximum")
-	MAXIMUM,
+	MAXIMUM("Maximum"),
 
-	@XmlEnumValue("Minimum")
-	MINIMUM,
+	MINIMUM("Minimum"),
 
-	@XmlEnumValue("None")
-	NONE
+	NONE("None");
+
+	private String name;
+
+	private ReportSummaryType(String name) {
+		this.name = name;
+	}
+
+	public String toString() {
+		return this.name;
+	}
+
+	public static ReportSummaryType getSummaryType(String name) {
+		for (ReportSummaryType type : ReportSummaryType.values()) {
+			if (type.name.equals(name)) {
+				return type;
+			}
+		}
+		return null;
+	}
 }

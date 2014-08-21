@@ -1,18 +1,30 @@
 package com.vimukti.dashboard.client.data;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
-
-@XmlEnum
 public enum DashboardType {
 
-	@XmlEnumValue("SpecifiedUser")
-	SPECIFIED_USER,
+	SPECIFIED_USER("SpecifiedUser"),
 
-	@XmlEnumValue("LoggedInUser")
-	LOGGED_IN_USER,
+	LOGGED_IN_USER("LoggedInUser"),
 
-	@XmlEnumValue("MyTeamUser")
-	MY_TEAM_USER,
+	MY_TEAM_USER("MyTeamUser");
 
+	private String name;
+
+	private DashboardType(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return this.name;
+	}
+
+	public static DashboardType getDashboardType(String valeu) {
+		for (DashboardType type : DashboardType.values()) {
+			if (type.name.equals(valeu)) {
+				return type;
+			}
+		}
+		return null;
+	}
 }

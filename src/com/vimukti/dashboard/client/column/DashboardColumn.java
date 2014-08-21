@@ -5,13 +5,12 @@ import java.util.List;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.vimukti.dashboard.client.data.DashboardComponent;
 import com.vimukti.dashboard.client.data.DashboardComponentSection;
 import com.vimukti.dashboard.client.data.DashboardComponentSize;
 
 public abstract class DashboardColumn extends FlowPanel {
-	private VerticalPanel column;
+	private FlowPanel column;
 	private PortletContainerPanel portletContainer;
 	private ColumnHeader columnHeader;
 	private FlowPanel addIcon;
@@ -66,7 +65,7 @@ public abstract class DashboardColumn extends FlowPanel {
 	protected abstract void addColumn();
 
 	private void createColumn() {
-		column = new VerticalPanel();
+		column = new FlowPanel();
 		column.addStyleName("column-body");
 		// Column Header which contains Size and remove Icon
 		columnHeader = new ColumnHeader();

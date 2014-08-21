@@ -3,26 +3,35 @@ package com.vimukti.dashboard.client.chart.ui.controls;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
+import com.vimukti.dashboard.client.Dashboard;
 import com.vimukti.dashboard.client.data.DashboardComponent;
 import com.vimukti.dashboard.client.data.DashboardComponentType;
+import com.vimukti.dashboard.client.data.DashboardData;
 import com.vimukti.dashboard.client.reportdata.Report;
 import com.vimukti.dashboard.client.ui.utils.BaseDialog;
 import com.vimukti.dashboard.client.ui.utils.TabControl;
 import com.vimukti.dashboard.client.ui.utils.TextItem;
 
 @SuppressWarnings("rawtypes")
-public class ComponentEditorDialog extends BaseDialog {
+public abstract class ComponentEditorDialog extends BaseDialog {
 	private ChartFormatting formatting;
 	private ChartComponentData data;
-	private DashboardComponent chartData;
 	private TabLayoutPanel settingsPanel;
 	private SimplePanel targetPanel;
 	private Report reportData;
+	private String chartHtml;
+	protected DashboardComponent componentData;
+
+	public static final String GET_CHART_HTML = "/dashboard/chartpreview";
 
 	private FlowPanel horizontalBar;
 	private FlowPanel vertical;
@@ -34,9 +43,11 @@ public class ComponentEditorDialog extends BaseDialog {
 	private FlowPanel gauge;
 	private FlowPanel metric;
 	private FlowPanel tabel;
+	private FlowPanel previewPanel = new FlowPanel();
 
-	public ComponentEditorDialog(DashboardComponent chartData, Report reportData) {
-		this.chartData = chartData;
+	public ComponentEditorDialog(DashboardComponent componentData,
+			Report reportData) {
+		this.componentData = componentData;
 		this.reportData = reportData;
 		this.addStyleName("chart-settings-dialog");
 	}
@@ -57,17 +68,31 @@ public class ComponentEditorDialog extends BaseDialog {
 			@Override
 			public void onClick(ClickEvent event) {
 				// TODO Auto-generated method stub
-
 			}
 		});
 	}
 
 	private void CreateChartDataAndChartPanel() {
-		HorizontalPanel hPanel = new HorizontalPanel();
+		FlowPanel hPanel = new FlowPanel();
 
-		data = new ChartComponentData(chartData, reportData);
-		formatting = new ChartFormatting(chartData);
+		data = new ChartComponentData(componentData, reportData,
+				new IRefreshChartPanel() {
 
+					@Override
+					public void refreshChartPanel() {
+						ComponentEditorDialog.this.refreshChartPanel();
+						createChartPreviewPanel();
+					}
+				});
+		formatting = new ChartFormatting(componentData, reportData,
+				new IRefreshChartPanel() {
+
+					@Override
+					public void refreshChartPanel() {
+						ComponentEditorDialog.this.refreshChartPanel();
+						createChartPreviewPanel();
+					}
+				});
 		settingsPanel = new TabLayoutPanel(1.5, Unit.EM);
 		settingsPanel.addStyleName("settings-tabLayouts");
 		settingsPanel.add(data, "Component Data");
@@ -81,7 +106,6 @@ public class ComponentEditorDialog extends BaseDialog {
 			@Override
 			public void onClick(ClickEvent event) {
 				targetPanel.setWidget(data);
-
 			}
 		});
 
@@ -102,11 +126,15 @@ public class ComponentEditorDialog extends BaseDialog {
 	}
 
 	private FlowPanel createChartPreviewPanel() {
-		return null;
+		previewPanel.addStyleName("preview-panel");
+		previewPanel.clear();
+		HTML html = new HTML(chartHtml);
+		previewPanel.add(html);
+		return previewPanel;
 	}
 
 	private void createChartTypesPanel() {
-		HorizontalPanel hPanel = new HorizontalPanel();
+		FlowPanel hPanel = new FlowPanel();
 		hPanel.addStyleName("chart-types-panel");
 
 		Label selectChart = new Label("Select Type:");
@@ -120,11 +148,9 @@ public class ComponentEditorDialog extends BaseDialog {
 			public void onClick(ClickEvent event) {
 				clearSelectedStyleName();
 				horizontalBar.addStyleName("selected-chart");
-				chartData.setComponentType(DashboardComponentType.BAR);
-				data.reRendar(chartData);
-				formatting.reRender(chartData);
-				// TODO Auto-generated method stub
-
+				componentData.setComponentType(DashboardComponentType.BAR);
+				data.reRendar();
+				formatting.reRender();
 			}
 		}, ClickEvent.getType());
 		horizontalBar.addStyleName("horizontalbarchart");
@@ -137,11 +163,9 @@ public class ComponentEditorDialog extends BaseDialog {
 			public void onClick(ClickEvent event) {
 				clearSelectedStyleName();
 				vertical.addStyleName("selected-chart");
-				chartData.setComponentType(DashboardComponentType.COLUMN);
-				data.reRendar(chartData);
-				formatting.reRender(chartData);
-				// TODO Auto-generated method stub
-
+				componentData.setComponentType(DashboardComponentType.COLUMN);
+				data.reRendar();
+				formatting.reRender();
 			}
 		}, ClickEvent.getType());
 
@@ -153,10 +177,9 @@ public class ComponentEditorDialog extends BaseDialog {
 			public void onClick(ClickEvent event) {
 				clearSelectedStyleName();
 				line.addStyleName("selected-chart");
-				chartData.setComponentType(DashboardComponentType.LINE);
-				data.reRendar(chartData);
-				formatting.reRender(chartData);
-				// TODO Auto-generated method stub
+				componentData.setComponentType(DashboardComponentType.LINE);
+				data.reRendar();
+				formatting.reRender();
 			}
 		}, ClickEvent.getType());
 
@@ -168,10 +191,9 @@ public class ComponentEditorDialog extends BaseDialog {
 			public void onClick(ClickEvent event) {
 				clearSelectedStyleName();
 				pie.addStyleName("selected-chart");
-				chartData.setComponentType(DashboardComponentType.PIE);
-				data.reRendar(chartData);
-				formatting.reRender(chartData);
-				// TODO Auto-generated method stub
+				componentData.setComponentType(DashboardComponentType.PIE);
+				data.reRendar();
+				formatting.reRender();
 			}
 		}, ClickEvent.getType());
 
@@ -183,11 +205,9 @@ public class ComponentEditorDialog extends BaseDialog {
 			public void onClick(ClickEvent event) {
 				clearSelectedStyleName();
 				donut.addStyleName("selected-chart");
-				chartData.setComponentType(DashboardComponentType.DONUT);
-				data.reRendar(chartData);
-				formatting.reRender(chartData);
-				// TODO Auto-generated method stub
-
+				componentData.setComponentType(DashboardComponentType.DONUT);
+				data.reRendar();
+				formatting.reRender();
 			}
 		}, ClickEvent.getType());
 
@@ -199,11 +219,9 @@ public class ComponentEditorDialog extends BaseDialog {
 			public void onClick(ClickEvent event) {
 				clearSelectedStyleName();
 				funnel.addStyleName("selected-chart");
-				chartData.setComponentType(DashboardComponentType.FUNNEL);
-				data.reRendar(chartData);
-				formatting.reRender(chartData);
-				// TODO Auto-generated method stub
-
+				componentData.setComponentType(DashboardComponentType.FUNNEL);
+				data.reRendar();
+				formatting.reRender();
 			}
 		}, ClickEvent.getType());
 
@@ -215,10 +233,9 @@ public class ComponentEditorDialog extends BaseDialog {
 			public void onClick(ClickEvent event) {
 				clearSelectedStyleName();
 				scatter.addStyleName("selected-chart");
-				chartData.setComponentType(DashboardComponentType.SCATTER);
-				data.reRendar(chartData);
-				formatting.reRender(chartData);
-				// TODO Auto-generated method stub
+				componentData.setComponentType(DashboardComponentType.SCATTER);
+				data.reRendar();
+				formatting.reRender();
 			}
 		}, ClickEvent.getType());
 
@@ -230,11 +247,9 @@ public class ComponentEditorDialog extends BaseDialog {
 			public void onClick(ClickEvent event) {
 				clearSelectedStyleName();
 				gauge.addStyleName("selected-chart");
-				chartData.setComponentType(DashboardComponentType.GAUGE);
-				data.reRendar(chartData);
-				formatting.reRender(chartData);
-				// TODO Auto-generated method stub
-
+				componentData.setComponentType(DashboardComponentType.GAUGE);
+				data.reRendar();
+				formatting.reRender();
 			}
 		}, ClickEvent.getType());
 
@@ -246,11 +261,9 @@ public class ComponentEditorDialog extends BaseDialog {
 			public void onClick(ClickEvent event) {
 				clearSelectedStyleName();
 				metric.addStyleName("selected-chart");
-				chartData.setComponentType(DashboardComponentType.METRIC);
-				data.reRendar(chartData);
-				formatting.reRender(chartData);
-				// TODO Auto-generated method stub
-
+				componentData.setComponentType(DashboardComponentType.METRIC);
+				data.reRendar();
+				formatting.reRender();
 			}
 		}, ClickEvent.getType());
 
@@ -262,11 +275,9 @@ public class ComponentEditorDialog extends BaseDialog {
 			public void onClick(ClickEvent event) {
 				clearSelectedStyleName();
 				tabel.addStyleName("selected-chart");
-				chartData.setComponentType(DashboardComponentType.TABLE);
-				data.reRendar(chartData);
-				formatting.reRender(chartData);
-				// TODO Auto-generated method stub
-
+				componentData.setComponentType(DashboardComponentType.TABLE);
+				data.reRendar();
+				formatting.reRender();
 			}
 		}, ClickEvent.getType());
 
@@ -287,7 +298,7 @@ public class ComponentEditorDialog extends BaseDialog {
 
 	private void setSelectedStyleToPanel() {
 
-		switch (chartData.getComponentType()) {
+		switch (componentData.getComponentType()) {
 		case BAR:
 		case BAR_GROUPED:
 		case BAR_STACKED:
@@ -351,21 +362,27 @@ public class ComponentEditorDialog extends BaseDialog {
 		tabel.removeStyleName("selected-chart");
 	}
 
-	@Override
-	protected boolean onOK() {
-		update();
-		return false;
+	public void refreshChartPanel() {
+		RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.POST,
+				GET_CHART_HTML);
+
+		String componentString = componentData.toJSON().toString();
+		DashboardData dashboardData = Dashboard.getDashboardData();
+		String requestString = "componentData=" + componentString + ","
+				+ "dashboardId=" + dashboardData.getId();
+		requestBuilder.setRequestData(requestString);
+
+		requestBuilder.setCallback(new RequestCallback() {
+
+			@Override
+			public void onResponseReceived(Request request, Response response) {
+				chartHtml = response.getText();
+			}
+
+			@Override
+			public void onError(Request request, Throwable exception) {
+				// TODO Auto-generated method stub
+			}
+		});
 	}
-
-	@Override
-	public void setFocus() {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void update() {
-		data.update();
-		formatting.update();
-	}
-
 }

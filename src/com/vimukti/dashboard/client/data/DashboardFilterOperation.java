@@ -1,49 +1,50 @@
 package com.vimukti.dashboard.client.data;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
 
-@XmlEnum
 public enum DashboardFilterOperation {
 
-	@XmlEnumValue("equals")
-	EQUALS,
+	EQUALS("equals"),
 
-	@XmlEnumValue("notEqual")
-	NOT_EQUAL,
+	NOT_EQUAL("notEqual"),
 
-	@XmlEnumValue("lessThan")
-	LESS_THAN,
+	LESS_THAN("lessThan"),
 
-	@XmlEnumValue("greaterThan")
-	GREATER_THAN,
+	GREATER_THAN("greaterThan"),
 
-	@XmlEnumValue("lessOrEqual")
-	LESS_OR_EQUAL,
+	LESS_OR_EQUAL("lessOrEqual"),
 
-	@XmlEnumValue("greaterOrEqual")
-	GREATER_OR_EQUAL,
+	GREATER_OR_EQUAL("greaterOrEqual"),
 
-	@XmlEnumValue("contains")
-	CONTAINS,
+	CONTAINS("contains"),
 
-	@XmlEnumValue("notContain")
-	NOT_CONTAIN,
+	NOT_CONTAIN("notContain"),
 
-	@XmlEnumValue("startsWith")
-	STARTS_WITH,
+	STARTS_WITH("startsWith"),
 
-	@XmlEnumValue("between")
-	BETWEEN,
+	BETWEEN("between"),
 
-	@XmlEnumValue("includes")
-	INCLUDES,
+	INCLUDES("includes"),
 
-	@XmlEnumValue("excludes")
-	EXCLUDES;
+	EXCLUDES("excludes");
 
-	public String getDisplayName() {
-		String name = this.toString().toLowerCase();
-		return name;
+	private String name;
+
+	private DashboardFilterOperation(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return this.name;
+	}
+
+	public static DashboardFilterOperation getFilterOperation(String value) {
+		for (DashboardFilterOperation operation : DashboardFilterOperation
+				.values()) {
+			if (operation.name == value) {
+				return operation;
+			}
+		}
+		return null;
 	}
 }

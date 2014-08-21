@@ -1,42 +1,31 @@
 package com.vimukti.dashboard.client.reportdata;
 
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONValue;
 import com.vimukti.dashboard.client.data.MetaObject;
 
 @SuppressWarnings("serial")
 public class ReportGrouping extends MetaObject {
 
-	// ReportAggrType
-	private String aggregateType;
+	private ReportAggrType aggregateType;
 
-	// UserDateGranularity
-	private String dateGranularity;
+	private UserDateGranularity dateGranularity;
 
 	private String field;
 
-	private String sortByName;
-
-	// SortOrder
-	private String sortOrder;
-
-	// ReportSortType
-	private String sortType;
-
-	public ReportGrouping() {
-	}
-
-	public String getAggregateType() {
+	public ReportAggrType getAggregateType() {
 		return aggregateType;
 	}
 
-	public void setAggregateType(String aggregateType) {
+	public void setAggregateType(ReportAggrType aggregateType) {
 		this.aggregateType = aggregateType;
 	}
 
-	public String getDateGranularity() {
+	public UserDateGranularity getDateGranularity() {
 		return dateGranularity;
 	}
 
-	public void setDateGranularity(String dateGranularity) {
+	public void setDateGranularity(UserDateGranularity dateGranularity) {
 		this.dateGranularity = dateGranularity;
 	}
 
@@ -48,28 +37,25 @@ public class ReportGrouping extends MetaObject {
 		this.field = field;
 	}
 
-	public String getSortByName() {
-		return sortByName;
-	}
+	@Override
+	public void fromJSON(JSONObject jsonObject) {
+		super.fromJSON(jsonObject);
+		JSONValue jAggregateType = jsonObject.get("aggregateType");
+		if (jAggregateType != null) {
+			String stringValue = jAggregateType.isString().stringValue();
+			aggregateType = ReportAggrType.getReportAggrType(stringValue);
+		}
 
-	public void setSortByName(String sortByName) {
-		this.sortByName = sortByName;
-	}
+		JSONValue jDateGranularity = jsonObject.get("dateGranularity");
+		if (jDateGranularity != null) {
+			String stringValue = jDateGranularity.isString().stringValue();
+			dateGranularity = UserDateGranularity.get(stringValue);
+		}
 
-	public String getSortOrder() {
-		return sortOrder;
-	}
+		JSONValue jField = jsonObject.get("field");
+		if (jField != null) {
+			field = jField.isString().stringValue();
+		}
 
-	public void setSortOrder(String sortOrder) {
-		this.sortOrder = sortOrder;
 	}
-
-	public String getSortType() {
-		return sortType;
-	}
-
-	public void setSortType(String sortType) {
-		this.sortType = sortType;
-	}
-
 }

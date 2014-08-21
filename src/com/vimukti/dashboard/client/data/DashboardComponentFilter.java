@@ -1,21 +1,33 @@
 package com.vimukti.dashboard.client.data;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
-
-@XmlEnum
 public enum DashboardComponentFilter {
 
-	@XmlEnumValue("RowLabelAscending")
-	ROW_LABEL_ASCENDING,
+	ROW_LABEL_ASCENDING("Label Ascending"),
 
-	@XmlEnumValue("RowLabelDescending")
-	ROW_LABEL_DESCENDING,
+	ROW_LABEL_DESCENDING("Label Descending"),
 
-	@XmlEnumValue("RowValueAscending")
-	ROW_VALUE_ASCENDING,
+	ROW_VALUE_ASCENDING("Value Ascending"),
 
-	@XmlEnumValue("RowValueDescending")
-	ROW_VALUE_DESCENDING
+	ROW_VALUE_DESCENDING("Value Descending");
 
+	private String name;
+
+	private DashboardComponentFilter(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return this.name;
+	}
+
+	public static DashboardComponentFilter getCompontentFilter(String value) {
+		for (DashboardComponentFilter filter : DashboardComponentFilter
+				.values()) {
+			if (filter.name.equals(value)) {
+				return filter;
+			}
+		}
+		return null;
+	}
 }

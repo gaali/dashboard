@@ -1,11 +1,25 @@
 package com.vimukti.dashboard.client.data;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONBoolean;
+import com.google.gwt.json.client.JSONNumber;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONString;
+import com.google.gwt.json.client.JSONValue;
 
 @SuppressWarnings("serial")
 public class DashboardComponent extends MetaObject {
 
-	private ChartRangeType chartAxisRange;
+	public static String HIGH_COLOR = "ca54c2";
+
+	public static String MID_COLOR = "c2545a";
+
+	public static String LOW_COLOR = "c2e354";
+
+	private ChartRangeType chartAxisRange = ChartRangeType.AUTO;
 
 	private double chartAxisRangeMax;
 
@@ -19,7 +33,7 @@ public class DashboardComponent extends MetaObject {
 
 	private List<DashboardTableColumn> dashboardTableColumn;
 
-	private ChartUnits displayUnits;
+	private ChartUnits displayUnits = ChartUnits.AUTO;
 
 	private String drillDownUrl;
 
@@ -29,7 +43,7 @@ public class DashboardComponent extends MetaObject {
 
 	private boolean enableHover;
 
-	private boolean expandOthers;
+	private boolean expandOthers = true;
 
 	private String footer;
 
@@ -45,13 +59,13 @@ public class DashboardComponent extends MetaObject {
 
 	private double indicatorBreakpoint2;
 
-	private String indicatorHighColor;
+	private String indicatorHighColor = HIGH_COLOR;
 
-	private String indicatorLowColor;
+	private String indicatorLowColor = MID_COLOR;
 
-	private String indicatorMiddleColor;
+	private String indicatorMiddleColor = LOW_COLOR;
 
-	private ChartLegendPosition legendPosition;
+	private ChartLegendPosition legendPosition = ChartLegendPosition.BOTTOM;
 
 	private int maxValuesDisplayed;
 
@@ -75,9 +89,9 @@ public class DashboardComponent extends MetaObject {
 
 	private boolean showTotal;
 
-	private boolean showValues;
+	private boolean showValues = true;
 
-	private DashboardComponentFilter sortBy;
+	private DashboardComponentFilter sortBy = DashboardComponentFilter.ROW_LABEL_ASCENDING;
 
 	private String title;
 
@@ -668,5 +682,407 @@ public class DashboardComponent extends MetaObject {
 	 */
 	public void setUseReportChart(boolean useReportChart) {
 		this.useReportChart = useReportChart;
+	}
+
+	@Override
+	public void fromJSON(JSONObject jsonObject) {
+		super.fromJSON(jsonObject);
+		JSONValue jChartAxisRange = jsonObject.get("chartAxisRange");
+		if (jChartAxisRange != null) {
+			String stringValue = jChartAxisRange.isString().stringValue();
+			ChartRangeType rangeType = ChartRangeType.getRangeType(stringValue);
+			chartAxisRange = rangeType;
+		}
+
+		JSONValue jChartAxisRangeMax = jsonObject.get("chartAxisRangeMax");
+		if (jChartAxisRangeMax != null) {
+			double rangetMaxValue = jChartAxisRangeMax.isNumber().doubleValue();
+			chartAxisRangeMax = rangetMaxValue;
+		}
+
+		JSONValue jChartAxisRangeMin = jsonObject.get("chartAxisRangeMin");
+		if (jChartAxisRangeMin != null) {
+			double rangeMinValue = jChartAxisRangeMin.isNumber().doubleValue();
+			chartAxisRangeMin = rangeMinValue;
+		}
+
+		JSONValue jChartSummary = jsonObject.get("chartSummary");
+		if (jChartSummary != null) {
+			ChartSummary jChartSummaryObj = new ChartSummary();
+			jChartSummaryObj.fromJSON(jChartSummary.isObject());
+			chartSummary = jChartSummaryObj;
+		}
+
+		JSONValue jComponentType = jsonObject.get("componentType");
+		if (jComponentType != null) {
+			String componentTypeString = jComponentType.isString()
+					.stringValue();
+			componentType = DashboardComponentType
+					.getComponentType(componentTypeString);
+		}
+
+		JSONValue jDashboardFilterColumns = jsonObject
+				.get("dashboardFilterColumns");
+		if (jDashboardFilterColumns != null) {
+			JSONArray jDashboardFilterColumnsArray = jDashboardFilterColumns
+					.isArray();
+			List<DashboardFilterColumns> dashboardFilterColumnsList = new ArrayList<DashboardFilterColumns>();
+			for (int i = 0; i < jDashboardFilterColumnsArray.size(); i++) {
+				DashboardFilterColumns filterColumn = new DashboardFilterColumns();
+				JSONValue jFilterColumn = jDashboardFilterColumnsArray.get(i);
+				filterColumn.fromJSON(jFilterColumn.isObject());
+				dashboardFilterColumnsList.add(filterColumn);
+			}
+			dashboardFilterColumns = dashboardFilterColumnsList;
+		}
+
+		JSONValue jTableColumns = jsonObject.get("dashboardTableColumn");
+		if (jTableColumns != null) {
+			JSONArray jTableColumnArray = jTableColumns.isArray();
+			List<DashboardTableColumn> tableColumnList = new ArrayList<DashboardTableColumn>();
+			for (int i = 0; i < jTableColumnArray.size(); i++) {
+				DashboardTableColumn tableColumn = new DashboardTableColumn();
+				JSONValue jTableColumn = jTableColumnArray.get(i);
+				tableColumn.fromJSON(jTableColumn.isObject());
+				tableColumnList.add(tableColumn);
+			}
+			dashboardTableColumn = tableColumnList;
+		}
+
+		JSONValue jDisplayUnits = jsonObject.get("displayUnits");
+		if (jDisplayUnits != null) {
+			String unit = jDisplayUnits.toString();
+			displayUnits = ChartUnits.getUnits(unit);
+		}
+
+		JSONValue jDrillDownUrl = jsonObject.get("drillDownUrl");
+		if (jDrillDownUrl != null) {
+			drillDownUrl = jDrillDownUrl.isString().stringValue();
+		}
+		JSONValue jDrillEnabled = jsonObject.get("drillEnabled");
+		if (jDrillEnabled != null) {
+			drillEnabled = jDrillEnabled.isBoolean().booleanValue();
+		}
+
+		JSONValue jDrillToDetailEnabled = jsonObject
+				.get("drillToDetailEnabled");
+		if (jDrillToDetailEnabled != null) {
+			drillToDetailEnabled = jDrillToDetailEnabled.isBoolean()
+					.booleanValue();
+		}
+		JSONValue jEnableHover = jsonObject.get("enableHover");
+		if (jEnableHover != null) {
+			enableHover = jEnableHover.isBoolean().booleanValue();
+		}
+
+		JSONValue jExpandOthers = jsonObject.get("expandOthers");
+		if (jExpandOthers != null) {
+			expandOthers = jExpandOthers.isBoolean().booleanValue();
+		}
+
+		JSONValue jFooter = jsonObject.get("footer");
+		if (jFooter != null) {
+			footer = jFooter.isString().stringValue();
+		}
+
+		JSONValue jGaugeMax = jsonObject.get("gaugeMax");
+		if (jGaugeMax != null) {
+			gaugeMax = jGaugeMax.isNumber().doubleValue();
+		}
+
+		JSONValue jGaugeMin = jsonObject.get("gaugeMin");
+		if (jGaugeMin != null) {
+			gaugeMin = jGaugeMin.isNumber().doubleValue();
+		}
+
+		JSONValue jGroupingColumn = jsonObject.get("groupingColumn");
+		if (jGroupingColumn != null) {
+			groupingColumn = jGroupingColumn.isString().stringValue();
+		}
+		JSONValue jHeader = jsonObject.get("header");
+		if (jHeader != null) {
+			header = jHeader.isString().stringValue();
+		}
+
+		JSONValue jBreackPoint1 = jsonObject.get("indicatorBreakpoint1");
+		if (jBreackPoint1 != null) {
+			indicatorBreakpoint1 = jBreackPoint1.isNumber().doubleValue();
+		}
+		JSONValue jBreakPoint2 = jsonObject.get("indicatorBreakpoint2");
+		if (jBreakPoint2 != null) {
+			indicatorBreakpoint2 = jBreakPoint2.isNumber().doubleValue();
+		}
+		JSONValue jHightColor = jsonObject.get("indicatorHighColor");
+		if (jHightColor != null) {
+			indicatorHighColor = jHightColor.isString().stringValue();
+		}
+		JSONValue jLowColor = jsonObject.get("indicatorLowColor");
+		if (jLowColor != null) {
+			indicatorLowColor = jLowColor.isString().stringValue();
+		}
+		JSONValue jMiddleColor = jsonObject.get("indicatorMiddleColor");
+		if (jMiddleColor != null) {
+			indicatorMiddleColor = jMiddleColor.isString().stringValue();
+		}
+		JSONValue jLegendPosition = jsonObject.get("legendPosition");
+		if (jLegendPosition != null) {
+			String stringValue2 = jLegendPosition.isString().stringValue();
+			legendPosition = ChartLegendPosition.gtLegendPosition(stringValue2);
+		}
+		JSONValue jMaxValuesDisplayed = jsonObject.get("maxValuesDisplayed");
+		if (jMaxValuesDisplayed != null) {
+			maxValuesDisplayed = (int) jMaxValuesDisplayed.isNumber()
+					.doubleValue();
+		}
+
+		JSONValue jMetricLabel = jsonObject.get("metricLabel");
+		if (jMetricLabel != null) {
+			metricLabel = jMetricLabel.isString().stringValue();
+		}
+
+		JSONValue jPage = jsonObject.get("page");
+		if (jPage != null) {
+			page = jPage.isString().stringValue();
+		}
+
+		JSONValue jPageHeightInPixels = jsonObject.get("pageHeightInPixels");
+		if (jPageHeightInPixels != null) {
+			pageHeightInPixels = (int) jPageHeightInPixels.isNumber()
+					.doubleValue();
+		}
+
+		JSONValue jReport = jsonObject.get("report");
+		if (jReport != null) {
+			report = jReport.isString().stringValue();
+		}
+
+		JSONValue jScontrol = jsonObject.get("scontrol");
+		if (jScontrol != null) {
+			scontrol = jScontrol.isString().stringValue();
+		}
+
+		JSONValue jScontrolHeightInPixels = jsonObject
+				.get("scontrolHeightInPixels");
+		if (jScontrolHeightInPixels != null) {
+			scontrolHeightInPixels = (int) jScontrolHeightInPixels.isNumber()
+					.doubleValue();
+		}
+
+		JSONValue jShowPercentage = jsonObject.get("showPercentage");
+		if (jShowPercentage != null) {
+			showPercentage = jShowPercentage.isBoolean().booleanValue();
+		}
+		JSONValue jShowPicturesOnCharts = jsonObject
+				.get("showPicturesOnCharts");
+		if (jShowPicturesOnCharts != null) {
+			showPicturesOnCharts = jShowPicturesOnCharts.isBoolean()
+					.booleanValue();
+		}
+
+		JSONValue jShowPicturesOnTables = jsonObject
+				.get("showPicturesOnTables");
+		if (jShowPicturesOnTables != null) {
+			showPicturesOnTables = jShowPicturesOnTables.isBoolean()
+					.booleanValue();
+		}
+
+		JSONValue jShowTotal = jsonObject.get("showTotal");
+		if (jShowTotal != null) {
+			showTotal = jShowTotal.isBoolean().booleanValue();
+		}
+
+		JSONValue jShowValues = jsonObject.get("showValues");
+		if (jShowValues != null) {
+			showValues = jShowValues.isBoolean().booleanValue();
+		}
+		JSONValue jSortBy = jsonObject.get("sortBy");
+		if (jSortBy != null) {
+			String stringValue2 = jSortBy.isString().stringValue();
+			sortBy = DashboardComponentFilter.getCompontentFilter(stringValue2);
+		}
+
+		JSONValue jUseReportChart = jsonObject.get("useReportChart");
+		if (jUseReportChart != null) {
+			useReportChart = jUseReportChart.isBoolean().booleanValue();
+		}
+	}
+
+	@Override
+	public JSONObject toJSON() {
+		JSONObject json = super.toJSON();
+		if (chartAxisRange != null) {
+			String string = chartAxisRange.toString();
+			json.put("chartAxisRange", new JSONString(string));
+		}
+		json.put("chartAxisRangeMax", new JSONNumber(chartAxisRangeMax));
+		json.put("chartAxisRangeMin", new JSONNumber(chartAxisRangeMin));
+
+		if (chartSummary != null) {
+			String string = chartSummary.toString();
+			json.put("chartSummary", new JSONString(string));
+		}
+
+		if (componentType != null) {
+			String string = componentType.toString();
+			json.put("componentType", new JSONString(string));
+		}
+
+		JSONArray filterColumnArray = new JSONArray();
+		int filterIndex = 0;
+		if (dashboardFilterColumns != null) {
+			for (DashboardFilterColumns filterColumn : dashboardFilterColumns) {
+				if (filterColumn != null) {
+					filterColumnArray.set(filterIndex++, filterColumn.toJSON());
+				}
+			}
+		}
+		json.put("dashboardFilterColumns", filterColumnArray);
+
+		JSONArray tableColumnArray = new JSONArray();
+		int tableIndex = 0;
+		if (dashboardTableColumn != null) {
+			for (DashboardTableColumn tableColumn : dashboardTableColumn) {
+				if (tableColumn != null) {
+					tableColumnArray.set(tableIndex++, tableColumn.toJSON());
+				}
+			}
+		}
+		json.put("dashboardTableColumn", tableColumnArray);
+
+		if (displayUnits != null) {
+			String string = displayUnits.toString();
+			json.put("displayUnits", new JSONString(string));
+		}
+
+		if (drillDownUrl != null) {
+			json.put("drillDownUrl", new JSONString(drillDownUrl));
+		}
+
+		json.put("drillEnabled", JSONBoolean.getInstance(drillEnabled));
+		json.put("drillToDetailEnabled",
+				JSONBoolean.getInstance(drillToDetailEnabled));
+		json.put("enableHover", JSONBoolean.getInstance(enableHover));
+		json.put("expandOthers", JSONBoolean.getInstance(expandOthers));
+		if (footer != null) {
+			json.put("footer", new JSONString(footer));
+		}
+		json.put("gaugeMax", new JSONNumber(gaugeMax));
+		json.put("gaugeMin`", new JSONNumber(gaugeMin));
+		if (groupingColumn != null) {
+			json.put("groupingColumn", new JSONString(groupingColumn));
+		}
+		if (header != null) {
+			json.put("header", new JSONString(header));
+		}
+		json.put("indicatorBreakpoint1", new JSONNumber(indicatorBreakpoint1));
+		json.put("indicatorBreakpoint2", new JSONNumber(indicatorBreakpoint2));
+		if (indicatorHighColor != null) {
+			json.put("indicatorHighColor", new JSONString(indicatorHighColor));
+		}
+		if (indicatorLowColor != null) {
+			json.put("indicatorLowColor", new JSONString(indicatorLowColor));
+		}
+		if (indicatorMiddleColor != null) {
+			json.put("indicatorMiddleColor", new JSONString(
+					indicatorMiddleColor));
+		}
+		if (legendPosition != null) {
+			String string = legendPosition.toString();
+			json.put("legendPosition", new JSONString(string));
+		}
+
+		json.put("maxValuesDisplayed", new JSONNumber(maxValuesDisplayed));
+		json.put("metricLabel", new JSONString(metricLabel));
+		json.put("page", new JSONString(page));
+		json.put("pageHeightInPixels", new JSONNumber(pageHeightInPixels));
+		if (report != null) {
+			json.put("report", new JSONString(report));
+		}
+
+		json.put("scontrol", new JSONString(scontrol));
+		json.put("scontrolHeightInPixels", new JSONNumber(
+				scontrolHeightInPixels));
+		json.put("showPercentage", JSONBoolean.getInstance(showPercentage));
+		json.put("showPicturesOnCharts",
+				JSONBoolean.getInstance(showPicturesOnCharts));
+		json.put("showPicturesOnTables",
+				JSONBoolean.getInstance(showPicturesOnTables));
+		json.put("showTotal", JSONBoolean.getInstance(showTotal));
+		json.put("showValues", JSONBoolean.getInstance(showValues));
+		if (sortBy != null) {
+			String string = sortBy.toString();
+			json.put("sortBy", new JSONString(string));
+		}
+		if (title != null) {
+			json.put("title", new JSONString(title));
+		}
+		json.put("useReportChart", JSONBoolean.getInstance(useReportChart));
+
+		return json;
+	}
+
+	public DashboardComponent clone() {
+		DashboardComponent dashboardComponent = new DashboardComponent();
+		super.clone(dashboardComponent);
+		dashboardComponent.chartAxisRange = this.chartAxisRange;
+		dashboardComponent.chartAxisRangeMax = this.chartAxisRangeMin;
+		dashboardComponent.chartAxisRangeMin = this.chartAxisRangeMin;
+
+		if (chartSummary != null) {
+			dashboardComponent.chartSummary = this.chartSummary.clone();
+		}
+		dashboardComponent.componentType = this.componentType;
+
+		List<DashboardFilterColumns> clonedColumns = new ArrayList<DashboardFilterColumns>();
+		for (DashboardFilterColumns columns : this.dashboardFilterColumns) {
+			if (columns != null) {
+				DashboardFilterColumns clone = columns.clone();
+				clonedColumns.add(clone);
+			}
+
+		}
+		dashboardComponent.dashboardFilterColumns = clonedColumns;
+
+		List<DashboardTableColumn> clonedTableColumns = new ArrayList<DashboardTableColumn>();
+		for (DashboardTableColumn column : this.dashboardTableColumn) {
+			if (column != null) {
+				DashboardTableColumn clone = column.clone();
+				clonedTableColumns.add(clone);
+			}
+		}
+		dashboardComponent.dashboardTableColumn = clonedTableColumns;
+
+		dashboardComponent.displayUnits = this.displayUnits;
+		dashboardComponent.drillDownUrl = this.drillDownUrl;
+		dashboardComponent.drillEnabled = this.drillEnabled;
+		dashboardComponent.drillToDetailEnabled = this.drillToDetailEnabled;
+		dashboardComponent.enableHover = this.enableHover;
+		dashboardComponent.expandOthers = this.expandOthers;
+		dashboardComponent.footer = this.footer;
+		dashboardComponent.gaugeMax = this.gaugeMax;
+		dashboardComponent.gaugeMin = this.gaugeMin;
+		dashboardComponent.groupingColumn = this.groupingColumn;
+		dashboardComponent.header = this.header;
+		dashboardComponent.indicatorBreakpoint1 = this.indicatorBreakpoint1;
+		dashboardComponent.indicatorBreakpoint2 = this.indicatorBreakpoint2;
+		dashboardComponent.indicatorHighColor = this.indicatorHighColor;
+		dashboardComponent.indicatorLowColor = this.indicatorLowColor;
+		dashboardComponent.indicatorMiddleColor = this.indicatorMiddleColor;
+		dashboardComponent.legendPosition = this.legendPosition;
+		dashboardComponent.maxValuesDisplayed = this.maxValuesDisplayed;
+		dashboardComponent.metricLabel = this.metricLabel;
+		dashboardComponent.page = this.page;
+		dashboardComponent.pageHeightInPixels = this.pageHeightInPixels;
+		dashboardComponent.report = this.report;
+		dashboardComponent.scontrol = this.scontrol;
+		dashboardComponent.scontrolHeightInPixels = this.scontrolHeightInPixels;
+		dashboardComponent.showPercentage = this.showPercentage;
+		dashboardComponent.showPicturesOnCharts = this.showPicturesOnCharts;
+		dashboardComponent.showPicturesOnTables = this.showPicturesOnTables;
+		dashboardComponent.showTotal = this.showTotal;
+		dashboardComponent.showValues = this.showValues;
+		dashboardComponent.sortBy = this.sortBy;
+		dashboardComponent.title = this.title;
+		return dashboardComponent;
 	}
 }

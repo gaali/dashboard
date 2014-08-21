@@ -4,7 +4,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.vimukti.dashboard.client.data.DashboardData;
-import com.vimukti.dashboard.client.data.IDashboardService;
 import com.vimukti.dashboard.client.ui.utils.BaseDialog;
 import com.vimukti.dashboard.client.ui.utils.TabControl;
 
@@ -15,7 +14,6 @@ public class DashboardPropertiesDialog extends BaseDialog {
 	private GeneralSettingsPanel general;
 	private ComponentSettingsPanel componentSettings;
 	protected Object sPanel;
-	public static IDashboardService service = null;
 
 	public DashboardPropertiesDialog(DashboardData dashBoard) {
 		super("Dashboard Properties");
