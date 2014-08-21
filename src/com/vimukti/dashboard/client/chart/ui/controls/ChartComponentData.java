@@ -251,47 +251,13 @@ public class ChartComponentData extends FlowPanel {
 	}
 
 	private void createControlsForBarColumnLine() {
-		if (type == DashboardComponentType.COLUMN
-				|| type == DashboardComponentType.LINE) {
-
-			final SelectListBox<ColumnInner> yAxis = new SelectListBox<ColumnInner>() {
-				@Override
-				public String getDisplayName(ColumnInner item) {
-					return item.getName();
-				}
-			};
-			yAxis.addChangeHandler(new ChangeHandler() {
-
-				@Override
-				public void onChange(ChangeEvent event) {
-					ColumnInner selectedValue = yAxis.getSelectedValue();
-					setChartDataToComponent(selectedValue, ChartAxis.Y);
-					refreshPanel.refreshChartPanel();
-				}
-			});
-			yAxis.setItems(summaryList);
-			this.add(yAxis);
-
-			final SelectListBox<ReportGrouping> xAxis = new SelectListBox<ReportGrouping>() {
-				@Override
-				public String getDisplayName(ReportGrouping item) {
-					return item.getField();
-				}
-			};
-			xAxis.addChangeHandler(new ChangeHandler() {
-
-				@Override
-				public void onChange(ChangeEvent event) {
-					ReportGrouping selectedValue = xAxis.getSelectedValue();
-					String field = selectedValue.getField();
-					setGroupingColumnToComponent(field);
-					refreshPanel.refreshChartPanel();
-				}
-			});
-			xAxis.setItems(groupings);
-			this.add(xAxis);
-		} else if (type == DashboardComponentType.BAR
-				|| type == DashboardComponentType.SCATTER) {
+		switch (type) {
+		case COLUMN:
+		case LINE:
+			xandYforLineAndColumn();
+			break;
+		case BAR:
+		case SCATTER:
 			final SelectListBox<ColumnInner> xAxis = new SelectListBox<ColumnInner>() {
 				@Override
 				public String getDisplayName(ColumnInner item) {
@@ -327,6 +293,8 @@ public class ChartComponentData extends FlowPanel {
 			});
 			yAxis.setItems(groupings);
 			this.add(yAxis);
+		default:
+			break;
 		}
 		if (type == DashboardComponentType.LINE) {
 			final SelectListBox<ReportGrouping> groupByListBox = new SelectListBox<ReportGrouping>() {
@@ -377,6 +345,45 @@ public class ChartComponentData extends FlowPanel {
 				|| type == DashboardComponentType.BAR) {
 			createCombinationChartsPanel();
 		}
+	}
+
+	private void xandYforLineAndColumn() {
+		final SelectListBox<ColumnInner> yAxis = new SelectListBox<ColumnInner>() {
+			@Override
+			public String getDisplayName(ColumnInner item) {
+				return item.getName();
+			}
+		};
+		yAxis.addChangeHandler(new ChangeHandler() {
+
+			@Override
+			public void onChange(ChangeEvent event) {
+				ColumnInner selectedValue = yAxis.getSelectedValue();
+				setChartDataToComponent(selectedValue, ChartAxis.Y);
+				refreshPanel.refreshChartPanel();
+			}
+		});
+		yAxis.setItems(summaryList);
+		this.add(yAxis);
+
+		final SelectListBox<ReportGrouping> xAxis = new SelectListBox<ReportGrouping>() {
+			@Override
+			public String getDisplayName(ReportGrouping item) {
+				return item.getField();
+			}
+		};
+		xAxis.addChangeHandler(new ChangeHandler() {
+
+			@Override
+			public void onChange(ChangeEvent event) {
+				ReportGrouping selectedValue = xAxis.getSelectedValue();
+				String field = selectedValue.getField();
+				setGroupingColumnToComponent(field);
+				refreshPanel.refreshChartPanel();
+			}
+		});
+		xAxis.setItems(groupings);
+		this.add(xAxis);
 	}
 
 	private void setGroupingColumnToComponent(String field) {

@@ -14,6 +14,9 @@ public class ChartSummary extends MetaObject {
 
 	private String column;
 
+	public ChartSummary() {
+	}
+
 	public ReportSummaryType getAggregate() {
 		return aggregate;
 	}

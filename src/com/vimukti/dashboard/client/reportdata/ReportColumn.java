@@ -14,6 +14,7 @@ import com.vimukti.dashboard.client.data.ReportSummaryType;
 @SuppressWarnings("serial")
 public class ReportColumn extends MetaObject {
 
+	// ReportSummaryType
 	private List<ReportSummaryType> aggregateTypes;
 
 	private String field;

@@ -13,6 +13,9 @@ public class ReportGrouping extends MetaObject {
 
 	private String field;
 
+	public ReportGrouping() {
+	}
+
 	public ReportAggrType getAggregateType() {
 		return aggregateType;
 	}

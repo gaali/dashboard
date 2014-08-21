@@ -97,6 +97,10 @@ public class DashboardComponent extends MetaObject {
 
 	private boolean useReportChart;
 
+	public DashboardComponent() {
+		// TODO Auto-generated constructor stub
+	}
+
 	/**
 	 * @return the chartAxisRange
 	 */
