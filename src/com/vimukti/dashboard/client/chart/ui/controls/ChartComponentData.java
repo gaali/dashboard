@@ -27,23 +27,62 @@ import com.vimukti.dashboard.client.reportdata.ReportGrouping;
 import com.vimukti.dashboard.client.ui.utils.SelectListBox;
 import com.vimukti.dashboard.client.ui.utils.TextItem;
 
+/**
+ * This class fields help to show data in charts
+ *
+ */
 public class ChartComponentData extends FlowPanel {
 
+	/**
+	 * Type of chart now showing chart preview
+	 */
 	private DashboardComponentType type;
-	private FlowPanel groupBy;
+
+	/**
+	 * units for chart axis
+	 */
 	private SelectListBox<ChartUnits> displayUnits;
+
+	/**
+	 * Cumulative chart type for Line chart
+	 */
 	private CheckBox cumulative;
+
+	/**
+	 * plotBy chart type Scatter chart this is one of the OPTION in Scatter
+	 * chart
+	 */
 	private SelectListBox<ReportGrouping> plotBy;
+
+	/**
+	 * this Report data will show in charts
+	 */
 	private Report result;
 
+	/**
+	 * All aggregates(formulas) of the reports have
+	 */
 	private List<ReportAggregate> aggregates;
+	/**
+	 * all groued columns in report
+	 */
 	private List<ReportGrouping> groupings;
-	private IRefreshChartPanel refreshPanel;
-	private List<ColumnInner> summaryList;
 
+	private IRefreshChartPanel refreshPanel;
+
+	/**
+	 * to show summary columns and report grouping columns in list
+	 */
+	private List<SummaryAndAggregatesColumn> summaryList;
+
+	/**
+	 * to save report data in component
+	 */
 	private DashboardComponent component;
 
-	// needCreate object for this field
+	/**
+	 * when click on the chart it redirect to given url
+	 */
 	private SelectListBox<DrillDownToType> drillDownTo;
 
 	public ChartComponentData(DashboardComponent component, Report results,
@@ -59,18 +98,22 @@ public class ChartComponentData extends FlowPanel {
 		createControls();
 	}
 
+	/**
+	 * preparing data from report to show in dialog, summaryList and aggregates
+	 * need to in one list
+	 */
 	private void prepareReportData() {
-		summaryList = new ArrayList<ColumnInner>();
+		summaryList = new ArrayList<SummaryAndAggregatesColumn>();
 		List<ReportColumn> columns = result.getColumns();
 		for (ReportColumn column : columns) {
-			ColumnInner columInner = new ColumnInner();
+			SummaryAndAggregatesColumn columInner = new SummaryAndAggregatesColumn();
 			columInner.setIsColumn(true);
 			String field = column.getField();
 			columInner.setColumn(field);
 			List<ReportSummaryType> aggregateTypes = column.getAggregateTypes();
 			for (ReportSummaryType summaryType : aggregateTypes) {
 				String string = summaryType.toString();
-				columInner.setName(string + " " + field);
+				columInner.setDisplayName(string + " " + field);
 				columInner.setType(summaryType);
 				summaryList.add(columInner);
 			}
@@ -78,9 +121,9 @@ public class ChartComponentData extends FlowPanel {
 
 		aggregates = result.getAggregates();
 		for (ReportAggregate aggregate : aggregates) {
-			ColumnInner columInner = new ColumnInner();
+			SummaryAndAggregatesColumn columInner = new SummaryAndAggregatesColumn();
 			columInner.setIsColumn(false);
-			columInner.setName(aggregate.getMasterLabel());
+			columInner.setDisplayName(aggregate.getMasterLabel());
 			columInner.setColumn(aggregate.getMasterLabel());
 			summaryList.add(columInner);
 		}
@@ -89,10 +132,18 @@ public class ChartComponentData extends FlowPanel {
 
 	}
 
+	/**
+	 * re rendering the panel when chart(component) type changed
+	 */
 	public void reRendar() {
 		this.clear();
 		createControls();
 	}
+
+	/**
+	 * creating controls by chart(component) type and grouping similar type
+	 * charts
+	 */
 
 	private void createControls() {
 		switch (type) {
@@ -117,6 +168,7 @@ public class ChartComponentData extends FlowPanel {
 		case SCATTER:
 		case SCATTER_GROUPED:
 			createControlsForScatter();
+			groupByForLineAndScatter();
 			break;
 		case DONUT:
 		case FUNNEL:
@@ -134,7 +186,7 @@ public class ChartComponentData extends FlowPanel {
 		default:
 			break;
 		}
-
+		// these two fields are available for all chart tyeps
 		displayUnits = new SelectListBox<ChartUnits>("Display Units") {
 			@Override
 			public String getDisplayName(ChartUnits item) {
@@ -150,6 +202,7 @@ public class ChartComponentData extends FlowPanel {
 				refreshPanel.refreshChartPanel();
 			}
 		});
+
 		ChartUnits displayUnits2 = component.getDisplayUnits();
 		displayUnits.setSelectedValue(displayUnits2);
 		this.add(displayUnits);
@@ -160,6 +213,8 @@ public class ChartComponentData extends FlowPanel {
 				return item.toString();
 			}
 		};
+		// this text box show when Other url is selcted
+		// and user can enter custom url
 		final TextBox box = new TextBox();
 		box.addStyleName("url-texbox");
 		drillDownTo.addChangeHandler(new ChangeHandler() {
@@ -188,6 +243,10 @@ public class ChartComponentData extends FlowPanel {
 		this.add(drillDownTo);
 	}
 
+	/**
+	 * creating Scatter chart controls ,plotBy:takes Grouping column,
+	 * xAsix:takes Summary column yAsix:takes summary Column
+	 */
 	private void createControlsForScatter() {
 		plotBy = new SelectListBox<ReportGrouping>() {
 			@Override
@@ -201,29 +260,25 @@ public class ChartComponentData extends FlowPanel {
 			public void onChange(ChangeEvent event) {
 				ReportGrouping selectedValue = plotBy.getSelectedValue();
 				String field = selectedValue.getField();
-				String groupingColumn = component.getGroupingColumn();
-				if (groupingColumn != null) {
-					String[] split = groupingColumn.split(",");
-					split[0] = field;
-				}
-				component.setGroupingColumn(field);
+				setGroupingColumnToComponent(field);
 				refreshPanel.refreshChartPanel();
 			}
 		});
 		plotBy.setItems(groupings);
 		this.add(plotBy);
-
-		final SelectListBox<ColumnInner> xAxis = new SelectListBox<ColumnInner>() {
+		// for x axis it shows summaries and aggregates of report
+		final SelectListBox<SummaryAndAggregatesColumn> xAxis = new SelectListBox<SummaryAndAggregatesColumn>() {
 			@Override
-			public String getDisplayName(ColumnInner item) {
-				return item.getName();
+			public String getDisplayName(SummaryAndAggregatesColumn item) {
+				return item.getDisplayName();
 			}
 		};
 		xAxis.addChangeHandler(new ChangeHandler() {
 
 			@Override
 			public void onChange(ChangeEvent event) {
-				ColumnInner selectedValue = xAxis.getSelectedValue();
+				SummaryAndAggregatesColumn selectedValue = xAxis
+						.getSelectedValue();
 				setChartDataToComponent(selectedValue, ChartAxis.Y);
 				refreshPanel.refreshChartPanel();
 			}
@@ -231,17 +286,18 @@ public class ChartComponentData extends FlowPanel {
 		xAxis.setItems(summaryList);
 		this.add(xAxis);
 
-		final SelectListBox<ColumnInner> yAxis = new SelectListBox<ColumnInner>() {
+		final SelectListBox<SummaryAndAggregatesColumn> yAxis = new SelectListBox<SummaryAndAggregatesColumn>() {
 			@Override
-			public String getDisplayName(ColumnInner item) {
-				return item.getName();
+			public String getDisplayName(SummaryAndAggregatesColumn item) {
+				return item.getDisplayName();
 			}
 		};
 		yAxis.addChangeHandler(new ChangeHandler() {
 
 			@Override
 			public void onChange(ChangeEvent event) {
-				ColumnInner selectedValue = yAxis.getSelectedValue();
+				SummaryAndAggregatesColumn selectedValue = yAxis
+						.getSelectedValue();
 				setChartDataToComponent(selectedValue, ChartAxis.Y);
 				refreshPanel.refreshChartPanel();
 			}
@@ -250,115 +306,109 @@ public class ChartComponentData extends FlowPanel {
 		this.add(yAxis);
 	}
 
+	/**
+	 * creating Bar and Column and line charts controls
+	 * 
+	 */
 	private void createControlsForBarColumnLine() {
 		switch (type) {
 		case COLUMN:
-		case LINE:
+		case COLUMN_GROUPED:
+		case COLUMN_STACKED:
+		case COLUMN_STACKED100:
 			xandYforLineAndColumn();
+			createGroupByPanel();
+			createCombinationChartsPanel();
+			break;
+		case LINE:
+		case LINE_CUMULATIVE:
+		case LINE_GROUPED:
+		case LINE_GROUPED_CUMULATIVE:
+			xandYforLineAndColumn();
+			groupByForLineAndScatter();
+			cumulativeForLine();
+			createCombinationChartsPanel();
 			break;
 		case BAR:
-		case SCATTER:
-			final SelectListBox<ColumnInner> xAxis = new SelectListBox<ColumnInner>() {
-				@Override
-				public String getDisplayName(ColumnInner item) {
-					return item.getName();
-				}
-			};
-			xAxis.addChangeHandler(new ChangeHandler() {
-
-				@Override
-				public void onChange(ChangeEvent event) {
-					ColumnInner selectedValue = xAxis.getSelectedValue();
-					setChartDataToComponent(selectedValue, ChartAxis.X);
-					refreshPanel.refreshChartPanel();
-				}
-			});
-			xAxis.setItems(summaryList);
-			this.add(xAxis);
-			final SelectListBox<ReportGrouping> yAxis = new SelectListBox<ReportGrouping>() {
-				@Override
-				public String getDisplayName(ReportGrouping item) {
-					return item.getField();
-				}
-			};
-			yAxis.addChangeHandler(new ChangeHandler() {
-
-				@Override
-				public void onChange(ChangeEvent event) {
-					ReportGrouping selectedValue = yAxis.getSelectedValue();
-					String field = selectedValue.getField();
-					setGroupingColumnToComponent(field);
-					refreshPanel.refreshChartPanel();
-				}
-			});
-			yAxis.setItems(groupings);
-			this.add(yAxis);
+			createGroupByPanel();
+			createCombinationChartsPanel();
+			break;
 		default:
 			break;
 		}
-		if (type == DashboardComponentType.LINE) {
-			final SelectListBox<ReportGrouping> groupByListBox = new SelectListBox<ReportGrouping>() {
-				@Override
-				public String getDisplayName(ReportGrouping item) {
-					return item.getField();
-				}
-			};
-			groupByListBox.addChangeHandler(new ChangeHandler() {
+	}
 
-				@Override
-				public void onChange(ChangeEvent event) {
-					ReportGrouping selectedValue = groupByListBox
-							.getSelectedValue();
-					String field = selectedValue.getField();
-					setGroupingColumnToComponent(field);
+	/**
+	 * Line Cumulative chart type check box, this control shows in line chart if
+	 * this box checks chart type changes to line cumulative
+	 */
+	private void cumulativeForLine() {
+		cumulative = new CheckBox("Cumulative");
+		cumulative.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+			@Override
+			public void onValueChange(ValueChangeEvent<Boolean> event) {
+				if (cumulative.getValue()) {
+					component
+							.setComponentType(DashboardComponentType.LINE_CUMULATIVE);
+					refreshPanel.refreshChartPanel();
+				} else {
+					component.setComponentType(DashboardComponentType.LINE);
 					refreshPanel.refreshChartPanel();
 				}
-			});
-			groupByListBox.addStyleName("groupByList");
-			this.add(groupByListBox);
-		} else if (type == DashboardComponentType.BAR
-				|| type == DashboardComponentType.COLUMN) {
-			createGroupByPanel(type);
-		}
-		if (type == DashboardComponentType.LINE) {
-			cumulative = new CheckBox("Cumulative");
-			cumulative.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-				@Override
-				public void onValueChange(ValueChangeEvent<Boolean> event) {
-					if (cumulative.getValue()) {
-						component
-								.setComponentType(DashboardComponentType.LINE_CUMULATIVE);
-					} else {
-						component.setComponentType(DashboardComponentType.LINE);
-					}
-				}
-			});
-
-			cumulative.addStyleName("cumulative");
-			if (type == DashboardComponentType.LINE_CUMULATIVE) {
-				cumulative.setValue(true);
 			}
-		}
-		if (type == DashboardComponentType.COLUMN
-				|| type == DashboardComponentType.LINE
-				|| type == DashboardComponentType.BAR) {
-			createCombinationChartsPanel();
+		});
+
+		cumulative.addStyleName("cumulative");
+		if (type == DashboardComponentType.LINE_CUMULATIVE) {
+			cumulative.setValue(true);
 		}
 	}
 
-	private void xandYforLineAndColumn() {
-		final SelectListBox<ColumnInner> yAxis = new SelectListBox<ColumnInner>() {
+	/**
+	 * Group by control for line and scatter charts it shows grouping columns of
+	 * reports
+	 */
+	private void groupByForLineAndScatter() {
+
+		final SelectListBox<ReportGrouping> groupByListBox = new SelectListBox<ReportGrouping>() {
 			@Override
-			public String getDisplayName(ColumnInner item) {
-				return item.getName();
+			public String getDisplayName(ReportGrouping item) {
+				return item.getField();
+			}
+		};
+		groupByListBox.addChangeHandler(new ChangeHandler() {
+
+			@Override
+			public void onChange(ChangeEvent event) {
+				ReportGrouping selectedValue = groupByListBox
+						.getSelectedValue();
+				String field = selectedValue.getField();
+				secondGroupBy(field);
+				refreshPanel.refreshChartPanel();
+			}
+		});
+		groupByListBox.addStyleName("groupByList");
+		this.add(groupByListBox);
+	}
+
+	/**
+	 * x and y axis for line column charts x show summary and aggreagets and y
+	 * show grouping of reports
+	 */
+	private void xandYforLineAndColumn() {
+		final SelectListBox<SummaryAndAggregatesColumn> yAxis = new SelectListBox<SummaryAndAggregatesColumn>() {
+			@Override
+			public String getDisplayName(SummaryAndAggregatesColumn item) {
+				return item.getDisplayName();
 			}
 		};
 		yAxis.addChangeHandler(new ChangeHandler() {
 
 			@Override
 			public void onChange(ChangeEvent event) {
-				ColumnInner selectedValue = yAxis.getSelectedValue();
+				SummaryAndAggregatesColumn selectedValue = yAxis
+						.getSelectedValue();
 				setChartDataToComponent(selectedValue, ChartAxis.Y);
 				refreshPanel.refreshChartPanel();
 			}
@@ -386,17 +436,41 @@ public class ChartComponentData extends FlowPanel {
 		this.add(xAxis);
 	}
 
+	/**
+	 * 
+	 * here field selected value this method takes selected value and set in
+	 * first positions if it has multiple grouping values else it replace the
+	 * older value with field
+	 */
 	private void setGroupingColumnToComponent(String field) {
 		String groupingColumn = component.getGroupingColumn();
 		String groupingColumnString = "";
 		if (groupingColumn != null) {
 			String[] split = groupingColumn.split(",");
 			split[0] = field;
-			for (String groupinString : split) {
-				groupingColumnString = groupinString;
-				if (split.length == 2) {
-					groupingColumnString = groupingColumnString + ",";
-				}
+			groupingColumnString = split.toString();
+		} else {
+			groupingColumnString = field;
+		}
+		component.setGroupingColumn(groupingColumnString);
+	}
+
+	/**
+	 * 
+	 * here field selected value this method takes selected value and set in
+	 * second positions, if it has multiple grouping values else it replace the
+	 * older value with field,
+	 */
+	private void secondGroupBy(String field) {
+		String groupingColumn = component.getGroupingColumn();
+		String groupingColumnString = "";
+		if (groupingColumn != null) {
+			String[] split = groupingColumn.split(",");
+			if (split.length == 2) {
+				split[1] = field;
+			} else {
+				groupingColumnString = split.toString();
+				groupingColumnString += "," + field;
 			}
 		} else {
 			groupingColumnString = field;
@@ -404,10 +478,16 @@ public class ChartComponentData extends FlowPanel {
 		component.setGroupingColumn(groupingColumnString);
 	}
 
-	private void setChartDataToComponent(ColumnInner selectedValue,
+	/**
+	 * @param data
+	 *            selected value for chart summary data and sets
+	 * @param axis
+	 *            data shows in this axis
+	 */
+	private void setChartDataToComponent(SummaryAndAggregatesColumn data,
 			ChartAxis axis) {
-		String column = selectedValue.getColumn();
-		ReportSummaryType type2 = selectedValue.getType();
+		String column = data.getColumn();
+		ReportSummaryType type2 = data.getType();
 
 		ChartSummary chartSummary = component.getChartSummary();
 		chartSummary.setAggregate(type2);
@@ -417,12 +497,15 @@ public class ChartComponentData extends FlowPanel {
 		chartSummary.setColumn(column);
 	}
 
+	/**
+	 * creating controls for Donut funnel charts
+	 */
 	private void pieDonutFunnelChartType() {
-		final SelectListBox<ColumnInner> values = new SelectListBox<ColumnInner>(
+		final SelectListBox<SummaryAndAggregatesColumn> values = new SelectListBox<SummaryAndAggregatesColumn>(
 				"values") {
 			@Override
-			public String getDisplayName(ColumnInner item) {
-				return item.getName();
+			public String getDisplayName(SummaryAndAggregatesColumn item) {
+				return item.getDisplayName();
 			}
 		};
 		values.addChangeHandler(new ChangeHandler() {
@@ -437,39 +520,72 @@ public class ChartComponentData extends FlowPanel {
 		values.addStyleName("values-list");
 		this.add(values);
 
-		if (type != DashboardComponentType.FUNNEL) {
-			final SelectListBox<ReportGrouping> wedges = new SelectListBox<ReportGrouping>(
-					"Wedges") {
-				@Override
-				public String getDisplayName(ReportGrouping item) {
-					return item.getField();
-				}
-			};
-			wedges.addChangeHandler(new ChangeHandler() {
-
-				@Override
-				public void onChange(ChangeEvent event) {
-					ReportGrouping selectedValue = wedges.getSelectedValue();
-					String field = selectedValue.getField();
-					setGroupingColumnToComponent(field);
-					refreshPanel.refreshChartPanel();
-				}
-			});
-			wedges.addStyleName("wedges-list");
-			this.add(wedges);
+		if (type == DashboardComponentType.DONUT) {
+			wedgesForDonut();
 		} else {
-			SelectListBox<Object> segments = new SelectListBox<Object>(
-					"Segments");
-			segments.addStyleName("segmets-list");
+			segmentsForFunnel();
 		}
 	}
 
+	/**
+	 * creating segmet control for funnel chart
+	 */
+	private void segmentsForFunnel() {
+		final SelectListBox<ReportGrouping> segments = new SelectListBox<ReportGrouping>(
+				"Segments") {
+			@Override
+			public String getDisplayName(ReportGrouping item) {
+				return item.getField();
+			}
+		};
+		segments.addChangeHandler(new ChangeHandler() {
+
+			@Override
+			public void onChange(ChangeEvent event) {
+				ReportGrouping selectedValue = segments.getSelectedValue();
+				String field = selectedValue.getField();
+				setGroupingColumnToComponent(field);
+				refreshPanel.refreshChartPanel();
+			}
+		});
+		segments.addStyleName("segmets-list");
+		this.add(segments);
+	}
+
+	/**
+	 * creating wedges control for Donut
+	 */
+	private void wedgesForDonut() {
+		final SelectListBox<ReportGrouping> wedges = new SelectListBox<ReportGrouping>(
+				"Wedges") {
+			@Override
+			public String getDisplayName(ReportGrouping item) {
+				return item.getField();
+			}
+		};
+		wedges.addChangeHandler(new ChangeHandler() {
+
+			@Override
+			public void onChange(ChangeEvent event) {
+				ReportGrouping selectedValue = wedges.getSelectedValue();
+				String field = selectedValue.getField();
+				setGroupingColumnToComponent(field);
+				refreshPanel.refreshChartPanel();
+			}
+		});
+		wedges.addStyleName("wedges-list");
+		this.add(wedges);
+	}
+
+	/**
+	 * creating value for control for gauge and metric charts
+	 */
 	private void gaugeMetricChart() {
-		final SelectListBox<ColumnInner> value = new SelectListBox<ColumnInner>(
+		final SelectListBox<SummaryAndAggregatesColumn> value = new SelectListBox<SummaryAndAggregatesColumn>(
 				"value") {
 			@Override
-			public String getDisplayName(ColumnInner item) {
-				return item.getName();
+			public String getDisplayName(SummaryAndAggregatesColumn item) {
+				return item.getDisplayName();
 			}
 		};
 		value.addChangeHandler(new ChangeHandler() {
@@ -492,8 +608,13 @@ public class ChartComponentData extends FlowPanel {
 		this.add(heightInPixels);
 	}
 
-	private void createGroupByPanel(DashboardComponentType type) {
-		groupBy = new FlowPanel();
+	/**
+	 * creating groupBy pane for Bar and column here 3 type charts will be added
+	 * side-by-side,stacked and full stacked these 3 types of charts appears in
+	 * groupby panel
+	 */
+	private void createGroupByPanel() {
+		FlowPanel groupBy = new FlowPanel();
 
 		Label name = new Label("Group by");
 		FlowPanel vPanel = new FlowPanel();
@@ -511,7 +632,7 @@ public class ChartComponentData extends FlowPanel {
 			public void onChange(ChangeEvent event) {
 				ReportGrouping selectedValue = box.getSelectedValue();
 				String field = selectedValue.getField();
-				setGroupingColumnToComponent(field);
+				secondGroupBy(field);
 				refreshPanel.refreshChartPanel();
 			}
 		});
@@ -523,10 +644,9 @@ public class ChartComponentData extends FlowPanel {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				DashboardComponentType dType = null;
-				dType = DashboardComponentType.getComponentType("Bar") != null ? DashboardComponentType.BAR_GROUPED
+				type = DashboardComponentType.getComponentType("Bar") != null ? DashboardComponentType.BAR_GROUPED
 						: DashboardComponentType.COLUMN_GROUPED;
-				component.setComponentType(dType);
+				component.setComponentType(type);
 				refreshPanel.refreshChartPanel();
 
 			}
@@ -538,13 +658,9 @@ public class ChartComponentData extends FlowPanel {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				DashboardComponentType dType = null;
-				if (DashboardComponentType.getComponentType("Bar") != null) {
-					dType = DashboardComponentType.BAR_STACKED;
-				} else {
-					dType = DashboardComponentType.COLUMN_STACKED;
-				}
-				component.setComponentType(dType);
+				type = DashboardComponentType.getComponentType("Bar") != null ? DashboardComponentType.BAR_GROUPED
+						: DashboardComponentType.COLUMN_GROUPED;
+				component.setComponentType(type);
 				refreshPanel.refreshChartPanel();
 
 			}
@@ -556,13 +672,9 @@ public class ChartComponentData extends FlowPanel {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				DashboardComponentType dType = null;
-				if (DashboardComponentType.getComponentType("Bar") != null) {
-					dType = DashboardComponentType.BAR_STACKED100;
-				} else {
-					dType = DashboardComponentType.COLUMN_STACKED100;
-				}
-				component.setComponentType(dType);
+				type = DashboardComponentType.getComponentType("Bar") != null ? DashboardComponentType.BAR_GROUPED
+						: DashboardComponentType.COLUMN_GROUPED;
+				component.setComponentType(type);
 				refreshPanel.refreshChartPanel();
 
 			}
@@ -600,6 +712,10 @@ public class ChartComponentData extends FlowPanel {
 		this.add(groupBy);
 	}
 
+	/**
+	 * creating Combination chart panel this allow us to show up to 3 chart to
+	 * show in one chart
+	 */
 	private void createCombinationChartsPanel() {
 		FlowPanel hPanel = new FlowPanel();
 		hPanel.addStyleName("combination-chart-panel");
@@ -643,10 +759,10 @@ public class ChartComponentData extends FlowPanel {
 	}
 
 	private void addValueForCombitionsChart(FlowPanel panel) {
-		SelectListBox<ColumnInner> value = new SelectListBox<ColumnInner>() {
+		SelectListBox<SummaryAndAggregatesColumn> value = new SelectListBox<SummaryAndAggregatesColumn>() {
 			@Override
-			public String getDisplayName(ColumnInner item) {
-				return item.getName();
+			public String getDisplayName(SummaryAndAggregatesColumn item) {
+				return item.getDisplayName();
 			}
 		};
 		value.addChangeHandler(new ChangeHandler() {
@@ -659,8 +775,8 @@ public class ChartComponentData extends FlowPanel {
 			}
 		});
 
-		List<ColumnInner> sumlist = new ArrayList<ColumnInner>();
-		for (ColumnInner summary : summaryList) {
+		List<SummaryAndAggregatesColumn> sumlist = new ArrayList<SummaryAndAggregatesColumn>();
+		for (SummaryAndAggregatesColumn summary : summaryList) {
 			if (summary.isColumn) {
 				sumlist.add(summary);
 			}
@@ -670,16 +786,34 @@ public class ChartComponentData extends FlowPanel {
 		panel.insert(value, widgetCount);
 	}
 
-	class ColumnInner {
+	/**
+	 * this class help to hold ChartSummary and aggregate values of report and
+	 * set into on list
+	 *
+	 */
+	class SummaryAndAggregatesColumn {
+		/**
+		 * Name that in show in ListBox
+		 */
 		String displayName;
+		/**
+		 * to Differentiate summary column or aggregate
+		 */
 		boolean isColumn;
+		/**
+		 * type of summary column
+		 */
 		ReportSummaryType type;
+
+		/**
+		 * summary field or aggregate field
+		 */
 		String column;
 
 		/**
 		 * @return the name
 		 */
-		public String getName() {
+		public String getDisplayName() {
 			return displayName;
 		}
 
@@ -687,7 +821,7 @@ public class ChartComponentData extends FlowPanel {
 		 * @param name
 		 *            the name to set
 		 */
-		public void setName(String name) {
+		public void setDisplayName(String name) {
 			this.displayName = name;
 		}
 

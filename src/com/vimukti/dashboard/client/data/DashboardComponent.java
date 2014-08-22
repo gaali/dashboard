@@ -13,88 +13,284 @@ import com.google.gwt.json.client.JSONValue;
 @SuppressWarnings("serial")
 public class DashboardComponent extends MetaObject {
 
+	/**
+	 * default value for high color
+	 */
 	public static String HIGH_COLOR = "ca54c2";
 
+	/**
+	 * default value for mid color
+	 */
 	public static String MID_COLOR = "c2545a";
 
+	/**
+	 * default value for low color
+	 */
 	public static String LOW_COLOR = "c2e354";
 
+	/**
+	 * A manual or automatic axis range for bar or line charts. The valid values
+	 * are: auto, manual
+	 */
 	private ChartRangeType chartAxisRange = ChartRangeType.AUTO;
 
+	/**
+	 * The maximum axis range to be displayed. This only applies to bar and line
+	 * charts in which the manual axis range is selected for the chartAxisRange
+	 * field.
+	 */
 	private double chartAxisRangeMax;
 
+	/**
+	 * The minimum axis range to be displayed. This only applies to bar and line
+	 * charts in which the manual axis range is selected for the chartAxisRange
+	 * field.
+	 */
 	private double chartAxisRangeMin;
 
+	/**
+	 * Specifies the summary field for the chart data. Required if
+	 * isAutoSelectFromReport is set to false.
+	 */
 	private ChartSummary chartSummary;
 
+	/**
+	 * 
+	 */
 	private DashboardComponentType componentType;
 
+	/**
+	 * A list of dashboard filter columns. Each report-based component must have
+	 * a dashboard filter column that defines the column that the filter applies
+	 * to.
+	 */
 	private List<DashboardFilterColumns> dashboardFilterColumns;
 
+	/**
+	 * Represents a list of columns on a customized dashboard table component.
+	 */
 	private List<DashboardTableColumn> dashboardTableColumn;
 
+	/**
+	 * Chart Units. The valid values are:
+	 * 
+	 * Auto Integer Hundreds Thousands Millions Billions Trillions
+	 */
 	private ChartUnits displayUnits = ChartUnits.AUTO;
 
+	/**
+	 * specifies a URL that users go to when they click the dashboard component.
+	 * Use this option to send users to another dashboard, report, record detail
+	 * page, or other system that uses a Web interface. This field overrides the
+	 * drillEnabled and drillToDetailEnabled fields.
+	 */
 	private String drillDownUrl;
 
+	/**
+	 * Specifies whether to take users to the full or filtered source report
+	 * when they click the dashboard component. Set to false to drill to the
+	 * full source report; set to true to drill to the source report filtered by
+	 * what they clicked. If set to true, users can click individual groups,
+	 * axis values, or legend entries.
+	 * 
+	 * This overrides the drillToDetailEnabled field
+	 */
 	private boolean drillEnabled;
 
+	/**
+	 * When enabled, users are taken to the record detail page when they click a
+	 * record name, record owner, or feed post in a table or chart. When set to
+	 * true users can click axis and legend values, chart elements, and table
+	 * entries. The drillDownUrl and drillEnabled fields override this field.
+	 * This field is available in API version 20.0 and later.
+	 */
 	private boolean drillToDetailEnabled;
 
+	/**
+	 * Specifies whether to display values, labels, and percentages when
+	 * hovering over charts. Hover details depend on chart type. Percentages
+	 * apply to pie, donut, and funnel charts only.
+	 */
 	private boolean enableHover;
 
+	/**
+	 * Specifies whether to combine all groups less than or equal to 3% of the
+	 * total into a single 'Others' wedge or segment. This only applies to pie,
+	 * donut, and funnel charts. Set to true to show all values individually on
+	 * the chart; set to false to combine small groups into 'Others.
+	 */
 	private boolean expandOthers = true;
 
+	/**
+	 * Footer displayed at the bottom of the dashboard component. Maximum of 255
+	 * characters.
+	 */
 	private String footer;
 
+	/**
+	 * The maximum value on a gauge. A gauge is used to see how far you are from
+	 * reaching a goal. It looks like a speedometer in a car.
+	 */
 	private double gaugeMax;
 
+	/**
+	 * The minimum value on a gauge.
+	 */
 	private double gaugeMin;
 
+	/**
+	 * Specifies the field by which to group data. This data is displayed on the
+	 * X-axis for vertical column charts and on the Y-axis for horizontal bar
+	 * charts.
+	 */
 	private String groupingColumn;
 
+	/**
+	 * Header displayed at the top of the dashboard component.
+	 */
 	private String header;
 
+	/**
+	 * The value that separates the indicatorLowColor from the
+	 * indicatorMiddleColor on the dashboard.
+	 * 
+	 */
 	private double indicatorBreakpoint1;
 
+	/**
+	 * The value that separates the indicatorMiddleColor from the
+	 * indicatorHighColor on the dashboard.
+	 */
 	private double indicatorBreakpoint2;
 
+	/**
+	 * The color representing a high number range on the gauge.
+	 */
 	private String indicatorHighColor = HIGH_COLOR;
 
+	/**
+	 * The color representing a low number range on the gauge.
+	 */
 	private String indicatorLowColor = MID_COLOR;
 
+	/**
+	 * The color representing a medium number range on the gauge.
+	 */
 	private String indicatorMiddleColor = LOW_COLOR;
 
+	/**
+	 * 
+	 The location of the legend with respect to the chart. The valid values
+	 * are:
+	 * 
+	 * Bottom OnChart Right
+	 */
 	private ChartLegendPosition legendPosition = ChartLegendPosition.BOTTOM;
 
+	/**
+	 * The maximum number of elements to include in the top-level grouping of
+	 * the horizontal axis of a horizontal chart, vertical axis of a vertical
+	 * chart, or selected axis of a stacked bar chart. For example, if you want
+	 * to list only your top five salespeople, create an opportunity report that
+	 * lists total opportunity amounts by owner and enter 5 in this field.
+	 */
 	private int maxValuesDisplayed;
 
+	/**
+	 * Descriptive label for the metric. This is relevant if metric is the value
+	 * of the componentType field.
+	 */
 	private String metricLabel;
 
+	/**
+	 * Visualforce page associated with the component.
+	 */
 	private String page;
 
+	/**
+	 * Display height of the s-control in pixels.
+	 */
 	private int pageHeightInPixels;
 
+	/**
+	 * Name of the report associated with the component.
+	 */
 	private String report;
 
+	/**
+	 * S-control associated with component if scontrol is the value of the
+	 * componentType field. For more information, see “Defining Custom
+	 * S-Controls” in the Salesforce online help.
+	 */
 	private String scontrol;
 
+	/**
+	 * Display height of the s-control in pixels.
+	 */
 	private int scontrolHeightInPixels;
 
+	/**
+	 * Indicates if percentages are displayed for regions of gauges and wedges
+	 * and segments of pie, donut, and funnel charts (true), or not (false).
+	 * 
+	 */
 	private boolean showPercentage;
 
+	/**
+	 * Display Chatter photos for up to 20 records in a horizontal bar chart
+	 * component whose source report is grouped by a user or group name field.
+	 * If there are more than 20 records with photos, record names are shown
+	 * instead of photos. Set Grouping Display to None to show photos. Set the
+	 * Drill Down to option to Record Detail Page to take users directly to user
+	 * profile or group pages when they click photos. Chatter must be enabled
+	 * for photos to be displayed. Depending on your organization's setup, you
+	 * may not see photos on tables and charts.
+	 */
 	private boolean showPicturesOnCharts;
 
+	/**
+	 * Display Chatter photos for up to 20 records in a horizontal bar chart
+	 * component whose source report is grouped by a user or group name field.
+	 * If there are more than 20 records with photos, record names are shown
+	 * instead of photos. Set Grouping Display to None to show photos. Set the
+	 * Drill Down to option to Record Detail Page to take users directly to user
+	 * profile or group pages when they click photos. Chatter must be enabled
+	 * for photos to be displayed. Depending on your organization's setup, you
+	 * may not see photos on tables and charts.
+	 */
 	private boolean showPicturesOnTables;
 
+	/**
+	 * Indicates if the total of all wedges is displayed for gauges and donut
+	 * charts (true), or not (false).
+	 */
 	private boolean showTotal;
 
+	/**
+	 * Indicates if the values of individual records or groups are displayed for
+	 * charts (true), or not (false).
+	 */
 	private boolean showValues = true;
 
+	/**
+	 * The sort option for the dashboard component.
+	 */
 	private DashboardComponentFilter sortBy = DashboardComponentFilter.ROW_LABEL_ASCENDING;
 
+	/**
+	 * The title of the dashboard component. Maximum of 40 characters.
+	 */
 	private String title;
 
+	/**
+	 * Specifies whether to use the chart defined in the source report on this
+	 * dashboard component. The chart settings in the source report determine
+	 * how the chart displays in the dashboard, and any chart settings you
+	 * define for the dashboard are overridden. If you defined a combination
+	 * chart in the source report, use this option to use that combination chart
+	 * on this dashboard.
+	 * 
+	 */
 	private boolean useReportChart;
 
 	public DashboardComponent() {

@@ -1,6 +1,5 @@
 package com.vimukti.dashboard.client.chart.ui.controls;
 
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.Request;
@@ -11,7 +10,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.vimukti.dashboard.client.Dashboard;
 import com.vimukti.dashboard.client.data.DashboardComponent;
 import com.vimukti.dashboard.client.data.DashboardComponentType;
@@ -21,18 +19,40 @@ import com.vimukti.dashboard.client.ui.utils.BaseDialog;
 import com.vimukti.dashboard.client.ui.utils.TabControl;
 import com.vimukti.dashboard.client.ui.utils.TextItem;
 
+/**
+ * this edit portlet chart type
+ *
+ */
 @SuppressWarnings("rawtypes")
 public abstract class ComponentEditorDialog extends BaseDialog {
+	/**
+	 * this panel controls formats the chart position of legened axis renge
+	 * colors of chart
+	 */
 	private ChartFormatting formatting;
+
+	/**
+	 * this panel controls gives which data show in charts
+	 */
 	private ChartComponentData data;
-	private TabLayoutPanel settingsPanel;
-	private SimplePanel targetPanel;
+
+	/**
+	 * the data wich is shown in charts
+	 */
 	private Report reportData;
+
 	private String chartHtml;
+
+	/**
+	 * componet data will save in this object
+	 */
 	protected DashboardComponent componentData;
 
 	public static final String GET_CHART_HTML = "/dashboard/chartpreview";
 
+	/**
+	 * these all flow panels are chart(component) types
+	 */
 	private FlowPanel horizontalBar;
 	private FlowPanel vertical;
 	private FlowPanel line;
@@ -93,12 +113,7 @@ public abstract class ComponentEditorDialog extends BaseDialog {
 						createChartPreviewPanel();
 					}
 				});
-		settingsPanel = new TabLayoutPanel(1.5, Unit.EM);
-		settingsPanel.addStyleName("settings-tabLayouts");
-		settingsPanel.add(data, "Component Data");
-		settingsPanel.add(formatting, "Formatting");
-
-		targetPanel = new SimplePanel();
+		final SimplePanel targetPanel = new SimplePanel();
 
 		TabControl tabs = new TabControl();
 		tabs.addTab("Component Data", new ClickHandler() {
@@ -125,6 +140,9 @@ public abstract class ComponentEditorDialog extends BaseDialog {
 		this.add(hPanel);
 	}
 
+	/**
+	 * creating chart preview panel
+	 */
 	private FlowPanel createChartPreviewPanel() {
 		previewPanel.addStyleName("preview-panel");
 		previewPanel.clear();
@@ -133,6 +151,9 @@ public abstract class ComponentEditorDialog extends BaseDialog {
 		return previewPanel;
 	}
 
+	/**
+	 * creating chart type
+	 */
 	private void createChartTypesPanel() {
 		FlowPanel hPanel = new FlowPanel();
 		hPanel.addStyleName("chart-types-panel");
@@ -296,6 +317,9 @@ public abstract class ComponentEditorDialog extends BaseDialog {
 		setSelectedStyleToPanel();
 	}
 
+	/**
+	 * seting the selected style to selected chart panel
+	 */
 	private void setSelectedStyleToPanel() {
 
 		switch (componentData.getComponentType()) {
@@ -349,6 +373,9 @@ public abstract class ComponentEditorDialog extends BaseDialog {
 
 	}
 
+	/**
+	 * clearing the all chart type panels selected style
+	 */
 	private void clearSelectedStyleName() {
 		horizontalBar.removeStyleName("selected-chart");
 		vertical.removeStyleName("selected-chart");
@@ -362,6 +389,10 @@ public abstract class ComponentEditorDialog extends BaseDialog {
 		tabel.removeStyleName("selected-chart");
 	}
 
+	/**
+	 * when data changes in dialog rpc will call get the chart in Html format
+	 * assign chart html
+	 */
 	public void refreshChartPanel() {
 		RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.POST,
 				GET_CHART_HTML);

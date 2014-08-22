@@ -9,24 +9,64 @@ import com.vimukti.dashboard.client.data.MetaObject;
 @SuppressWarnings("serial")
 public class ReportAggregate extends MetaObject {
 
+	/**
+	 * Defines the row grouping level at which you want your custom summary
+	 * formula to be displayed.
+	 */
 	private String acrossGroupingContext;
 
+	/**
+	 * The custom summary formula. For example, AMOUNT:SUM + OPP_QUANTITY:SUM
+	 */
 	private String calculatedFormula;
 
+	/**
+	 * Specifies the data type for formatting and display of the custom summary
+	 * formula results.
+	 */
 	private ReportAggregateDatatype datatype;
 
+	/**
+	 * The custom summary formula description
+	 */
 	private String description;
 
+	/**
+	 * The internal development name of the custom summary formula, for example,
+	 * FORMULA1. This is used to reference custom summary formulas from other
+	 * report components, including conditional highlighting.
+	 */
 	private String developerName;
 
+	/**
+	 * Defines the column grouping level at which you want your custom summary
+	 * formula to be displayed
+	 */
 	private String downGroupingContext;
 
+	/**
+	 * Determines whether the custom summary formula is a cross-block formula,
+	 * which is available with joined reports. true indicates a cross-block
+	 * custom summary formula. false indicates a standard custom summary
+	 * formula.
+	 */
 	private boolean isCrossBlock;
 
+	/**
+	 * The custom summary formula label (name).
+	 */
 	private String masterLabel;
 
+	/**
+	 * Required for joined reports. Specifies the reportType of the blocks to
+	 * which the aggregate can be added.
+	 */
 	private String reportType;
 
+	/**
+	 * The formula result is calculated to the specified number of decimal
+	 * places. Valid values 0 through 18.
+	 */
 	private int scale;
 
 	/**
@@ -199,6 +239,12 @@ public class ReportAggregate extends MetaObject {
 		if (jDescription != null) {
 			description = jDescription.isString().stringValue();
 		}
+
+		JSONValue jdeveloperName = jsonObject.get("developerName");
+		if (jdeveloperName != null) {
+			developerName = jDescription.isString().stringValue();
+		}
+
 		JSONValue jIsCrossBlock = jsonObject.get("isCrossBlock");
 		if (jIsCrossBlock != null) {
 			isCrossBlock = jIsCrossBlock.isBoolean().booleanValue();
@@ -236,6 +282,9 @@ public class ReportAggregate extends MetaObject {
 		}
 		if (description != null) {
 			json.put("description", new JSONString(description));
+		}
+		if (developerName != null) {
+			json.put("developerName", new JSONString(developerName));
 		}
 		if (downGroupingContext != null) {
 			json.put("downGroupingContext", new JSONString(downGroupingContext));

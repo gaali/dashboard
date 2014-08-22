@@ -23,19 +23,66 @@ import com.vimukti.dashboard.client.ui.utils.SelectListBox;
 import com.vimukti.dashboard.client.ui.utils.TextItem;
 
 public class ChartFormatting extends FlowPanel {
+	/**
+	 * Chart or component type
+	 */
 	DashboardComponentType type;
+
+	/**
+	 * Sort rows for charts assending or desending
+	 */
 	private SelectListBox<DashboardComponentFilter> sortRowsBy;
+
+	/**
+	 * it takes number value to show max value in chart,value is up to 99 only
+	 */
 	private TextItem maximumValueDisplayed;
+	/**
+	 * axis range for the up value from and to values can enter
+	 */
 	private SelectListBox<ChartRangeType> axisRange;
+
+	/**
+	 * legend position in chart this field is not available for all chars
+	 */
 	private SelectListBox<ChartLegendPosition> legendPosition;
+
+	/**
+	 * if chart control vaues changed preview need to refresh by calling rpc
+	 */
 	private IRefreshChartPanel refreshPanel;
 
+	/**
+	 * minimum value to show in chart
+	 */
 	private TextItem minimumValue;
+
+	/**
+	 * The color representing a low number range on the gauge.
+	 */
 	private ColorItem lowRangeColor;
+
+	/**
+	 * The value that separates the indicatorLowColor from the
+	 * indicatorMiddleColor on the dashboard.
+	 */
 	private TextItem breakPoint1;
+	/**
+	 * The color representing a mid number range on the gauge.
+	 */
 	private ColorItem middleRangeColor;
+	/**
+	 * The value that separates the indicatorLowColor from the
+	 * indicatorMiddleColor on the dashboard.
+	 */
 	private TextItem breakPoint2;
+	/**
+	 * The color representing a high number range on the gauge.
+	 */
 	private ColorItem highRangeColor;
+	/**
+	 * maximum value of the chart to show
+	 */
 	private TextItem maximum;
 
 	private double minValue;
