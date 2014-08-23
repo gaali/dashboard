@@ -33,6 +33,9 @@ import com.vimukti.dashboard.client.ui.utils.TextItem;
  */
 public class ChartComponentData extends FlowPanel {
 
+	public static final String AUTO = "Auto";
+
+	public static final String NONE = "None";
 	/**
 	 * Type of chart now showing chart preview
 	 */
@@ -64,10 +67,13 @@ public class ChartComponentData extends FlowPanel {
 	 */
 	private List<ReportAggregate> aggregates;
 	/**
-	 * all groued columns in report
+	 * all grouped columns in report
 	 */
 	private List<ReportGrouping> groupings;
 
+	/**
+	 * when data changes in dialog it refresh charPreview panel
+	 */
 	private IRefreshChartPanel refreshPanel;
 
 	/**
@@ -79,6 +85,17 @@ public class ChartComponentData extends FlowPanel {
 	 * to save report data in component
 	 */
 	private DashboardComponent component;
+
+	private SelectListBox<SummaryAndAggregatesColumn> summaryListBox;
+
+	private SelectListBox<SummaryAndAggregatesColumn> summaryListBox2;
+
+	private SelectListBox<ReportGrouping> groupingListBox;
+	private FlowPanel combinationPanel;
+
+	private SelectListBox<ReportGrouping> groupByListBox;
+
+	private SelectListBox<SummaryAndAggregatesColumn> combinationChartValue;
 
 	/**
 	 * when click on the chart it redirect to given url
@@ -104,6 +121,11 @@ public class ChartComponentData extends FlowPanel {
 	 */
 	private void prepareReportData() {
 		summaryList = new ArrayList<SummaryAndAggregatesColumn>();
+		// auto is default value
+		SummaryAndAggregatesColumn auto = new SummaryAndAggregatesColumn();
+		auto.setDisplayName(AUTO);
+		summaryList.add(auto);
+
 		List<ReportColumn> columns = result.getColumns();
 		for (ReportColumn column : columns) {
 			SummaryAndAggregatesColumn columInner = new SummaryAndAggregatesColumn();
@@ -128,8 +150,12 @@ public class ChartComponentData extends FlowPanel {
 			summaryList.add(columInner);
 		}
 
-		groupings = result.getGroupings();
-
+		// adding to types of groupings into collection
+		ReportGrouping rAuto = new ReportGrouping();
+		rAuto.setField(AUTO);
+		groupings.add(rAuto);
+		groupings.addAll(result.getGroupingsAcross());
+		groupings.addAll(result.getGroupingsDown());
 	}
 
 	/**
@@ -167,7 +193,7 @@ public class ChartComponentData extends FlowPanel {
 			break;
 		case SCATTER:
 		case SCATTER_GROUPED:
-			createControlsForScatter();
+			createControlsForBarAndScatter();
 			groupByForLineAndScatter();
 			break;
 		case DONUT:
@@ -247,63 +273,86 @@ public class ChartComponentData extends FlowPanel {
 	 * creating Scatter chart controls ,plotBy:takes Grouping column,
 	 * xAsix:takes Summary column yAsix:takes summary Column
 	 */
-	private void createControlsForScatter() {
-		plotBy = new SelectListBox<ReportGrouping>() {
-			@Override
-			public String getDisplayName(ReportGrouping item) {
-				return item.getField();
-			}
-		};
-		plotBy.addChangeHandler(new ChangeHandler() {
-
-			@Override
-			public void onChange(ChangeEvent event) {
-				ReportGrouping selectedValue = plotBy.getSelectedValue();
-				String field = selectedValue.getField();
-				setGroupingColumnToComponent(field);
-				refreshPanel.refreshChartPanel();
-			}
-		});
-		plotBy.setItems(groupings);
-		this.add(plotBy);
+	private void createControlsForBarAndScatter() {
 		// for x axis it shows summaries and aggregates of report
-		final SelectListBox<SummaryAndAggregatesColumn> xAxis = new SelectListBox<SummaryAndAggregatesColumn>() {
+		summaryListBox = new SelectListBox<SummaryAndAggregatesColumn>("x-Axis") {
 			@Override
 			public String getDisplayName(SummaryAndAggregatesColumn item) {
 				return item.getDisplayName();
 			}
 		};
-		xAxis.addChangeHandler(new ChangeHandler() {
+
+		summaryListBox.addChangeHandler(new ChangeHandler() {
 
 			@Override
 			public void onChange(ChangeEvent event) {
-				SummaryAndAggregatesColumn selectedValue = xAxis
+				SummaryAndAggregatesColumn selectedValue = summaryListBox
 						.getSelectedValue();
-				setChartDataToComponent(selectedValue, ChartAxis.Y);
+				if (selectedValue.getDisplayName().equals(AUTO)) {
+					selectedValue = null;
+					summaryListBox2.setSelectedIndex(0);
+					plotBy.setSelectedIndex(0);
+				}
+				setChartSummaryToComponent(selectedValue, ChartAxis.X, 0);
 				refreshPanel.refreshChartPanel();
 			}
 		});
-		xAxis.setItems(summaryList);
-		this.add(xAxis);
+		summaryListBox.setItems(summaryList);
 
-		final SelectListBox<SummaryAndAggregatesColumn> yAxis = new SelectListBox<SummaryAndAggregatesColumn>() {
+		// yAxis
+		summaryListBox2 = new SelectListBox<SummaryAndAggregatesColumn>(
+				"Y-Axis") {
 			@Override
 			public String getDisplayName(SummaryAndAggregatesColumn item) {
 				return item.getDisplayName();
 			}
 		};
-		yAxis.addChangeHandler(new ChangeHandler() {
+
+		summaryListBox2.addChangeHandler(new ChangeHandler() {
 
 			@Override
 			public void onChange(ChangeEvent event) {
-				SummaryAndAggregatesColumn selectedValue = yAxis
+				SummaryAndAggregatesColumn selectedValue = summaryListBox2
 						.getSelectedValue();
-				setChartDataToComponent(selectedValue, ChartAxis.Y);
+				if (selectedValue.getDisplayName().equals(AUTO)) {
+					selectedValue = null;
+					summaryListBox.setSelectedIndex(0);
+					plotBy.setSelectedIndex(0);
+				}
+				setChartSummaryToComponent(selectedValue, ChartAxis.Y, 1);
 				refreshPanel.refreshChartPanel();
 			}
 		});
-		yAxis.setItems(summaryList);
-		this.add(yAxis);
+		summaryListBox2.setItems(summaryList);
+
+		if (type == DashboardComponentType.SCATTER
+				|| type == DashboardComponentType.SCATTER_GROUPED) {
+			plotBy = new SelectListBox<ReportGrouping>("Plot By") {
+				@Override
+				public String getDisplayName(ReportGrouping item) {
+					return item.getField();
+				}
+			};
+			plotBy.addChangeHandler(new ChangeHandler() {
+
+				@Override
+				public void onChange(ChangeEvent event) {
+					ReportGrouping selectedValue = plotBy.getSelectedValue();
+					String field = selectedValue.getField();
+					if (field.equals(AUTO)) {
+						field = null;
+						summaryListBox.setSelectedIndex(0);
+						setChartSummaryToComponent(null, ChartAxis.Y, 0);
+					}
+					component.setGroupingColumn(field);
+					refreshPanel.refreshChartPanel();
+				}
+			});
+			plotBy.setItems(groupings);
+			this.add(plotBy);
+		}
+		this.add(summaryListBox);
+		this.add(summaryListBox2);
 	}
 
 	/**
@@ -314,6 +363,10 @@ public class ChartComponentData extends FlowPanel {
 		switch (type) {
 		case COLUMN:
 		case COLUMN_GROUPED:
+		case COLUMN_LINE:
+		case COLUMN_LINE_GROUPED:
+		case COLUMN_LINE_STACKED:
+		case COLUMN_LINE_STACKED100:
 		case COLUMN_STACKED:
 		case COLUMN_STACKED100:
 			xandYforLineAndColumn();
@@ -330,6 +383,10 @@ public class ChartComponentData extends FlowPanel {
 			createCombinationChartsPanel();
 			break;
 		case BAR:
+		case BAR_GROUPED:
+		case BAR_STACKED:
+		case BAR_STACKED100:
+			createControlsForBarAndScatter();
 			createGroupByPanel();
 			createCombinationChartsPanel();
 			break;
@@ -374,7 +431,11 @@ public class ChartComponentData extends FlowPanel {
 		final SelectListBox<ReportGrouping> groupByListBox = new SelectListBox<ReportGrouping>() {
 			@Override
 			public String getDisplayName(ReportGrouping item) {
-				return item.getField();
+				String field = item.getField();
+				if (field.equals(AUTO)) {
+					field = "None";
+				}
+				return field;
 			}
 		};
 		groupByListBox.addChangeHandler(new ChangeHandler() {
@@ -384,7 +445,9 @@ public class ChartComponentData extends FlowPanel {
 				ReportGrouping selectedValue = groupByListBox
 						.getSelectedValue();
 				String field = selectedValue.getField();
-				secondGroupBy(field);
+				component.setSecondaryGroupingColumn(field);
+				component
+						.setComponentType(DashboardComponentType.SCATTER_GROUPED);
 				refreshPanel.refreshChartPanel();
 			}
 		});
@@ -397,85 +460,54 @@ public class ChartComponentData extends FlowPanel {
 	 * show grouping of reports
 	 */
 	private void xandYforLineAndColumn() {
-		final SelectListBox<SummaryAndAggregatesColumn> yAxis = new SelectListBox<SummaryAndAggregatesColumn>() {
+		summaryListBox = new SelectListBox<SummaryAndAggregatesColumn>("yAxis") {
 			@Override
 			public String getDisplayName(SummaryAndAggregatesColumn item) {
 				return item.getDisplayName();
 			}
 		};
-		yAxis.addChangeHandler(new ChangeHandler() {
+		summaryListBox.addChangeHandler(new ChangeHandler() {
 
 			@Override
 			public void onChange(ChangeEvent event) {
-				SummaryAndAggregatesColumn selectedValue = yAxis
+				SummaryAndAggregatesColumn selectedValue = summaryListBox
 						.getSelectedValue();
-				setChartDataToComponent(selectedValue, ChartAxis.Y);
+				if (selectedValue.getDisplayName().equals(AUTO)) {
+					selectedValue = summaryListBox.getValueByIdex(1);
+					groupingListBox.setSelectedIndex(0);
+					component.setGroupingColumn(null);
+				}
+				setChartSummaryToComponent(selectedValue, ChartAxis.Y, 0);
 				refreshPanel.refreshChartPanel();
 			}
 		});
-		yAxis.setItems(summaryList);
-		this.add(yAxis);
+		summaryListBox.setItems(summaryList);
+		this.add(summaryListBox);
 
-		final SelectListBox<ReportGrouping> xAxis = new SelectListBox<ReportGrouping>() {
+		groupingListBox = new SelectListBox<ReportGrouping>("xAxis") {
 			@Override
 			public String getDisplayName(ReportGrouping item) {
 				return item.getField();
 			}
 		};
-		xAxis.addChangeHandler(new ChangeHandler() {
+		groupingListBox.addChangeHandler(new ChangeHandler() {
 
 			@Override
 			public void onChange(ChangeEvent event) {
-				ReportGrouping selectedValue = xAxis.getSelectedValue();
+				ReportGrouping selectedValue = groupingListBox
+						.getSelectedValue();
 				String field = selectedValue.getField();
-				setGroupingColumnToComponent(field);
+				if (field.equals(AUTO)) {
+					field = null;
+					summaryListBox.setSelectedIndex(0);
+					setChartSummaryToComponent(null, ChartAxis.Y, 0);
+				}
+				component.setGroupingColumn(field);
 				refreshPanel.refreshChartPanel();
 			}
 		});
-		xAxis.setItems(groupings);
-		this.add(xAxis);
-	}
-
-	/**
-	 * 
-	 * here field selected value this method takes selected value and set in
-	 * first positions if it has multiple grouping values else it replace the
-	 * older value with field
-	 */
-	private void setGroupingColumnToComponent(String field) {
-		String groupingColumn = component.getGroupingColumn();
-		String groupingColumnString = "";
-		if (groupingColumn != null) {
-			String[] split = groupingColumn.split(",");
-			split[0] = field;
-			groupingColumnString = split.toString();
-		} else {
-			groupingColumnString = field;
-		}
-		component.setGroupingColumn(groupingColumnString);
-	}
-
-	/**
-	 * 
-	 * here field selected value this method takes selected value and set in
-	 * second positions, if it has multiple grouping values else it replace the
-	 * older value with field,
-	 */
-	private void secondGroupBy(String field) {
-		String groupingColumn = component.getGroupingColumn();
-		String groupingColumnString = "";
-		if (groupingColumn != null) {
-			String[] split = groupingColumn.split(",");
-			if (split.length == 2) {
-				split[1] = field;
-			} else {
-				groupingColumnString = split.toString();
-				groupingColumnString += "," + field;
-			}
-		} else {
-			groupingColumnString = field;
-		}
-		component.setGroupingColumn(groupingColumnString);
+		groupingListBox.setItems(groupings);
+		this.add(groupingListBox);
 	}
 
 	/**
@@ -484,17 +516,24 @@ public class ChartComponentData extends FlowPanel {
 	 * @param axis
 	 *            data shows in this axis
 	 */
-	private void setChartDataToComponent(SummaryAndAggregatesColumn data,
-			ChartAxis axis) {
+
+	private void setChartSummaryToComponent(SummaryAndAggregatesColumn data,
+			ChartAxis axis, int index) {
+		if (data == null) {
+			component.setChartSummary(null);
+			return;
+		}
 		String column = data.getColumn();
 		ReportSummaryType type2 = data.getType();
-
-		ChartSummary chartSummary = component.getChartSummary();
-		chartSummary.setAggregate(type2);
-		if (axis != null) {
-			chartSummary.setAxisBinding(axis);
+		List<ChartSummary> chartSummaries = component.getChartSummary();
+		ChartSummary chartSummary2 = chartSummaries.get(index);
+		if (chartSummary2 == null) {
+			chartSummary2 = new ChartSummary();
 		}
-		chartSummary.setColumn(column);
+		chartSummary2.setAggregate(type2);
+		chartSummary2.setAxisBinding(axis);
+		chartSummary2.setColumn(column);
+
 	}
 
 	/**
@@ -512,7 +551,13 @@ public class ChartComponentData extends FlowPanel {
 
 			@Override
 			public void onChange(ChangeEvent event) {
-				setChartDataToComponent(values.getSelectedValue(), null);
+				SummaryAndAggregatesColumn selectedValue = values
+						.getSelectedValue();
+				if (selectedValue.getDisplayName().equals(AUTO)) {
+					selectedValue = null;
+
+				}
+				setChartSummaryToComponent(selectedValue, null, 0);
 				refreshPanel.refreshChartPanel();
 			}
 		});
@@ -520,8 +565,8 @@ public class ChartComponentData extends FlowPanel {
 		values.addStyleName("values-list");
 		this.add(values);
 
-		if (type == DashboardComponentType.DONUT) {
-			wedgesForDonut();
+		if (type != DashboardComponentType.FUNNEL) {
+			wedgesForPieAndDonut();
 		} else {
 			segmentsForFunnel();
 		}
@@ -544,7 +589,10 @@ public class ChartComponentData extends FlowPanel {
 			public void onChange(ChangeEvent event) {
 				ReportGrouping selectedValue = segments.getSelectedValue();
 				String field = selectedValue.getField();
-				setGroupingColumnToComponent(field);
+				if (field.equals(AUTO)) {
+					field = null;
+				}
+				component.setGroupingColumn(field);
 				refreshPanel.refreshChartPanel();
 			}
 		});
@@ -555,7 +603,7 @@ public class ChartComponentData extends FlowPanel {
 	/**
 	 * creating wedges control for Donut
 	 */
-	private void wedgesForDonut() {
+	private void wedgesForPieAndDonut() {
 		final SelectListBox<ReportGrouping> wedges = new SelectListBox<ReportGrouping>(
 				"Wedges") {
 			@Override
@@ -569,7 +617,7 @@ public class ChartComponentData extends FlowPanel {
 			public void onChange(ChangeEvent event) {
 				ReportGrouping selectedValue = wedges.getSelectedValue();
 				String field = selectedValue.getField();
-				setGroupingColumnToComponent(field);
+				component.setGroupingColumn(field);
 				refreshPanel.refreshChartPanel();
 			}
 		});
@@ -592,7 +640,7 @@ public class ChartComponentData extends FlowPanel {
 
 			@Override
 			public void onChange(ChangeEvent event) {
-				setChartDataToComponent(value.getSelectedValue(), null);
+				setChartSummaryToComponent(value.getSelectedValue(), null, 0);
 				refreshPanel.refreshChartPanel();
 			}
 		});
@@ -615,40 +663,56 @@ public class ChartComponentData extends FlowPanel {
 	 */
 	private void createGroupByPanel() {
 		FlowPanel groupBy = new FlowPanel();
+		// chart panel
+		final FlowPanel fPanel = new FlowPanel();
 
 		Label name = new Label("Group by");
 		FlowPanel vPanel = new FlowPanel();
 		vPanel.addStyleName("groupby-section");
 
-		final SelectListBox<ReportGrouping> box = new SelectListBox<ReportGrouping>() {
+		groupByListBox = new SelectListBox<ReportGrouping>() {
 			@Override
 			public String getDisplayName(ReportGrouping item) {
-				return item.getField();
+				String field = item.getField();
+				if (field.equals(AUTO)) {
+					field = NONE;
+				}
+				return field;
 			}
 		};
-		box.addChangeHandler(new ChangeHandler() {
+		groupByListBox.addChangeHandler(new ChangeHandler() {
 
 			@Override
 			public void onChange(ChangeEvent event) {
-				ReportGrouping selectedValue = box.getSelectedValue();
+				fPanel.removeStyleName("disable");
+				ReportGrouping selectedValue = groupByListBox
+						.getSelectedValue();
 				String field = selectedValue.getField();
-				secondGroupBy(field);
+				if (field.equals(NONE)) {
+					field = null;
+					fPanel.addStyleName("disable");
+					combinationPanel.removeStyleName("disable");
+				} else {
+					combinationPanel.addStyleName("disable");
+					type = type == DashboardComponentType.BAR ? DashboardComponentType.BAR_GROUPED
+							: DashboardComponentType.COLUMN_GROUPED;
+				}
+				component.setComponentType(type);
+				component.setSecondaryGroupingColumn(field);
 				refreshPanel.refreshChartPanel();
 			}
 		});
-		box.addStyleName("groupby-listbox");
-		FlowPanel fPanel = new FlowPanel();
+		groupByListBox.addStyleName("groupby-listbox");
 
 		FlowPanel sideBySide = new FlowPanel();
 		sideBySide.addDomHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				type = DashboardComponentType.getComponentType("Bar") != null ? DashboardComponentType.BAR_GROUPED
+				type = type == DashboardComponentType.BAR ? DashboardComponentType.BAR_GROUPED
 						: DashboardComponentType.COLUMN_GROUPED;
 				component.setComponentType(type);
 				refreshPanel.refreshChartPanel();
-
 			}
 		}, ClickEvent.getType());
 		sideBySide.addStyleName("sidebyside-" + type.toString().toLowerCase());
@@ -658,11 +722,10 @@ public class ChartComponentData extends FlowPanel {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				type = DashboardComponentType.getComponentType("Bar") != null ? DashboardComponentType.BAR_GROUPED
-						: DashboardComponentType.COLUMN_GROUPED;
+				type = type == DashboardComponentType.BAR ? DashboardComponentType.BAR_STACKED
+						: DashboardComponentType.COLUMN_STACKED;
 				component.setComponentType(type);
 				refreshPanel.refreshChartPanel();
-
 			}
 		}, ClickEvent.getType());
 		stacked.addStyleName("stacked-" + type.toString().toLowerCase());
@@ -672,9 +735,11 @@ public class ChartComponentData extends FlowPanel {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				type = DashboardComponentType.getComponentType("Bar") != null ? DashboardComponentType.BAR_GROUPED
-						: DashboardComponentType.COLUMN_GROUPED;
+				type = type == DashboardComponentType.BAR ? DashboardComponentType.BAR_STACKED100
+						: DashboardComponentType.COLUMN_STACKED100;
 				component.setComponentType(type);
+				// TODO
+				// disable combination charts panel
 				refreshPanel.refreshChartPanel();
 
 			}
@@ -705,7 +770,7 @@ public class ChartComponentData extends FlowPanel {
 		fPanel.add(sideBySide);
 		fPanel.add(stacked);
 		fPanel.add(fullStacked);
-		vPanel.add(box);
+		vPanel.add(groupByListBox);
 		vPanel.add(fPanel);
 		groupBy.add(name);
 		groupBy.add(vPanel);
@@ -720,7 +785,15 @@ public class ChartComponentData extends FlowPanel {
 		FlowPanel hPanel = new FlowPanel();
 		hPanel.addStyleName("combination-chart-panel");
 		Label combinationCharts = new Label("Cmbination Charts");
-		FlowPanel fPanel = new FlowPanel();
+
+		combinationPanel = new FlowPanel();
+
+		// condition for combination panel to show or not
+		combinationPanel.addStyleName("disable");
+		if (!summaryListBox.getSelectedValue().equals(AUTO)) {
+			combinationPanel.removeStyleName("disable");
+		}
+
 		final FlowPanel comboPanel = new FlowPanel();
 		final CheckBox additionalValue = new CheckBox("Plot additions value");
 		additionalValue
@@ -729,37 +802,117 @@ public class ChartComponentData extends FlowPanel {
 					@Override
 					public void onValueChange(ValueChangeEvent<Boolean> event) {
 						if (additionalValue.getValue()) {
-							additionalValuesPanel(comboPanel);
+							switch (type) {
+							case COLUMN:
+							case COLUMN_GROUPED:
+							case COLUMN_STACKED:
+								additionalValuesPanelForColumn(comboPanel);
+								break;
+							case BAR:
+							case BAR_GROUPED:
+							case BAR_STACKED:
+								additionalValuesPanelBar(comboPanel);
+							default:
+								break;
+							}
 						} else {
 							comboPanel.clear();
 						}
-
 					}
 				});
-		fPanel.add(comboPanel);
-		fPanel.add(additionalValue);
+		combinationPanel.add(comboPanel);
+		combinationPanel.add(additionalValue);
 		hPanel.add(combinationCharts);
-		hPanel.add(fPanel);
+		hPanel.add(combinationPanel);
 		this.add(hPanel);
 	}
 
-	private void additionalValuesPanel(final FlowPanel panel) {
+	private void additionalValuesPanelBar(final FlowPanel panel) {
+
 		if (type != DashboardComponentType.LINE) {
 			Button addButton = new Button();
 			addButton.addClickHandler(new ClickHandler() {
 
 				@Override
 				public void onClick(ClickEvent event) {
-					addValueForCombitionsChart(panel);
+
+					addValueForCombitionsChart(panel, component
+							.getChartSummary().size());
 				}
 			});
 			panel.add(addButton);
 		}
-		addValueForCombitionsChart(panel);
+
+		addValueForCombitionsChart(panel, component.getChartSummary().size());
 	}
 
-	private void addValueForCombitionsChart(FlowPanel panel) {
-		SelectListBox<SummaryAndAggregatesColumn> value = new SelectListBox<SummaryAndAggregatesColumn>() {
+	private void additionalValuesPanelForColumn(final FlowPanel panel) {
+		final SelectListBox<DisplayType> display = new SelectListBox<DisplayType>(
+				"Display") {
+			@Override
+			public String getDisplayName(DisplayType item) {
+				return item.toString();
+			}
+		};
+
+		display.addStyleName("disable");
+		if (!summaryListBox.getSelectedValue().equals(AUTO)) {
+			display.removeStyleName("disable");
+		}
+
+		display.addChangeHandler(new ChangeHandler() {
+
+			@Override
+			public void onChange(ChangeEvent event) {
+				combinationsPlotpanel(panel, display.getSelectedValue());
+			}
+		});
+
+	}
+
+	private void combinationsPlotpanel(FlowPanel panel,
+			DisplayType selectedValue) {
+		if (selectedValue == DisplayType.COlUMN) {
+			additionalValuesPanelBar(panel);
+		} else {
+			combinationChartValue = new SelectListBox<SummaryAndAggregatesColumn>(
+					"Value") {
+				@Override
+				public String getDisplayName(SummaryAndAggregatesColumn item) {
+					return item.getDisplayName();
+				}
+			};
+			combinationChartValue.setItems(summaryList);
+			combinationChartValue.addChangeHandler(new ChangeHandler() {
+
+				@Override
+				public void onChange(ChangeEvent event) {
+					SummaryAndAggregatesColumn sval = combinationChartValue
+							.getSelectedValue();
+					setChartSummaryToComponent(sval, ChartAxis.X, 1);
+					// TODO set Chart type ,this depend on groupBy
+				}
+			});
+			CheckBox useSecondAxis = new CheckBox();
+			useSecondAxis
+					.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+						@Override
+						public void onValueChange(
+								ValueChangeEvent<Boolean> event) {
+							SummaryAndAggregatesColumn sval = combinationChartValue
+									.getSelectedValue();
+							setChartSummaryToComponent(sval, ChartAxis.Y2, 1);
+						}
+					});
+
+			panel.add(combinationChartValue);
+			panel.add(useSecondAxis);
+		}
+	}
+
+	private void addValueForCombitionsChart(FlowPanel panel, final int index) {
+		final SelectListBox<SummaryAndAggregatesColumn> value = new SelectListBox<SummaryAndAggregatesColumn>() {
 			@Override
 			public String getDisplayName(SummaryAndAggregatesColumn item) {
 				return item.getDisplayName();
@@ -769,21 +922,26 @@ public class ChartComponentData extends FlowPanel {
 
 			@Override
 			public void onChange(ChangeEvent event) {
-				// TODO
+				SummaryAndAggregatesColumn selectedValue = value
+						.getSelectedValue();
+				setChartSummaryToComponent(selectedValue, ChartAxis.X, index);
 				refreshPanel.refreshChartPanel();
-
 			}
 		});
 
+		value.setItems(getSummaryList());
+		int widgetCount = panel.getWidgetCount();
+		panel.insert(value, widgetCount);
+	}
+
+	private List<SummaryAndAggregatesColumn> getSummaryList() {
 		List<SummaryAndAggregatesColumn> sumlist = new ArrayList<SummaryAndAggregatesColumn>();
 		for (SummaryAndAggregatesColumn summary : summaryList) {
 			if (summary.isColumn) {
 				sumlist.add(summary);
 			}
 		}
-		value.setItems(sumlist);
-		int widgetCount = panel.getWidgetCount();
-		panel.insert(value, widgetCount);
+		return summaryList;
 	}
 
 	/**

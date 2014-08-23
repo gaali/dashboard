@@ -21,7 +21,9 @@ public class Report extends MetaObject {
 
 	private String fullName;
 
-	private List<ReportGrouping> groupings = new ArrayList<ReportGrouping>();
+	private List<ReportGrouping> groupingsAcross = new ArrayList<ReportGrouping>();
+
+	private List<ReportGrouping> groupingsDown = new ArrayList<ReportGrouping>();
 
 	private String name;
 
@@ -88,6 +90,36 @@ public class Report extends MetaObject {
 	}
 
 	/**
+	 * @return the groupingsAcross
+	 */
+	public List<ReportGrouping> getGroupingsAcross() {
+		return groupingsAcross;
+	}
+
+	/**
+	 * @param groupingsAcross
+	 *            the groupingsAcross to set
+	 */
+	public void setGroupingsAcross(List<ReportGrouping> groupingsAcross) {
+		this.groupingsAcross = groupingsAcross;
+	}
+
+	/**
+	 * @return the groupingsDown
+	 */
+	public List<ReportGrouping> getGroupingsDown() {
+		return groupingsDown;
+	}
+
+	/**
+	 * @param groupingsDown
+	 *            the groupingsDown to set
+	 */
+	public void setGroupingsDown(List<ReportGrouping> groupingsDown) {
+		this.groupingsDown = groupingsDown;
+	}
+
+	/**
 	 * @return the name
 	 */
 	public String getName() {
@@ -132,21 +164,6 @@ public class Report extends MetaObject {
 		this.columns = columns;
 	}
 
-	/**
-	 * @return the groupings
-	 */
-	public List<ReportGrouping> getGroupings() {
-		return groupings;
-	}
-
-	/**
-	 * @param groupings
-	 *            the groupings to set
-	 */
-	public void setGroupings(List<ReportGrouping> groupings) {
-		this.groupings = groupings;
-	}
-
 	@Override
 	public void fromJSON(JSONObject jsonObject) {
 		super.fromJSON(jsonObject);
@@ -164,10 +181,9 @@ public class Report extends MetaObject {
 		}
 		aggregates = aggregateList;
 		JSONValue jColumns = jsonObject.get("columns");
-		List<ReportColumn> columnsList = null;
-		JSONArray columnArray = jColumns.isArray();
+		List<ReportColumn> columnsList = new ArrayList<ReportColumn>();
 		if (jColumns != null) {
-			columnsList = new ArrayList<ReportColumn>();
+			JSONArray columnArray = jColumns.isArray();
 			for (int i = 0; i < columnArray.size(); i++) {
 				ReportColumn col = new ReportColumn();
 				JSONValue jsonValue = columnArray.get(i);
@@ -176,6 +192,53 @@ public class Report extends MetaObject {
 			}
 		}
 		columns = columnsList;
+
+		JSONValue jCurrency = jsonObject.get("currency");
+		if (jCurrency != null) {
+			currency = jCurrency.isString().toString();
+		}
+
+		JSONValue jFullName = jsonObject.get("fullName");
+		if (jFullName != null) {
+			fullName = jFullName.isString().toString();
+		}
+
+		JSONValue jGroupingsAcross = jsonObject.get("groupingsAcross");
+		List<ReportGrouping> groupingList = new ArrayList<ReportGrouping>();
+		if (jGroupingsAcross != null) {
+			JSONArray jGroupingsAcrossArray = jGroupingsAcross.isArray();
+			for (int i = 0; i < jGroupingsAcrossArray.size(); i++) {
+				ReportGrouping acrossGrouping = new ReportGrouping();
+				JSONValue jsonValue = jGroupingsAcrossArray.get(i);
+				acrossGrouping.fromJSON(jsonValue.isObject());
+				groupingList.add(acrossGrouping);
+			}
+		}
+		groupingsAcross = groupingList;
+		
+		JSONValue jgroupingsDown= jsonObject.get("groupingsDown");
+		List<ReportGrouping> groupingDownList = new ArrayList<ReportGrouping>();
+		if (jGroupingsAcross != null) {
+			JSONArray jGroupingsDownArray = jgroupingsDown.isArray();
+			for (int i = 0; i < jGroupingsDownArray.size(); i++) {
+				ReportGrouping acrossGrouping = new ReportGrouping();
+				JSONValue jsonValue = jGroupingsDownArray.get(i);
+				acrossGrouping.fromJSON(jsonValue.isObject());
+				groupingDownList.add(acrossGrouping);
+			}
+		}
+		groupingsDown = groupingDownList;
+		
+
+		JSONValue jName = jsonObject.get("name");
+		if (jName != null) {
+			name = jName.isString().toString();
+		}
+
+		JSONValue jReportType = jsonObject.get("reportType");
+		if (jReportType != null) {
+			reportType = jReportType.isString().toString();
+		}
 	}
 
 }

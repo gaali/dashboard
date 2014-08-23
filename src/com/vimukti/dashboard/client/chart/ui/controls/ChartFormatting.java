@@ -181,7 +181,6 @@ public class ChartFormatting extends FlowPanel {
 
 			@Override
 			public void onChange(ChangeEvent event) {
-				// TODO Auto-generated method stub
 				ChartLegendPosition selectedValue = legendPosition
 						.getSelectedValue();
 				component.setLegendPosition(selectedValue);
@@ -250,15 +249,15 @@ public class ChartFormatting extends FlowPanel {
 				|| type == DashboardComponentType.DONUT
 				|| type == DashboardComponentType.FUNNEL) {
 			final CheckBox combineSmallGroupsIntoOthers = new CheckBox(
-					"Combine Small groups into 'Others'");
+					"Combine Small groups into \"Others\"");
 			combineSmallGroupsIntoOthers
 					.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 						@Override
 						public void onValueChange(
 								ValueChangeEvent<Boolean> event) {
-							// TODO Auto-generated method stub
 							Boolean value = combineSmallGroupsIntoOthers
 									.getValue();
+							component.setExpandOthers(!value);
 							refreshPanel.refreshChartPanel();
 						}
 					});
@@ -413,7 +412,6 @@ public class ChartFormatting extends FlowPanel {
 
 			@Override
 			public void onChange(ChangeEvent event) {
-				// TODO Auto-generated method stub
 				String color = lowRangeColor.getColor();
 				component.setIndicatorLowColor(color);
 				refreshPanel.refreshChartPanel();
@@ -429,7 +427,6 @@ public class ChartFormatting extends FlowPanel {
 
 			@Override
 			public void onBlur(BlurEvent event) {
-				// TODO Auto-generated method stub
 				String value = breakPoint1.getValue();
 				try {
 					double parseDouble = Double.parseDouble(value);
@@ -458,7 +455,6 @@ public class ChartFormatting extends FlowPanel {
 
 			@Override
 			public void onChange(ChangeEvent event) {
-				// TODO Auto-generated method stub
 				String color = middleRangeColor.getColor();
 				component.setIndicatorMiddleColor(color);
 				refreshPanel.refreshChartPanel();

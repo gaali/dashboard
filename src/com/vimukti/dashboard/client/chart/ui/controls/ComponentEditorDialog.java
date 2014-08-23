@@ -26,7 +26,7 @@ import com.vimukti.dashboard.client.ui.utils.TextItem;
 @SuppressWarnings("rawtypes")
 public abstract class ComponentEditorDialog extends BaseDialog {
 	/**
-	 * this panel controls formats the chart position of legened axis renge
+	 * this panel controls formats the chart position of legend axis range
 	 * colors of chart
 	 */
 	private ChartFormatting formatting;
@@ -37,14 +37,14 @@ public abstract class ComponentEditorDialog extends BaseDialog {
 	private ChartComponentData data;
 
 	/**
-	 * the data wich is shown in charts
+	 * the data which is shown in charts
 	 */
 	private Report reportData;
 
 	private String chartHtml;
 
 	/**
-	 * componet data will save in this object
+	 * component data will save in this object
 	 */
 	protected DashboardComponent componentData;
 
@@ -318,7 +318,7 @@ public abstract class ComponentEditorDialog extends BaseDialog {
 	}
 
 	/**
-	 * seting the selected style to selected chart panel
+	 * setting the selected style to selected chart panel
 	 */
 	private void setSelectedStyleToPanel() {
 

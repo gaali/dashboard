@@ -52,10 +52,10 @@ public class DashboardComponent extends MetaObject {
 	 * Specifies the summary field for the chart data. Required if
 	 * isAutoSelectFromReport is set to false.
 	 */
-	private ChartSummary chartSummary;
+	private List<ChartSummary> chartSummary;
 
 	/**
-	 * 
+	 * chart type
 	 */
 	private DashboardComponentType componentType;
 
@@ -144,6 +144,13 @@ public class DashboardComponent extends MetaObject {
 	 * charts.
 	 */
 	private String groupingColumn;
+
+	/**
+	 * Specifies the field by which to group data. This data is displayed on the
+	 * X-axis for vertical column charts and on the Y-axis for horizontal bar
+	 * charts.this is second group data
+	 */
+	private String secondaryGroupingColumn;
 
 	/**
 	 * Header displayed at the top of the dashboard component.
@@ -345,7 +352,7 @@ public class DashboardComponent extends MetaObject {
 	/**
 	 * @return the chartSummary
 	 */
-	public ChartSummary getChartSummary() {
+	public List<ChartSummary> getChartSummary() {
 		return chartSummary;
 	}
 
@@ -353,7 +360,7 @@ public class DashboardComponent extends MetaObject {
 	 * @param chartSummary
 	 *            the chartSummary to set
 	 */
-	public void setChartSummary(ChartSummary chartSummary) {
+	public void setChartSummary(List<ChartSummary> chartSummary) {
 		this.chartSummary = chartSummary;
 	}
 
@@ -552,6 +559,21 @@ public class DashboardComponent extends MetaObject {
 	 */
 	public void setGroupingColumn(String groupingColumn) {
 		this.groupingColumn = groupingColumn;
+	}
+
+	/**
+	 * @return the secondaryGroupingColumn
+	 */
+	public String getSecondaryGroupingColumn() {
+		return secondaryGroupingColumn;
+	}
+
+	/**
+	 * @param secondaryGroupingColumn
+	 *            the secondaryGroupingColumn to set
+	 */
+	public void setSecondaryGroupingColumn(String secondaryGroupingColumn) {
+		this.secondaryGroupingColumn = secondaryGroupingColumn;
 	}
 
 	/**
@@ -908,9 +930,15 @@ public class DashboardComponent extends MetaObject {
 
 		JSONValue jChartSummary = jsonObject.get("chartSummary");
 		if (jChartSummary != null) {
-			ChartSummary jChartSummaryObj = new ChartSummary();
-			jChartSummaryObj.fromJSON(jChartSummary.isObject());
-			chartSummary = jChartSummaryObj;
+			JSONArray jChartSummaryArray = jChartSummary.isArray();
+			List<ChartSummary> chartColumnList = new ArrayList<ChartSummary>();
+			for (int i = 0; i < jChartSummaryArray.size(); i++) {
+				ChartSummary jChartSummaryObj = new ChartSummary();
+				JSONValue jsonValue = jChartSummaryArray.get(i);
+				jChartSummaryObj.fromJSON(jsonValue.isObject());
+				chartColumnList.add(jChartSummaryObj);
+			}
+			chartSummary = chartColumnList;
 		}
 
 		JSONValue jComponentType = jsonObject.get("componentType");
@@ -998,6 +1026,11 @@ public class DashboardComponent extends MetaObject {
 		JSONValue jGroupingColumn = jsonObject.get("groupingColumn");
 		if (jGroupingColumn != null) {
 			groupingColumn = jGroupingColumn.isString().stringValue();
+		}
+
+		JSONValue jSecondGrouping = jsonObject.get("secondaryGroupingColumn");
+		if (jSecondGrouping != null) {
+			secondaryGroupingColumn = jSecondGrouping.isString().toString();
 		}
 		JSONValue jHeader = jsonObject.get("header");
 		if (jHeader != null) {
@@ -1117,9 +1150,14 @@ public class DashboardComponent extends MetaObject {
 		json.put("chartAxisRangeMax", new JSONNumber(chartAxisRangeMax));
 		json.put("chartAxisRangeMin", new JSONNumber(chartAxisRangeMin));
 
+		JSONArray chartSummaryArray = new JSONArray();
+		int SummaryIndex = 0;
 		if (chartSummary != null) {
-			String string = chartSummary.toString();
-			json.put("chartSummary", new JSONString(string));
+			for (ChartSummary summary : chartSummary) {
+				if (summary != null) {
+					chartSummaryArray.set(SummaryIndex++, summary.toJSON());
+				}
+			}
 		}
 
 		if (componentType != null) {
@@ -1170,6 +1208,10 @@ public class DashboardComponent extends MetaObject {
 		json.put("gaugeMin`", new JSONNumber(gaugeMin));
 		if (groupingColumn != null) {
 			json.put("groupingColumn", new JSONString(groupingColumn));
+		}
+		if (secondaryGroupingColumn != null) {
+			json.put("secondaryGroupingColumn", new JSONString(
+					secondaryGroupingColumn));
 		}
 		if (header != null) {
 			json.put("header", new JSONString(header));
@@ -1228,9 +1270,13 @@ public class DashboardComponent extends MetaObject {
 		dashboardComponent.chartAxisRangeMax = this.chartAxisRangeMin;
 		dashboardComponent.chartAxisRangeMin = this.chartAxisRangeMin;
 
-		if (chartSummary != null) {
-			dashboardComponent.chartSummary = this.chartSummary.clone();
+		List<ChartSummary> clonedSummaries = new ArrayList<ChartSummary>();
+		for (ChartSummary summary : chartSummary) {
+			ChartSummary clone = summary.clone();
+			clonedSummaries.add(clone);
 		}
+		dashboardComponent.chartSummary = clonedSummaries;
+
 		dashboardComponent.componentType = this.componentType;
 
 		List<DashboardFilterColumns> clonedColumns = new ArrayList<DashboardFilterColumns>();
@@ -1262,6 +1308,7 @@ public class DashboardComponent extends MetaObject {
 		dashboardComponent.gaugeMax = this.gaugeMax;
 		dashboardComponent.gaugeMin = this.gaugeMin;
 		dashboardComponent.groupingColumn = this.groupingColumn;
+		dashboardComponent.secondaryGroupingColumn = this.secondaryGroupingColumn;
 		dashboardComponent.header = this.header;
 		dashboardComponent.indicatorBreakpoint1 = this.indicatorBreakpoint1;
 		dashboardComponent.indicatorBreakpoint2 = this.indicatorBreakpoint2;

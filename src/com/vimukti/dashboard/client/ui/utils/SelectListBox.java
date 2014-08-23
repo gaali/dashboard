@@ -91,6 +91,14 @@ public class SelectListBox<T> extends ListBox {
 		return (T) items.toArray()[index];
 	}
 
+	@SuppressWarnings("unchecked")
+	public T getValueByIdex(int index) {
+		if (items.toArray().length < index) {
+			return null;
+		}
+		return (T) items.toArray()[index];
+	}
+
 	public void clearError() {
 		errorPanel.clear();
 		errorPanel.setVisible(false);
