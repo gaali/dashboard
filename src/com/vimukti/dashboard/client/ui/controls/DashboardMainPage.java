@@ -8,6 +8,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.vimukti.dashboard.client.Dashboard;
 import com.vimukti.dashboard.client.column.DashboardColumnsPanel;
 import com.vimukti.dashboard.client.data.DashboardData;
 import com.vimukti.dashboard.client.data.DashboardFilters;
@@ -20,8 +21,8 @@ public class DashboardMainPage extends VerticalPanel {
 	private DashboardColumnsPanel columnsPanel;
 	private Label showDescription;
 
-	public DashboardMainPage(DashboardData dashBoard) {
-		this.dashboard = dashBoard;
+	public DashboardMainPage() {
+		this.dashboard = Dashboard.getDashboardData();
 		createControls();
 	}
 
@@ -75,14 +76,6 @@ public class DashboardMainPage extends VerticalPanel {
 	private void createColumnPanel() {
 		columnsPanel = new DashboardColumnsPanel(dashboard);
 		this.add(columnsPanel);
-	}
-
-	public void reRender(DashboardData dashboard) {
-		this.clear();
-		if (dashboard != null) {
-			this.dashboard = dashboard;
-		}
-		createControls();
 	}
 
 }

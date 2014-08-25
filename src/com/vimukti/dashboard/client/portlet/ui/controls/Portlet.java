@@ -40,6 +40,7 @@ public class Portlet extends AbsolutePanel implements RequiresResize,
 	private DashboardComponentType type;
 	private String objectId;
 	private Report results;
+	private String pageUrl;
 
 	private static Logger logger = Logger.getLogger("DataSourcePanel");
 	public static final String GET_DASHBOARD_PAGE = "/dashboard/apexpage";
@@ -79,7 +80,15 @@ public class Portlet extends AbsolutePanel implements RequiresResize,
 				public void onClick(ClickEvent event) {
 					if (type == DashboardComponentType.PAGE) {
 						ComponentEditorDialogForPage editorPage = new ComponentEditorDialogForPage(
-								getComponent());
+								pageUrl) {
+							@Override
+							protected boolean onOK() {
+								Portlet.this.component
+										.setPageHeightInPixels(height);
+								return true;
+							}
+
+						};
 						editorPage.show();
 						editorPage.center();
 					} else {
@@ -89,11 +98,6 @@ public class Portlet extends AbsolutePanel implements RequiresResize,
 							protected boolean onOK() {
 								setComponent(componentData);
 								return true;
-							}
-
-							@Override
-							public void setFocus() {
-								// TODO Auto-generated method stub
 							}
 						};
 						componentEditor.show();
@@ -302,8 +306,8 @@ public class Portlet extends AbsolutePanel implements RequiresResize,
 				@Override
 				public void onResponseReceived(Request request,
 						Response response) {
-
-					Frame frame = new Frame(response.getText());
+					pageUrl = response.getText();
+					Frame frame = new Frame(pageUrl);
 					ChartContainer.this.add(frame);
 
 					logger.info("successfully saved report");

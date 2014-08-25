@@ -100,6 +100,9 @@ public class ChartFormatting extends FlowPanel {
 		createControls();
 	}
 
+	/**
+	 * re-rendering when control value changed
+	 */
 	public void reRender() {
 		this.clear();
 		type = component.getComponentType();
@@ -111,6 +114,9 @@ public class ChartFormatting extends FlowPanel {
 		}
 	}
 
+	/**
+	 * Creating Controls for Chart UI view Formating controls
+	 */
 	private void createControls() {
 		sortByMaximumValue();
 		if (type == DashboardComponentType.BAR
@@ -199,6 +205,9 @@ public class ChartFormatting extends FlowPanel {
 		createDataLabelFields();
 	}
 
+	/**
+	 * creating sortBy Maximum Value Control
+	 */
 	public void sortByMaximumValue() {
 		sortRowsBy = new SelectListBox<DashboardComponentFilter>("Sort Rows By");
 		DashboardComponentFilter[] values = DashboardComponentFilter.values();
@@ -241,6 +250,9 @@ public class ChartFormatting extends FlowPanel {
 		this.add(maximumValueDisplayed);
 	}
 
+	/**
+	 * Creating data Label Fields for all Charts
+	 */
 	private void createDataLabelFields() {
 		FlowPanel hDataLablePanel = new FlowPanel();
 		Label dataLabel = new Label("Data Label");
@@ -358,6 +370,9 @@ public class ChartFormatting extends FlowPanel {
 
 	}
 
+	/**
+	 * creating Table formating controls
+	 */
 	private void createTabelControls() {
 
 		if (type == DashboardComponentType.TABLE) {
@@ -371,7 +386,7 @@ public class ChartFormatting extends FlowPanel {
 						public void onValueChange(
 								ValueChangeEvent<Boolean> event) {
 							Boolean value = chatterPhoto.getValue();
-							// TODO no field to found ,in DashboardComponent
+							component.setShowPicturesOnTables(value);
 							refreshPanel.refreshChartPanel();
 						}
 					});
@@ -405,7 +420,6 @@ public class ChartFormatting extends FlowPanel {
 			minimumValue.setValue(String.valueOf(gaugeMin));
 			this.add(minimumValue);
 		}
-
 		lowRangeColor = new ColorItem("Low Range Color");
 		lowRangeColor.addStyleName("lowranangecolor");
 		lowRangeColor.addDomHandler(new ChangeHandler() {
@@ -435,7 +449,7 @@ public class ChartFormatting extends FlowPanel {
 							&& point2Value < maxValue) {
 						component.setIndicatorBreakpoint1(parseDouble);
 					} else {
-						// show an error
+						// show an error under text box
 					}
 
 				} catch (Exception e) {
@@ -470,7 +484,6 @@ public class ChartFormatting extends FlowPanel {
 
 			@Override
 			public void onBlur(BlurEvent event) {
-				// TODO Auto-generated method stub
 				String value = breakPoint2.getValue();
 				try {
 					double parseDouble = Double.parseDouble(value);
@@ -478,7 +491,7 @@ public class ChartFormatting extends FlowPanel {
 							&& point2Value < maxValue) {
 						component.setIndicatorBreakpoint2(parseDouble);
 					} else {
-						// show an error
+						// show an error under text box
 					}
 
 				} catch (Exception e) {
@@ -505,7 +518,6 @@ public class ChartFormatting extends FlowPanel {
 		}, ChangeEvent.getType());
 
 		highRangeColor.setColor(component.getIndicatorHighColor());
-		// TODO add value change handler
 		this.add(highRangeColor);
 
 		if (type == DashboardComponentType.GAUGE) {
@@ -515,7 +527,6 @@ public class ChartFormatting extends FlowPanel {
 
 				@Override
 				public void onBlur(BlurEvent event) {
-					// TODO Auto-generated method stub
 					String value = maximum.getValue();
 					try {
 						double parseDouble = Double.parseDouble(value);
@@ -523,7 +534,7 @@ public class ChartFormatting extends FlowPanel {
 								&& point2Value < maxValue) {
 							component.setGaugeMax(parseDouble);
 						} else {
-							// show an error
+							// show an error under text box
 						}
 					} catch (Exception e) {
 						// TODO: handle exception

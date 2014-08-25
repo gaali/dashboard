@@ -1,10 +1,21 @@
 package com.vimukti.dashboard.client.data;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class CustomObject {
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONValue;
 
+public class CustomObject implements IJSONData {
+
+	/**
+	 * name of the this object
+	 */
 	private String name;
+	/**
+	 * list of this object fields
+	 */
 	private List<Field> fields;
 
 	/**
@@ -35,6 +46,33 @@ public class CustomObject {
 	 */
 	public void setFields(List<Field> fields) {
 		this.fields = fields;
+	}
+
+	@Override
+	public void fromJSON(JSONObject jsonObject) {
+		JSONValue jName = jsonObject.get("name");
+		if (jName != null) {
+			name = jName.isString().stringValue();
+		}
+		JSONValue jsonValue = jsonObject.get("fields");
+		List<Field> fieldsList = new ArrayList<Field>();
+		if (jsonValue != null) {
+			JSONArray fieldsArray = jsonValue.isArray();
+			for (int i = 0; i < fieldsArray.size(); i++) {
+				Field field = new Field();
+				JSONValue jsonValue2 = fieldsArray.get(i);
+				field.fromJSON(jsonValue2.isObject());
+				fieldsList.add(field);
+			}
+		}
+		fields = fieldsList;
+	}
+
+	@Override
+	public JSONObject toJSON() {
+		// this object will not send to server so no need to implement this
+		// method
+		return null;
 	}
 
 }

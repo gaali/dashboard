@@ -17,12 +17,12 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.vimukti.dashboard.client.data.CustomObject;
+import com.vimukti.dashboard.client.Dashboard;
 import com.vimukti.dashboard.client.data.DashboardFilterOperation;
 import com.vimukti.dashboard.client.data.DashboardFilterOptions;
 import com.vimukti.dashboard.client.data.DashboardFilters;
 import com.vimukti.dashboard.client.data.Field;
-import com.vimukti.dashboard.client.data.Field.FieldType;
+import com.vimukti.dashboard.client.data.FieldType;
 import com.vimukti.dashboard.client.ui.utils.BaseDialog;
 import com.vimukti.dashboard.client.ui.utils.SelectListBox;
 import com.vimukti.dashboard.client.ui.utils.TextItem;
@@ -33,30 +33,27 @@ public class AddFilterDialog extends BaseDialog {
 	private SelectListBox<Field> fields;
 	private TextItem displayName;
 	private Button addRow;
-	private List<DashboardFilterOptions> filterOptionsList;
 	private List<FilterOptions> filterOptionsPanels;
-	private DashboardFilters options;
 	private DashboardFilters filter;
 	private FlowPanel optionsPanel;
 	private FlowPanel addRowfPanel;
-	private List<Field> fieldsList;
 
 	// use this dialog to as edit Filter dialog
-	public AddFilterDialog(DashboardFilters filter, List<Field> fieldsList) {
+	public AddFilterDialog(DashboardFilters filter) {
 		this.filter = filter;
-		this.fieldsList = fieldsList;
 		this.addStyleName("dashboard-filter-dialog");
 		createControlsw();
 	}
 
 	protected void createControlsw() {
-		if (fieldsList == null) {
-			prepareFields();
-			setDefaultValueForDisplayName();
-		}
+		prepareFields();
+		setDefaultValueForDisplayName();
+
 		displayName = new TextItem("DispalayName");
 		displayName.addStyleName("displayname");
 		this.add(displayName);
+		String displayLabel = filter.getDisplayLabel();
+		displayName.setText(displayLabel);
 
 		HorizontalPanel hpanel = new HorizontalPanel();
 		Label filterOptions = new Label("Filter Options");
@@ -66,23 +63,20 @@ public class AddFilterDialog extends BaseDialog {
 		hpanel.add(helpText);
 		this.add(hpanel);
 		prepareFilterOptionsPanel();
-		if (fieldsList != null) {
-			init();
-		}
-	}
-
-	private void init() {
-		// TODO
 	}
 
 	private void prepareFields() {
 		fields = new SelectListBox<Field>("Fields") {
 			@Override
 			public String getDisplayName(Field item) {
-				return item.toString();
+				return item.getName();
 			}
 		};
 		fields.addStyleName("fields");
+
+		List<Field> allFields = Dashboard.getAllFields();
+		fields.setItems(allFields);
+
 		// need to call Rpc very time open this dialog or when insert report get
 		// all fields belongs to that report if 2 option is ok then where to
 		// save those fields and how to access them when open filter dialog
@@ -97,20 +91,6 @@ public class AddFilterDialog extends BaseDialog {
 		this.add(fields);
 	}
 
-	public List<Field> prepareFieldsFromCustomObject(CustomObject object) {
-		List<Field> fields2 = object.getFields();
-		List<Field> filterdFields = new ArrayList<Field>();
-		for (Field field : fields2) {
-			FieldType fieldType = field.getFieldType();
-			if (fieldType == FieldType.REFRENCE) {
-				prepareFieldsFromCustomObject(field.getRefrenceType());
-				continue;
-			}
-			filterdFields.add(field);
-		}
-		return filterdFields;
-	}
-
 	private void setDefaultValueForDisplayName() {
 		fields.addHandler(new ValueChangeHandler<String>() {
 
@@ -123,9 +103,7 @@ public class AddFilterDialog extends BaseDialog {
 
 	private void prepareFilterOptionsPanel() {
 		optionsPanel = new FlowPanel();
-		if (fieldsList == null) {
-			optionsPanel.getElement().setPropertyBoolean("disabled", true);
-		}
+		optionsPanel.getElement().setPropertyBoolean("disabled", true);
 		optionsPanel.addStyleName("filter-optionspanel");
 
 		final VerticalPanel vPanel = new VerticalPanel();
@@ -149,7 +127,7 @@ public class AddFilterDialog extends BaseDialog {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (vPanel.getWidgetCount() <= MAXIMUM_FILTERS_OPTIONS_SIZE) {
-					addRow(vPanel);
+					addRow(vPanel, null);
 				}
 			}
 		});
@@ -157,35 +135,38 @@ public class AddFilterDialog extends BaseDialog {
 		addRowfPanel.add(addRow);
 
 		vPanel.add(addRowfPanel);
-		addRow(vPanel);
 
 		optionsPanel.add(vPanel);
 		this.add(optionsPanel);
-	}
-
-	private void addRow(VerticalPanel vPanel) {
-		FilterOptions createOptionRow = new FilterOptions();
-		createOptionRow.addStyleName("options-row");
 		filterOptionsPanels = new ArrayList<FilterOptions>();
-		filterOptionsPanels.add(createOptionRow);
-		vPanel.insert(createOptionRow, vPanel.getWidgetIndex(addRowfPanel));
-
-		if (options != null) {
-			List<DashboardFilterOptions> dashboardFilterOptions = options
-					.getDashboardFilterOptions();
-			for (DashboardFilterOptions filter : dashboardFilterOptions) {
-				FilterOptions createOptionRow1 = new FilterOptions();
-				createOptionRow1.operator
-						.setSelectedValue(filter.getOperator());
+		List<DashboardFilterOptions> dashboardFilterOptions = filter
+				.getDashboardFilterOptions();
+		if (dashboardFilterOptions != null) {
+			for (DashboardFilterOptions filterOption : dashboardFilterOptions) {
+				addRow(vPanel, filterOption);
 			}
 		}
 	}
 
+	/**
+	 * creating row(panel) for given filter option
+	 * 
+	 * @param vPanel
+	 * @param filterOption
+	 */
+	private void addRow(VerticalPanel vPanel,
+			DashboardFilterOptions filterOption) {
+		FilterOptions createOptionRow = new FilterOptions(filterOption);
+		createOptionRow.addStyleName("options-row");
+		filterOptionsPanels.add(createOptionRow);
+		vPanel.insert(createOptionRow, vPanel.getWidgetIndex(addRowfPanel));
+	}
+
 	@Override
 	protected boolean onOK() {
-		update();
 		filter.setName(fields.getSelectedValue().getName());
 		filter.setDisplayLabel(displayName.getText());
+		ArrayList<DashboardFilterOptions> filterOptionsList = getFilterOptionsList();
 		filter.setDashboardFilterOptions(filterOptionsList);
 		return true;
 	}
@@ -196,28 +177,28 @@ public class AddFilterDialog extends BaseDialog {
 
 	}
 
-	public void update() {
-		filterOptionsList = new ArrayList<DashboardFilterOptions>();
+	public ArrayList<DashboardFilterOptions> getFilterOptionsList() {
+		ArrayList<DashboardFilterOptions> filterOptionsList = new ArrayList<DashboardFilterOptions>();
 		for (FilterOptions panel : filterOptionsPanels) {
 			DashboardFilterOperation selectedOperator = panel.operator
 					.getSelectedValue();
 			String value = panel.valueBox.getValue();
 			String value2 = panel.valueBox2.getText();
 
-			DashboardFilterOptions filter = new DashboardFilterOptions();
-			filter.setOperator(selectedOperator);
+			DashboardFilterOptions filterOption = panel.filterOption;
+			filterOption.setOperator(selectedOperator);
 			if (selectedOperator == DashboardFilterOperation.BETWEEN) {
 				List<String> listOfValues = new ArrayList<String>();
 				listOfValues.add(value);
 				listOfValues.add("and");
 				listOfValues.add(value2);
-				filter.setValues(listOfValues);
+				filterOption.setValues(listOfValues);
 			} else {
-				filter.setValue(value);
+				filterOption.setValue(value);
 			}
-			filterOptionsList.add(filter);
+			filterOptionsList.add(filterOption);
 		}
-
+		return filterOptionsList;
 	}
 
 	class FilterOptions extends HorizontalPanel {
@@ -225,6 +206,13 @@ public class AddFilterDialog extends BaseDialog {
 		TextBox groupName;
 		TextBox valueBox;
 		TextBox valueBox2;
+		private DashboardFilterOptions filterOption;
+
+		public FilterOptions(DashboardFilterOptions filterOption) {
+			super();
+			this.filterOption = filterOption;
+			createControlsForOptions();
+		}
 
 		/**
 		 * @return the operator
@@ -286,14 +274,9 @@ public class AddFilterDialog extends BaseDialog {
 			this.valueBox2 = valueBox2;
 		}
 
-		public FilterOptions() {
-			createControlsForOptions();
-		}
-
 		private void createControlsForOptions() {
 			// TODO add operators by selected field. operators are differ by
-			// field
-			// type
+			// field type
 			operator = new SelectListBox<DashboardFilterOperation>() {
 				@Override
 				public String getDisplayName(DashboardFilterOperation item) {
@@ -301,10 +284,11 @@ public class AddFilterDialog extends BaseDialog {
 				}
 			};
 			operator.addStyleName("operator");
-			DashboardFilterOperation[] values = DashboardFilterOperation
+
+			DashboardFilterOperation[] filterOperators = DashboardFilterOperation
 					.values();
 			List<DashboardFilterOperation> operatersList = Arrays
-					.asList(values);
+					.asList(filterOperators);
 			List<DashboardFilterOperation> filteredOperaters = new ArrayList<DashboardFilterOperation>();
 			if (fields.getSelectedValue() != null) {
 				if (fields.getSelectedValue().getFieldType() == FieldType.INT) {
@@ -324,43 +308,54 @@ public class AddFilterDialog extends BaseDialog {
 			}
 			operator.setItems(filteredOperaters);
 
+			DashboardFilterOperation selectedOperation = filterOption
+					.getOperator();
+
+			operator.setSelectedValue(selectedOperation);
+
 			groupName = new TextBox();
+			groupName.setText(filterOption.getName());
 			valueBox = new TextBox();
-			valueBox2 = new TextBox();
-			Label and = new Label("and");
+			String value = filterOption.getValue();
+			valueBox.setText(value);
+
 			HTML searchIcon = new HTML("<i class=searchIcon></i>");
-			searchIcon.addDomHandler(new ClickHandler() {
+			searchIcon.addClickHandler(new ClickHandler() {
 
 				@Override
 				public void onClick(ClickEvent event) {
 					// TODO Auto-generated method stub
 
 				}
-			}, ClickEvent.getType());
+			});
 			final HTML removeIcon = new HTML("<i class =removeicon></i>");
-			removeIcon.addDomHandler(new ClickHandler() {
+			removeIcon.addClickHandler(new ClickHandler() {
 
 				@Override
 				public void onClick(ClickEvent event) {
-					HorizontalPanel parent2 = (HorizontalPanel) removeIcon
-							.getParent();
-					VerticalPanel parent3 = (VerticalPanel) parent2.getParent();
-					parent3.remove(parent2);
+					FilterOptions.this.removeFromParent();
+					filterOptionsPanels.remove(FilterOptions.this);
 				}
-			}, ClickEvent.getType());
+			});
 
 			this.add(operator);
 			this.add(groupName);
 			this.add(valueBox);
 			if (operator.getSelectedValue() == DashboardFilterOperation.BETWEEN) {
+				Label and = new Label("and");
 				this.add(and);
+				valueBox2 = new TextBox();
 				this.add(valueBox2);
+
+				List<String> values = filterOption.getValues();
+
+				valueBox.setText(values.get(0));
+				valueBox2.setText(values.get(1));
 			}
 			// TODO add this icon to panel by field type
 			this.add(searchIcon);
 			this.add(removeIcon);
 		}
-
 	}
 
 }

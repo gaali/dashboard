@@ -82,21 +82,24 @@ public class SelectListBox<T> extends ListBox {
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public T getSelectedValue() {
 		int index = getSelectedIndex();
 		if (index == -1) {
 			return null;
 		}
-		return (T) items.toArray()[index];
+		return items.get(index);
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * @param index
+	 *            pass the index number int value
+	 * @return gets the values for given index and returns the object
+	 */
 	public T getValueByIdex(int index) {
 		if (items.toArray().length < index) {
 			return null;
 		}
-		return (T) items.toArray()[index];
+		return items.get(index);
 	}
 
 	public void clearError() {

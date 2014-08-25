@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.vimukti.dashboard.client.Dashboard;
 import com.vimukti.dashboard.client.data.DashboardComponent;
 import com.vimukti.dashboard.client.data.DashboardComponentType;
 import com.vimukti.dashboard.client.portlet.ui.controls.Portlet;
@@ -68,6 +69,7 @@ public class PortletContainerPanel extends AbsolutePanel implements IDroppable {
 			DataSourceListType type = control.getType();
 			if (type == DataSourceListType.REPORT) {
 				portlet = portletFactory.createPortlerReport(control.getId());
+				Dashboard.retrieveAllCustomObjects();
 			} else if (type == DataSourceListType.PAGE) {
 				portlet = portletFactory.createPortlerPage(control.getId());
 			}
